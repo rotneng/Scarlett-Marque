@@ -47,7 +47,14 @@ const CartPage = () => {
       <Button
         startIcon={<ArrowBackIcon />}
         onClick={() => navigate("/")}
-        sx={{ mb: 3 }}
+        variant="contained"
+        sx={{
+          mt: 2,
+          bgcolor: "#0f2a1d",
+          mb: 3,
+          // width: "20%",
+          borderRadius: "20px",
+        }}
       >
         Back to Store
       </Button>
@@ -107,7 +114,7 @@ const CartPage = () => {
             <Button
               variant="contained"
               fullWidth
-              sx={{ mt: 2, bgcolor: "#0f2a1d" }}
+              sx={{ mt: 2, bgcolor: "#0f2a1d", borderRadius: "20px" }}
             >
               Checkout
             </Button>

@@ -83,7 +83,13 @@ const ProductDetails = () => {
       <Button
         startIcon={<ArrowBackIcon />}
         onClick={() => navigate("/")}
-        sx={{ mb: 3 }}
+        variant="contained"
+        sx={{
+          mt: 2,
+          bgcolor: "#0f2a1d",
+          mb: 3,
+          borderRadius: "20px",
+        }}
       >
         Back to Store
       </Button>

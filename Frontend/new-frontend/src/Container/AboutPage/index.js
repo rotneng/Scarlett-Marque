@@ -7,6 +7,7 @@ import InstagramIcon from "@mui/icons-material/Instagram";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import FacebookIcon from "@mui/icons-material/Facebook";
 import PhoneIcon from "@mui/icons-material/Phone";
+import EmailIcon from "@mui/icons-material/Email";
 
 const AboutPage = () => {
   const navigate = useNavigate();
@@ -167,6 +168,21 @@ const AboutPage = () => {
             style={{ color: "inherit", textDecoration: "none" }}
           >
             <FacebookIcon
+              sx={{
+                fontSize: 30,
+                cursor: "pointer",
+                "&:hover": { color: "#4267B2" },
+              }}
+            />
+          </a>
+
+          <a
+            href="https://mail.google.com/mail/u/0/?tab=rm&ogbl#inbox/FMfcgzQcqbfvRcPWmhLKnQQczSrmHBzq?compose=CllgCJTHWDGRHrxwfxZtRRzCgjmZSFcTrRLdfWGRlJmLvHKsGsvwnSvRJZcKFSzVNrcbSvBCgZg"
+            target="blank"
+            rel="noopener noreferrer"
+            style={{ color: "inherit", textDecoration: "none" }}
+          >
+            <EmailIcon
               sx={{
                 fontSize: 30,
                 cursor: "pointer",

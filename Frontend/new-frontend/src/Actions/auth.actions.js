@@ -6,7 +6,7 @@ export const login = (loginData, navigate) => {
     try {
       dispatch({ type: authConstants.LOGIN_REQUEST });
       
-      const res = await axios.post("http://localhost:3000/user/loginUser", loginData);
+      const res = await axios.post("http://172.20.10.4:3000/user/loginUser", loginData);
 
       if (res.status === 200) {
         const { token, username, role } = res.data;
