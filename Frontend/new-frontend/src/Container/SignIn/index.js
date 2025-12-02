@@ -88,11 +88,11 @@ const SignIn = () => {
           padding: "20px",
         }}
       >
-        {(localError || auth.error) && (
+        {/* {(localError || auth.error) && (
           <Alert sx={{ width: "100%" }} severity="error">
             {localError || auth.error}
           </Alert>
-        )}
+        )} */}
 
         <TextField
           label="Username"

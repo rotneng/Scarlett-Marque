@@ -76,8 +76,8 @@ export const register = (signUpData, navigate) => {
       console.log("error in register action", error);
       
       const errorMessage = error.response && error.response.data.message 
-        ? error.response.data.message 
-        : "Registration Failed";
+      //   ? error.response.data.message 
+      //   : "Registration Failed";
 
       dispatch({
         type: authConstants.REGISTER_FAILURE,

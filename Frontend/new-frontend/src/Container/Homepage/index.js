@@ -21,7 +21,8 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
-import InfoIcon from '@mui/icons-material/Info';
+import InfoIcon from "@mui/icons-material/Info";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { getProducts, deleteProduct } from "../../Actions/product.actions";
@@ -112,7 +113,7 @@ const Homepage = () => {
           style={{
             backgroundColor: "white",
             borderRadius: "150px",
-            width: "40%",
+            width: "30%",
             minWidth: "200px",
           }}
           type="text"
@@ -130,13 +131,16 @@ const Homepage = () => {
         />
 
         <Box style={{ display: "flex", gap: "10px", alignItems: "center" }}>
-
           {!isAdmin && (
-              <Tooltip title="About">
-            <InfoIcon onClick={() => navigate("/about")}/>
-          </Tooltip>
+            <Tooltip title="About">
+              <InfoIcon onClick={() => navigate("/about")} />
+            </Tooltip>
           )}
-          {isAdmin && <AddIcon onClick={() => navigate("/addproducts")} />}
+          {isAdmin && (
+            <Tooltip title=" Add Products">
+              <AddIcon onClick={() => navigate("/addproducts")} />
+            </Tooltip>
+          )}
 
           {!isAdmin && (
             <Tooltip title="View Cart">
@@ -174,11 +178,10 @@ const Homepage = () => {
                 onClick={() => navigate("/signIn")}
                 style={{ color: "white" }}
               >
-                <LoginIcon />
+                <AccountCircleIcon />
               </IconButton>
             </Tooltip>
           )}
-
         </Box>
       </Box>
 
