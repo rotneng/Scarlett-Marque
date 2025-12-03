@@ -1,63 +1,90 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-const loadCart = () => {
-  const savedCart = localStorage.getItem("cart");
-  return savedCart ? JSON.parse(savedCart) : [];
+const loadLocalCart = () => {
+  try {
+    const serializedCart = localStorage.getItem("cart");
+    return serializedCart ? JSON.parse(serializedCart) : [];
+  } catch (e) {
+    return [];
+  }
 };
 
 const cartSlice = createSlice({
   name: "cart",
   initialState: {
-    cartItems: loadCart(),
+    cartItems: loadLocalCart(),
+    updatingCart: false,
+    error: null,
   },
   reducers: {
-    addToCart: (state, action) => {
-      const item = action.payload;
-      const existItem = state.cartItems.find((x) => x._id === item._id);
+    setCartLoading: (state, action) => {
+      state.updatingCart = action.payload;
+    },
 
-      if (existItem) {
-        existItem.qty += item.qty;
+    setCart: (state, action) => {
+      state.cartItems = action.payload;
+      state.updatingCart = false;
+      state.error = null;
+    },
+
+    setCartError: (state, action) => {
+      state.updatingCart = false;
+      state.error = action.payload;
+    },
+
+    addToCartLocal: (state, action) => {
+      const { product, qty } = action.payload;
+
+      const existingIndex = state.cartItems.findIndex(
+        (item) => item._id === product._id
+      );
+
+      if (existingIndex >= 0) {
+        state.cartItems[existingIndex].qty += qty;
+        if (state.cartItems[existingIndex].qty <= 0) {
+          state.cartItems.splice(existingIndex, 1);
+        }
       } else {
-        state.cartItems.push(item);
+        if (qty > 0) {
+          const newItem = {
+            _id: product._id,
+            title: product.title,
+            image: product.image,
+            price: product.price,
+            category: product.category,
+            qty: qty,
+          };
+          state.cartItems.push(newItem);
+        }
       }
 
       localStorage.setItem("cart", JSON.stringify(state.cartItems));
+      state.updatingCart = false;
     },
 
-    removeFromCart: (state, action) => {
-      const idToRemove = action.payload;
-      state.cartItems = state.cartItems.filter((x) => x._id !== idToRemove);
+    removeFromCartLocal: (state, action) => {
+      const productId = action.payload;
+      state.cartItems = state.cartItems.filter(
+        (item) => item._id !== productId
+      );
       localStorage.setItem("cart", JSON.stringify(state.cartItems));
-    },
-
-    increaseQty: (state, action) => {
-      const item = state.cartItems.find((x) => x._id === action.payload);
-      if (item) {
-        item.qty += 1;
-        localStorage.setItem("cart", JSON.stringify(state.cartItems));
-      }
-    },
-
-    decreaseQty: (state, action) => {
-      const item = state.cartItems.find((x) => x._id === action.payload);
-      if (item && item.qty > 1) {
-        item.qty -= 1;
-        localStorage.setItem("cart", JSON.stringify(state.cartItems));
-      }
+      state.updatingCart = false;
     },
 
     clearCart: (state) => {
       state.cartItems = [];
       localStorage.removeItem("cart");
+      state.updatingCart = false;
     },
   },
 });
 
 export const {
-  addToCart,
-  removeFromCart,
-  increaseQty,
-  decreaseQty,
+  setCart,
+  setCartLoading,
+  setCartError,
+  addToCartLocal,
+  removeFromCartLocal,
   clearCart,
 } = cartSlice.actions;
 

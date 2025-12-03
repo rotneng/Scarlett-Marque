@@ -17,7 +17,8 @@ import RemoveIcon from "@mui/icons-material/Remove";
 import EditIcon from "@mui/icons-material/Edit";
 
 import { getProducts } from "../../Actions/product.actions";
-import { addToCart } from "../../Reducers/cartSlice";
+
+import { addItemToCart } from "../../Actions/cartActions";
 
 const ProductDetails = () => {
   const { id } = useParams();
@@ -28,11 +29,12 @@ const ProductDetails = () => {
   const products = productState?.products || [];
   const loading = productState?.loading || false;
 
-  const [product, setProduct] = useState(null);
-  const [qty, setQty] = useState(1);
   const userString = localStorage.getItem("user");
   const user = userString ? JSON.parse(userString) : null;
   const isAdmin = user && user.role === "admin";
+
+  const [product, setProduct] = useState(null);
+  const [qty, setQty] = useState(1);
 
   useEffect(() => {
     if (products.length > 0) {
@@ -44,37 +46,40 @@ const ProductDetails = () => {
   }, [id, products, dispatch]);
 
   const handleIncreaseQty = () => {
-    if (product && qty < product.stock) {
-      setQty(qty + 1);
-    }
+    setQty((prev) => prev + 1);
   };
 
   const handleDecreaseQty = () => {
     if (qty > 1) {
-      setQty(qty - 1);
+      setQty((prev) => prev - 1);
     }
   };
 
   const handleAddToCart = () => {
     if (!product) return;
 
-    const itemToAdd = {
-      _id: product._id,
-      title: product.title,
-      price: product.price,
-      image: product.image,
-      category: product.category,
-      stock: product.stock,
-      qty: qty,
-    };
-
-    dispatch(addToCart(itemToAdd));
-    alert(`Added ${qty} item(s) to cart!`);
+    dispatch(addItemToCart(product, qty));
+    alert(`Added ${qty} ${product.title} to cart`);
   };
 
-  if (loading) return <CircularProgress />;
+  if (loading) {
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", mt: 10 }}>
+        <CircularProgress sx={{ color: "#0f2a1d" }} />
+      </Box>
+    );
+  }
 
-  if (!product) return <Typography>Product not found</Typography>;
+  if (!product) {
+    return (
+      <Box sx={{ textAlign: "center", mt: 10 }}>
+        <Typography variant="h5">Product not found</Typography>
+        <Button onClick={() => navigate("/")} sx={{ mt: 2 }}>
+          Back to Home
+        </Button>
+      </Box>
+    );
+  }
 
   return (
     <Box
@@ -89,6 +94,7 @@ const ProductDetails = () => {
           bgcolor: "#0f2a1d",
           mb: 3,
           borderRadius: "20px",
+          "&:hover": { bgcolor: "#144430" },
         }}
       >
         Back to Store
@@ -113,11 +119,13 @@ const ProductDetails = () => {
               variant="h4"
               sx={{ color: "#0f2a1d", fontWeight: "bold", my: 2 }}
             >
-              ₦{product.price}
+              ₦{product.price.toLocaleString()}
             </Typography>
-            <Typography sx={{ mb: 4 }}>{product.description}</Typography>
+            <Typography sx={{ mb: 4, color: "#555", lineHeight: 1.6 }}>
+              {product.description}
+            </Typography>
 
-            {!isAdmin && product.stock > 0 && (
+            {!isAdmin && (
               <Box
                 sx={{ display: "flex", alignItems: "center", gap: 2, mb: 3 }}
               >
@@ -128,6 +136,7 @@ const ProductDetails = () => {
                     alignItems: "center",
                     border: "1px solid #ddd",
                     borderRadius: "50px",
+                    px: 1,
                   }}
                 >
                   <IconButton onClick={handleDecreaseQty} disabled={qty <= 1}>
@@ -136,10 +145,7 @@ const ProductDetails = () => {
                   <Typography sx={{ mx: 2, fontWeight: "bold" }}>
                     {qty}
                   </Typography>
-                  <IconButton
-                    onClick={handleIncreaseQty}
-                    disabled={qty >= product.stock}
-                  >
+                  <IconButton onClick={handleIncreaseQty}>
                     <AddIcon />
                   </IconButton>
                 </Box>
@@ -164,10 +170,14 @@ const ProductDetails = () => {
                 startIcon={<ShoppingCartIcon />}
                 onClick={handleAddToCart}
                 fullWidth
-                disabled={product.stock <= 0}
-                sx={{ bgcolor: "#0f2a1d", py: 1.5, borderRadius: "30px" }}
+                sx={{
+                  bgcolor: "#0f2a1d",
+                  py: 1.5,
+                  borderRadius: "30px",
+                  "&:hover": { bgcolor: "#144430" },
+                }}
               >
-                {product.stock > 0 ? "Add to Cart" : "Out of Stock"}
+                Add to Cart
               </Button>
             )}
           </Grid>

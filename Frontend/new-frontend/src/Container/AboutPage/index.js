@@ -177,7 +177,7 @@ const AboutPage = () => {
           </a>
 
           <a
-            href="https://mail.google.com/mail/u/0/?tab=rm&ogbl#inbox/FMfcgzQcqbfvRcPWmhLKnQQczSrmHBzq?compose=CllgCJTHWDGRHrxwfxZtRRzCgjmZSFcTrRLdfWGRlJmLvHKsGsvwnSvRJZcKFSzVNrcbSvBCgZg"
+            href="https://mail.google.com/mail/u/0/?tab=rm&ogbl#inbox?compose=CllgCJTHWDGRHrxwfxZtRRzCgjmZSFcTrRLdfWGRlJmLvHKsGsvwnSvRJZcKFSzVNrcbSvBCgZg"
             target="blank"
             rel="noopener noreferrer"
             style={{ color: "inherit", textDecoration: "none" }}

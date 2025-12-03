@@ -5,6 +5,7 @@ const bodyParser = require("body-parser");
 const productRoute = require("./Route/productRoute");
 const messageRoute = require("./Route/messageRoute");
 const userRoute = require("./Route/userRoute");
+const cartRoutes = require("./Route/cartRoutes");
 const app = express();
 const port = 3000;
 
@@ -16,6 +17,7 @@ app.use(express.json());
 app.use("/product", productRoute);
 app.use("/messages", messageRoute);
 app.use("/user", userRoute);
+app.use("/cart", cartRoutes);
 
 mongoose
   .connect(
