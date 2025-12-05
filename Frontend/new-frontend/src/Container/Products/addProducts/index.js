@@ -4,6 +4,7 @@ import {
   TextField,
   Typography,
   CircularProgress,
+  Paper,
 } from "@mui/material";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -67,7 +68,6 @@ const AddProducts = () => {
         formDataToSend.append(key, formData[key]);
       });
 
-      // Append image
       formDataToSend.append("image", image);
 
       await dispatch(addProduct(formDataToSend, navigate));
@@ -80,30 +80,36 @@ const AddProducts = () => {
   };
 
   return (
-    <Box sx={{ pb: 5 }}>
+    <Box sx={{ pb: 5, backgroundColor: "#f4f4f4", minHeight: "100vh" }}>
       <Box
         sx={{
           bgcolor: "#0f2a1d",
           color: "white",
-          p: 3,
+          p: { xs: 2, md: 3 },
           textAlign: "center",
-          mb: 4,
+          mb: { xs: 3, md: 4 },
+          boxShadow: 2,
         }}
       >
-        <Typography variant="h4" fontWeight="bold">
+        <Typography
+          variant="h4"
+          fontWeight="bold"
+          sx={{ fontSize: { xs: "1.5rem", md: "2.125rem" } }}
+        >
           Add Products
         </Typography>
       </Box>
 
-      <Box
+      <Paper
+        elevation={3}
         sx={{
           display: "flex",
           flexDirection: "column",
           gap: 2,
           maxWidth: "600px",
+          width: { xs: "90%", sm: "80%", md: "600px" },
           margin: "0 auto",
-          p: 2,
-          boxShadow: 3,
+          p: { xs: 2, md: 4 },
           borderRadius: 2,
         }}
       >
@@ -125,7 +131,13 @@ const AddProducts = () => {
           fullWidth
         />
 
-        <Box sx={{ display: "flex", gap: 2 }}>
+        <Box
+          sx={{
+            display: "flex",
+            gap: 2,
+            flexDirection: { xs: "column", sm: "row" },
+          }}
+        >
           <TextField
             label="Price"
             name="price"
@@ -153,20 +165,29 @@ const AddProducts = () => {
           fullWidth
           required
         />
-        <TextField
-          label="Sizes (e.g. S, M, L)"
-          name="sizes"
-          onChange={handleInputChange}
-          value={formData.sizes}
-          fullWidth
-        />
-        <TextField
-          label="Colors (e.g. Red, Blue)"
-          name="colors"
-          onChange={handleInputChange}
-          value={formData.colors}
-          fullWidth
-        />
+
+        <Box
+          sx={{
+            display: "flex",
+            gap: 2,
+            flexDirection: { xs: "column", sm: "row" },
+          }}
+        >
+          <TextField
+            label="Sizes (e.g. S, M, L)"
+            name="sizes"
+            onChange={handleInputChange}
+            value={formData.sizes}
+            fullWidth
+          />
+          <TextField
+            label="Colors (e.g. Red, Blue)"
+            name="colors"
+            onChange={handleInputChange}
+            value={formData.colors}
+            fullWidth
+          />
+        </Box>
 
         <Box
           sx={{
@@ -174,20 +195,32 @@ const AddProducts = () => {
             p: 2,
             borderRadius: 1,
             textAlign: "center",
+            backgroundColor: "#fafafa",
           }}
         >
           <Button
             variant="outlined"
             component="label"
             startIcon={<CloudUpload />}
-            sx={{ mb: 1 }}
+            sx={{
+              mb: 1,
+              color: "#0f2a1d",
+              borderColor: "#0f2a1d",
+              "&:hover": {
+                borderColor: "#144430",
+                bgcolor: "rgba(15, 42, 29, 0.04)",
+              },
+            }}
           >
             {image ? "Change Image" : "Upload Image"}
             <input type="file" hidden onChange={handleImage} accept="image/*" />
           </Button>
 
           {image && (
-            <Typography variant="body2" color="primary">
+            <Typography
+              variant="body2"
+              sx={{ color: "#0f2a1d", fontWeight: "bold" }}
+            >
               Selected: {image.name}
             </Typography>
           )}
@@ -208,11 +241,17 @@ const AddProducts = () => {
             color: "white",
             py: 1.5,
             fontSize: "16px",
+            "&:hover": { bgcolor: "#144430" },
+            mt: 1,
           }}
         >
-          {loading ? "Adding" : "Submit"}
+          {loading ? (
+            <CircularProgress size={24} color="inherit" />
+          ) : (
+            "Submit Product"
+          )}
         </Button>
-      </Box>
+      </Paper>
     </Box>
   );
 };

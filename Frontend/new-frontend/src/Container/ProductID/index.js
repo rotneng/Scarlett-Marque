@@ -17,7 +17,6 @@ import RemoveIcon from "@mui/icons-material/Remove";
 import EditIcon from "@mui/icons-material/Edit";
 
 import { getProducts } from "../../Actions/product.actions";
-
 import { addItemToCart } from "../../Actions/cartActions";
 
 const ProductDetails = () => {
@@ -83,7 +82,12 @@ const ProductDetails = () => {
 
   return (
     <Box
-      sx={{ p: 4, maxWidth: "1200px", margin: "0 auto", minHeight: "100vh" }}
+      sx={{
+        p: { xs: 2, md: 4 },
+        maxWidth: "1200px",
+        margin: "0 auto",
+        minHeight: "100vh",
+      }}
     >
       <Button
         startIcon={<ArrowBackIcon />}
@@ -95,33 +99,56 @@ const ProductDetails = () => {
           mb: 3,
           borderRadius: "20px",
           "&:hover": { bgcolor: "#144430" },
+          width: { xs: "100%", sm: "auto" },
         }}
       >
         Back to Store
       </Button>
 
-      <Paper elevation={0} sx={{ p: 0, borderRadius: 2 }}>
-        <Grid container spacing={6}>
+      <Paper elevation={0} sx={{ p: { xs: 0, md: 0 }, borderRadius: 2 }}>
+        <Grid container spacing={{ xs: 4, md: 6 }}>
+          {" "}
           <Grid item xs={12} md={6}>
             <Box
               component="img"
               src={product.image || "https://via.placeholder.com/500"}
               alt={product.title}
-              sx={{ width: "100%", maxHeight: "500px", objectFit: "contain" }}
+              sx={{
+                width: "100%",
+                maxHeight: { xs: "350px", md: "500px" },
+                objectFit: "contain",
+              }}
             />
           </Grid>
-
           <Grid item xs={12} md={6}>
-            <Typography variant="h3" fontWeight="bold">
+            <Typography
+              variant="h3"
+              fontWeight="bold"
+              sx={{ fontSize: { xs: "1.75rem", md: "3rem" } }}
+            >
               {product.title}
             </Typography>
+
             <Typography
               variant="h4"
-              sx={{ color: "#0f2a1d", fontWeight: "bold", my: 2 }}
+              sx={{
+                color: "#0f2a1d",
+                fontWeight: "bold",
+                my: 2,
+                fontSize: { xs: "1.5rem", md: "2.125rem" },
+              }}
             >
               ₦{product.price.toLocaleString()}
             </Typography>
-            <Typography sx={{ mb: 4, color: "#555", lineHeight: 1.6 }}>
+
+            <Typography
+              sx={{
+                mb: 4,
+                color: "#555",
+                lineHeight: 1.6,
+                fontSize: { xs: "0.9rem", md: "1rem" },
+              }}
+            >
               {product.description}
             </Typography>
 

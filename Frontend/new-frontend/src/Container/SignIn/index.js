@@ -7,6 +7,7 @@ import {
   IconButton,
   Typography,
   CircularProgress,
+  Paper,
 } from "@mui/material";
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -60,116 +61,135 @@ const SignIn = () => {
   }, [auth.authenticate, navigate]);
 
   return (
-    <Box sx={{ pb: 5 }}>
+    <Box
+      sx={{
+        pb: 5,
+        minHeight: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: { xs: "flex-start" },
+        backgroundColor: "#f4f4f4",
+      }}
+    >
       <Box
         sx={{
-          fontSize: "30px",
+          fontSize: { xs: "24px", md: "30px" },
           fontWeight: "bolder",
           backgroundColor: "#0f2a1d",
           color: "white",
-          padding: "20px",
+          padding: { xs: "15px", md: "20px" },
           textAlign: "center",
-          mb: 4,
+          mb: { xs: 2, md: 4 },
+          width: "100%",
+          boxShadow: 2,
         }}
       >
         Sign In Page
       </Box>
 
-      <Box
-        component="form"
-        onSubmit={handleSignIn}
+      <Paper
+        elevation={3}
         sx={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          gap: 3,
-          maxWidth: "500px",
-          margin: "0 auto",
-          padding: "20px",
+          width: { xs: "90%", sm: "500px" },
+          p: { xs: 2, md: 4 },
+          borderRadius: "12px",
+          backgroundColor: "white",
         }}
       >
-        {(localError || auth.error) && (
-          <Alert sx={{ width: "100%" }} severity="error">
-            {localError || auth.error}
-          </Alert>
-        )}
-
-        <TextField
-          label="Username"
-          fullWidth
-          value={username}
-          onChange={handleInput(setUsername)}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <PersonIcon color="action" />
-              </InputAdornment>
-            ),
-          }}
-        />
-
-        <TextField
-          type={showPassword ? "text" : "password"}
-          label="Password"
-          fullWidth
-          value={password}
-          onChange={handleInput(setPassword)}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <LockIcon color="action" />
-              </InputAdornment>
-            ),
-            endAdornment: (
-              <InputAdornment position="end">
-                <IconButton
-                  onClick={() => setShowPassword(!showPassword)}
-                  edge="end"
-                >
-                  {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
-                </IconButton>
-              </InputAdornment>
-            ),
-          }}
-        />
-
-        <Button
-          type="submit"
-          variant="contained"
-          disabled={auth.authenticating}
+        <Box
+          component="form"
+          onSubmit={handleSignIn}
           sx={{
-            fontSize: 16,
-            backgroundColor: "#0f2a1d",
-            color: "white",
-            padding: "12px 40px",
-            marginTop: 2,
-            borderRadius: "30px",
-            "&:hover": { backgroundColor: "#1a4d33" },
-            width: "50%",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: 3,
           }}
         >
-          {auth.authenticating ? (
-            <CircularProgress size={24} style={{ color: "white" }} />
-          ) : (
-            "Sign In"
+          {(localError || auth.error) && (
+            <Alert sx={{ width: "100%" }} severity="error">
+              {localError || auth.error}
+            </Alert>
           )}
-        </Button>
 
-        <Typography variant="body2" sx={{ mt: 2 }}>
-          Don't have an account?
-          <span
-            style={{
-              color: "#0f2a1d",
-              fontWeight: "bold",
-              cursor: "pointer",
-              marginLeft: "5px",
+          <TextField
+            label="Username"
+            fullWidth
+            value={username}
+            onChange={handleInput(setUsername)}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <PersonIcon color="action" />
+                </InputAdornment>
+              ),
             }}
-            onClick={() => navigate("/signup")}
+          />
+
+          <TextField
+            type={showPassword ? "text" : "password"}
+            label="Password"
+            fullWidth
+            value={password}
+            onChange={handleInput(setPassword)}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <LockIcon color="action" />
+                </InputAdornment>
+              ),
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    onClick={() => setShowPassword(!showPassword)}
+                    edge="end"
+                  >
+                    {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
+          />
+
+          <Button
+            type="submit"
+            variant="contained"
+            disabled={auth.authenticating}
+            sx={{
+              fontSize: 16,
+              backgroundColor: "#0f2a1d",
+              color: "white",
+              padding: "12px 40px",
+              marginTop: 2,
+              borderRadius: "30px",
+              "&:hover": { backgroundColor: "#1a4d33" },
+              width: { xs: "100%", sm: "50%" },
+            }}
           >
-            Sign Up
-          </span>
-        </Typography>
-      </Box>
+            {auth.authenticating ? (
+              <CircularProgress size={24} style={{ color: "white" }} />
+            ) : (
+              "Sign In"
+            )}
+          </Button>
+
+          <Typography variant="body2" sx={{ mt: 2, textAlign: "center" }}>
+            Don't have an account?
+            <span
+              style={{
+                color: "#0f2a1d",
+                fontWeight: "bold",
+                cursor: "pointer",
+                marginLeft: "5px",
+              }}
+              onClick={() => navigate("/signup")}
+            >
+              Sign Up
+            </span>
+          </Typography>
+        </Box>
+      </Paper>
     </Box>
   );
 };

@@ -73,21 +73,30 @@ const CartPage = () => {
       <Box
         sx={{
           textAlign: "center",
-          mt: 10,
+          mt: { xs: 5, md: 10 },
           p: 3,
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
         }}
       >
-        <ShoppingBagIcon sx={{ fontSize: 80, color: "#ccc", mb: 2 }} />
-        <Typography variant="h5" sx={{ mb: 1, fontWeight: "bold" }}>
+        <ShoppingBagIcon
+          sx={{ fontSize: { xs: 60, md: 80 }, color: "#ccc", mb: 2 }}
+        />
+        <Typography
+          variant="h5"
+          sx={{
+            mb: 1,
+            fontWeight: "bold",
+            fontSize: { xs: "1.25rem", md: "1.5rem" },
+          }}
+        >
           Your Cart is Empty
         </Typography>
         <Button
           onClick={() => navigate("/")}
           variant="contained"
-          sx={{ bgcolor: "#0f2a1d", borderRadius: "30px", mt: 2 }}
+          sx={{ bgcolor: "#0f2a1d", borderRadius: "30px", mt: 2, px: 4 }}
         >
           Start Shopping
         </Button>
@@ -96,12 +105,25 @@ const CartPage = () => {
   }
 
   return (
-    <Box sx={{ p: 3, maxWidth: "1200px", margin: "0 auto", minHeight: "90vh" }}>
+    <Box
+      sx={{
+        p: { xs: 2, md: 3 },
+        maxWidth: "1200px",
+        margin: "0 auto",
+        minHeight: "90vh",
+      }}
+    >
       <Button
         startIcon={<ArrowBackIcon />}
         onClick={() => navigate("/")}
         variant="contained"
-        sx={{ mt: 2, bgcolor: "#0f2a1d", mb: 3, borderRadius: "20px" }}
+        sx={{
+          mt: 2,
+          bgcolor: "#0f2a1d",
+          mb: 3,
+          borderRadius: "20px",
+          width: { xs: "100%", sm: "auto" },
+        }}
       >
         Back to Store
       </Button>
@@ -109,7 +131,12 @@ const CartPage = () => {
       <Typography
         variant="h4"
         fontWeight="bold"
-        sx={{ mb: 3, display: "flex", alignItems: "center" }}
+        sx={{
+          mb: 3,
+          display: "flex",
+          alignItems: "center",
+          fontSize: { xs: "1.5rem", md: "2.125rem" },
+        }}
       >
         Shopping Cart{" "}
         {updatingCart && (
@@ -117,7 +144,7 @@ const CartPage = () => {
         )}
       </Typography>
 
-      <Grid container spacing={4}>
+      <Grid container spacing={{ xs: 2, md: 4 }}>
         <Grid item xs={12} md={8}>
           {cartItems.map((item) => (
             <Card
@@ -125,25 +152,41 @@ const CartPage = () => {
               elevation={3}
               sx={{
                 display: "flex",
+                flexDirection: { xs: "column", sm: "row" },
                 mb: 2,
                 p: 2,
                 alignItems: "center",
                 borderRadius: "12px",
+                textAlign: { xs: "center", sm: "left" },
               }}
             >
               <CardMedia
                 component="img"
                 sx={{
-                  width: 100,
-                  height: 100,
+                  width: { xs: 120, sm: 100 },
+                  height: { xs: 120, sm: 100 },
                   objectFit: "contain",
                   borderRadius: "8px",
+                  mb: { xs: 2, sm: 0 },
                 }}
                 image={item.image || "https://via.placeholder.com/100"}
                 alt={item.title}
               />
-              <Box sx={{ flexGrow: 1, ml: 2 }}>
-                <Typography variant="h6">{item.title}</Typography>
+
+              <Box
+                sx={{
+                  flexGrow: 1,
+                  ml: { xs: 0, sm: 2 },
+                  mb: { xs: 2, sm: 0 },
+                  width: { xs: "100%", sm: "auto" },
+                }}
+              >
+                <Typography
+                  variant="h6"
+                  sx={{ fontSize: { xs: "1rem", sm: "1.25rem" } }}
+                >
+                  {item.title}
+                </Typography>
                 <Typography variant="body2" color="text.secondary">
                   {item.category}
                 </Typography>
@@ -152,31 +195,49 @@ const CartPage = () => {
                 </Typography>
               </Box>
 
-              <Box sx={{ display: "flex", alignItems: "center", mr: 3 }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  width: { xs: "100%", sm: "auto" },
+                  justifyContent: { xs: "center", sm: "flex-end" },
+                }}
+              >
+                <Box sx={{ display: "flex", alignItems: "center", mr: 3 }}>
+                  <IconButton
+                    onClick={() => onQuantityDecrement(item._id)}
+                    disabled={item.qty <= 1 || updatingCart}
+                    sx={{ border: "1px solid #ddd", width: 30, height: 30 }}
+                  >
+                    <RemoveIcon fontSize="small" />
+                  </IconButton>
+                  <Typography sx={{ mx: 2, fontWeight: "bold" }}>
+                    {item.qty}
+                  </Typography>
+                  <IconButton
+                    onClick={() => onQuantityIncrement(item._id)}
+                    disabled={updatingCart}
+                    sx={{
+                      border: "1px solid #0f2a1d",
+                      width: 30,
+                      height: 30,
+                      color: "white",
+                      bgcolor: "#0f2a1d",
+                      "&:hover": { bgcolor: "#144430" },
+                    }}
+                  >
+                    <AddIcon fontSize="small" />
+                  </IconButton>
+                </Box>
+
                 <IconButton
-                  onClick={() => onQuantityDecrement(item._id)}
-                  disabled={item.qty <= 1 || updatingCart}
-                >
-                  <RemoveIcon fontSize="small" />
-                </IconButton>
-                <Typography sx={{ mx: 2, fontWeight: "bold" }}>
-                  {item.qty}
-                </Typography>
-                <IconButton
-                  onClick={() => onQuantityIncrement(item._id)}
+                  color="error"
+                  onClick={() => onRemoveCartItem(item._id)}
                   disabled={updatingCart}
                 >
-                  <AddIcon fontSize="small" />
+                  <DeleteIcon />
                 </IconButton>
               </Box>
-
-              <IconButton
-                color="error"
-                onClick={() => onRemoveCartItem(item._id)}
-                disabled={updatingCart}
-              >
-                <DeleteIcon />
-              </IconButton>
             </Card>
           ))}
         </Grid>
@@ -217,7 +278,7 @@ const CartPage = () => {
               }}
               // onClick={handleCheckout}
             >
-              {token ? "Checkout" : "Checkout"}
+              {token ? "Checkout" : "Login to Checkout"}
             </Button>
           </Card>
         </Grid>

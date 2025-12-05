@@ -81,9 +81,10 @@ const Homepage = () => {
   return (
     <Box>
       <Box
-        style={{
+        sx={{
           display: "flex",
-          padding: "20px",
+          flexWrap: "wrap",
+          padding: { xs: 2, md: "20px" },
           backgroundColor: "#0f2a1d",
           color: "white",
           alignItems: "center",
@@ -96,23 +97,29 @@ const Homepage = () => {
       >
         <Box
           onClick={() => navigate("/")}
-          style={{
+          sx={{
             color: "white",
             fontWeight: "bolder",
-            fontSize: "28px",
+            fontSize: { xs: "1.5rem", md: "28px" },
             cursor: "pointer",
-            marginRight: "20px",
+            mr: 2,
+            flexGrow: { xs: 1, md: 0 },
           }}
         >
           Scarlett Marque
         </Box>
 
         <TextField
-          style={{
+          sx={{
             backgroundColor: "white",
             borderRadius: "150px",
-            width: "30%",
-            minWidth: "200px",
+            width: { xs: "100%", md: "30%" },
+            minWidth: { xs: "auto", md: "200px" },
+            order: { xs: 3, md: 2 },
+            mt: { xs: 2, md: 0 },
+            "& .MuiOutlinedInput-root": {
+              borderRadius: "150px",
+            },
           }}
           type="text"
           placeholder="Search items..."
@@ -124,19 +131,35 @@ const Homepage = () => {
                 <SearchIcon style={{ color: "#888" }} />
               </InputAdornment>
             ),
-            style: { borderRadius: "150px" },
           }}
         />
 
-        <Box style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+        <Box
+          sx={{
+            display: "flex",
+            gap: { xs: 1, md: "10px" },
+            alignItems: "center",
+            order: { xs: 2, md: 3 },
+          }}
+        >
           {!isAdmin && (
             <Tooltip title="About">
-              <InfoIcon onClick={() => navigate("/about")} />
+              <IconButton
+                onClick={() => navigate("/about")}
+                sx={{ color: "white" }}
+              >
+                <InfoIcon />
+              </IconButton>
             </Tooltip>
           )}
           {isAdmin && (
             <Tooltip title=" Add Products">
-              <AddIcon onClick={() => navigate("/addproducts")} />
+              <IconButton
+                onClick={() => navigate("/addproducts")}
+                sx={{ color: "white" }}
+              >
+                <AddIcon />
+              </IconButton>
             </Tooltip>
           )}
 
@@ -184,15 +207,15 @@ const Homepage = () => {
       </Box>
 
       <Box
-        style={{
-          padding: "40px 20px",
+        sx={{
+          padding: { xs: 2, md: "40px 20px" },
           backgroundColor: "#f4f4f4",
           minHeight: "90vh",
         }}
       >
         {loading ? (
           <Box
-            style={{
+            sx={{
               display: "flex",
               justifyContent: "center",
               marginTop: "100px",
@@ -201,14 +224,14 @@ const Homepage = () => {
             <CircularProgress style={{ color: "#0f2a1d" }} />
           </Box>
         ) : (
-          <Grid container spacing={4}>
+          <Grid container spacing={{ xs: 2, md: 4 }}>
             {filteredProducts && filteredProducts.length > 0 ? (
               filteredProducts.map((item) => (
                 <Grid item key={item._id} xs={12} sm={6} md={4} lg={3}>
                   <Card
                     onClick={() => handleProductClick(item._id)}
                     elevation={3}
-                    style={{
+                    sx={{
                       cursor: "pointer",
                       height: "100%",
                       display: "flex",
@@ -216,6 +239,7 @@ const Homepage = () => {
                       borderRadius: "12px",
                       position: "relative",
                       transition: "0.3s",
+                      "&:hover": { transform: "translateY(-5px)" },
                     }}
                   >
                     {isAdmin && (
@@ -261,7 +285,7 @@ const Homepage = () => {
                       height="250"
                       image={item.image || "https://via.placeholder.com/250"}
                       alt={item.title}
-                      style={{ objectFit: "cover" }}
+                      sx={{ objectFit: "cover" }}
                     />
 
                     <CardContent style={{ flexGrow: 1 }}>
@@ -272,19 +296,23 @@ const Homepage = () => {
                         gutterBottom
                         variant="h6"
                         component="div"
-                        style={{ fontWeight: 700, lineHeight: 1.2 }}
+                        sx={{
+                          fontWeight: 700,
+                          lineHeight: 1.2,
+                          fontSize: { xs: "1rem", md: "1.25rem" },
+                        }}
                       >
                         {item.title}
                       </Typography>
                       <Typography
                         variant="h6"
-                        style={{
+                        sx={{
                           color: "#0f2a1d",
                           fontWeight: "bold",
                           marginTop: "10px",
                         }}
                       >
-                        ₦{item.price}
+                        ₦{item.price.toLocaleString()}
                       </Typography>
                     </CardContent>
                   </Card>
@@ -292,7 +320,7 @@ const Homepage = () => {
               ))
             ) : (
               <Box
-                style={{
+                sx={{
                   width: "100%",
                   textAlign: "center",
                   marginTop: "50px",

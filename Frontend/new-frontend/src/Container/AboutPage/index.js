@@ -6,7 +6,6 @@ import SupportAgentIcon from "@mui/icons-material/SupportAgent";
 import InstagramIcon from "@mui/icons-material/Instagram";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import FacebookIcon from "@mui/icons-material/Facebook";
-import PhoneIcon from "@mui/icons-material/Phone";
 import EmailIcon from "@mui/icons-material/Email";
 
 const AboutPage = () => {
@@ -16,25 +15,30 @@ const AboutPage = () => {
     <Box>
       <Box
         sx={{
-          py: 3,
+          py: { xs: 2, md: 3 },
           backgroundColor: "#0f2a1d",
           color: "white",
           boxShadow: 3,
           textAlign: "center",
         }}
       >
-        <Typography variant="h4" fontWeight="bold">
+        <Typography
+          variant="h4"
+          fontWeight="bold"
+          sx={{ fontSize: { xs: "1.5rem", md: "2.125rem" } }}
+        >
           About Scarlett Marque
         </Typography>
       </Box>
 
-      <Box sx={{ p: 4 }}>
+      <Box sx={{ p: { xs: 2, md: 4 }, textAlign: "center" }}>
         <Box
           component="img"
           src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80"
           alt="About"
           sx={{
-            width: "50%",
+            width: { xs: "100%", md: "50%" },
+            height: { xs: "auto", md: "400px" },
             objectFit: "cover",
             borderRadius: "15px",
             boxShadow: 3,
@@ -42,21 +46,24 @@ const AboutPage = () => {
         ></Box>
       </Box>
 
-      <Box sx={{ py: 6, px: 2, backgroundColor: "#f9f9f9" }}>
+      <Box sx={{ py: { xs: 4, md: 6 }, px: 2, backgroundColor: "#f9f9f9" }}>
         <Typography
           variant="h4"
           fontWeight="bold"
           textAlign="center"
           color="#0f2a1d"
-          sx={{ mb: 5 }}
+          sx={{
+            mb: { xs: 3, md: 5 },
+            fontSize: { xs: "1.75rem", md: "2.125rem" },
+          }}
         >
           Why Shop With Us?
         </Typography>
 
-        <Grid container spacing={4} justifyContent="center">
+        <Grid container spacing={{ xs: 4, md: 4 }} justifyContent="center">
           <Grid item xs={12} md={4} textAlign="center">
             <Box sx={{ color: "#0f2a1d", p: 2 }}>
-              <LocalShippingIcon sx={{ fontSize: 60, mb: 2 }} />
+              <LocalShippingIcon sx={{ fontSize: { xs: 50, md: 60 }, mb: 2 }} />
               <Typography variant="h6" fontWeight="bold">
                 Fast Delivery
               </Typography>
@@ -69,7 +76,7 @@ const AboutPage = () => {
 
           <Grid item xs={12} md={4} textAlign="center">
             <Box sx={{ color: "#0f2a1d", p: 2 }}>
-              <SecurityIcon sx={{ fontSize: 60, mb: 2 }} />
+              <SecurityIcon sx={{ fontSize: { xs: 50, md: 60 }, mb: 2 }} />
               <Typography variant="h6" fontWeight="bold">
                 Secure Payments
               </Typography>
@@ -82,7 +89,7 @@ const AboutPage = () => {
 
           <Grid item xs={12} md={4} textAlign="center">
             <Box sx={{ color: "#0f2a1d", p: 2 }}>
-              <SupportAgentIcon sx={{ fontSize: 60, mb: 2 }} />
+              <SupportAgentIcon sx={{ fontSize: { xs: 50, md: 60 }, mb: 2 }} />
               <Typography variant="h6" fontWeight="bold">
                 24/7 Support
               </Typography>
@@ -95,8 +102,12 @@ const AboutPage = () => {
         </Grid>
       </Box>
 
-      <Box sx={{ py: 8, textAlign: "center" }}>
-        <Typography variant="h4" fontWeight="bold" sx={{ mb: 3 }}>
+      <Box sx={{ py: { xs: 6, md: 8 }, textAlign: "center", px: 2 }}>
+        <Typography
+          variant="h4"
+          fontWeight="bold"
+          sx={{ mb: 3, fontSize: { xs: "1.5rem", md: "2.125rem" } }}
+        >
           Ready to find something special?
         </Typography>
 
@@ -107,10 +118,11 @@ const AboutPage = () => {
             backgroundColor: "#0f2a1d",
             color: "white",
             borderRadius: "30px",
-            px: 5,
+            px: { xs: 3, md: 5 },
             py: 1.5,
-            fontSize: "1.1rem",
+            fontSize: { xs: "1rem", md: "1.1rem" },
             "&:hover": { backgroundColor: "#1a4d33" },
+            width: { xs: "100%", sm: "auto" },
           }}
           onClick={() => navigate("/")}
         >
@@ -124,13 +136,26 @@ const AboutPage = () => {
           backgroundColor: "#0f2a1d",
           color: "white",
           textAlign: "center",
+          px: 2,
         }}
       >
-        <Typography variant="h6" gutterBottom>
+        <Typography
+          variant="h6"
+          gutterBottom
+          sx={{ fontSize: { xs: "1rem", md: "1.25rem" } }}
+        >
           Get Connected with us on Social Networks
         </Typography>
 
-        <Box sx={{ display: "flex", justifyContent: "center", gap: 3, mt: 2 }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            gap: { xs: 2, md: 3 },
+            mt: 2,
+            flexWrap: "wrap",
+          }}
+        >
           <a
             href="https://www.instagram.com/_thescarlettmarque/?__pwa=1"
             target="_blank"
@@ -139,7 +164,7 @@ const AboutPage = () => {
           >
             <InstagramIcon
               sx={{
-                fontSize: 30,
+                fontSize: { xs: 25, md: 30 },
                 cursor: "pointer",
                 "&:hover": { color: "#E1306C" },
               }}
@@ -154,7 +179,7 @@ const AboutPage = () => {
           >
             <WhatsAppIcon
               sx={{
-                fontSize: 30,
+                fontSize: { xs: 25, md: 30 },
                 cursor: "pointer",
                 "&:hover": { color: "#25D366" },
               }}
@@ -169,7 +194,7 @@ const AboutPage = () => {
           >
             <FacebookIcon
               sx={{
-                fontSize: 30,
+                fontSize: { xs: 25, md: 30 },
                 cursor: "pointer",
                 "&:hover": { color: "#4267B2" },
               }}
@@ -184,7 +209,7 @@ const AboutPage = () => {
           >
             <EmailIcon
               sx={{
-                fontSize: 30,
+                fontSize: { xs: 25, md: 30 },
                 cursor: "pointer",
                 "&:hover": { color: "#4267B2" },
               }}
