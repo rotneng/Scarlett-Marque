@@ -7,19 +7,16 @@ import {
   removeFromCartLocal 
 } from "../Reducers/cartSlice";
 
-// 1. GET CART
 export const getCartItems = () => {
   return async (dispatch) => {
     const token = localStorage.getItem("token");
 
     if (token) {
-      // LOGGED IN: Fetch from DB
       try {
         dispatch(setCartLoading(true));
         const res = await axios.post("/cart/user/cart/getCartItems");
         if (res.status === 200) {
           const { cartItems } = res.data;
-          // Convert Map to Array
           if (cartItems && typeof cartItems === "object") {
              const cartArray = Object.keys(cartItems).map((key) => cartItems[key]);
              dispatch(setCart(cartArray));
@@ -29,17 +26,14 @@ export const getCartItems = () => {
         console.log(error);
       }
     } 
-    // GUEST: Do nothing (State is already loaded from LocalStorage in Slice)
   };
 };
 
-// 2. ADD / UPDATE CART
 export const addItemToCart = (product, qty = 1) => {
   return async (dispatch) => {
     const token = localStorage.getItem("token");
 
     if (token) {
-      // LOGGED IN: Call API
       try {
         dispatch(setCartLoading(true));
         const payload = {
@@ -58,19 +52,16 @@ export const addItemToCart = (product, qty = 1) => {
         dispatch(setCartError(error));
       }
     } else {
-      // GUEST: Update Local State
       dispatch(addToCartLocal({ product, qty }));
     }
   };
 };
 
-// 3. REMOVE ITEM
 export const removeCartItem = (productId) => {
   return async (dispatch) => {
     const token = localStorage.getItem("token");
 
     if (token) {
-      // LOGGED IN: Call API
       try {
         dispatch(setCartLoading(true));
         const payload = { payload: { productId } };
@@ -83,7 +74,6 @@ export const removeCartItem = (productId) => {
         dispatch(setCartError(error));
       }
     } else {
-      // GUEST: Update Local State
       dispatch(removeFromCartLocal(productId));
     }
   };

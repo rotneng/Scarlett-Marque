@@ -6,9 +6,8 @@ export const login = (loginData, navigate) => {
     try {
       dispatch({ type: authConstants.LOGIN_REQUEST });
 
-      // 1. Login using your specific IP
       const res = await axios.post(
-        "http://172.20.10.4:3000/user/loginUser",
+        "http://localhost:3000/user/loginUser",
         loginData
       );
 
@@ -18,9 +17,6 @@ export const login = (loginData, navigate) => {
         localStorage.setItem("token", token);
         localStorage.setItem("user", JSON.stringify({ username, role }));
 
-        // ---------------------------------------------------------
-        // START: CART MERGE LOGIC (Updated with your IP)
-        // ---------------------------------------------------------
         const localCart = localStorage.getItem("cart")
           ? JSON.parse(localStorage.getItem("cart"))
           : [];
@@ -37,9 +33,8 @@ export const login = (loginData, navigate) => {
               },
             };
             
-            // We use the same IP address here
             return axios.post(
-              "http://172.20.10.4:3000/cart/user/cart/addtocart", 
+              "http://localhost:3000/cart/user/cart/addtocart", 
               payload, 
               {
                 headers: { Authorization: `Bearer ${token}` }
@@ -52,9 +47,6 @@ export const login = (loginData, navigate) => {
           localStorage.removeItem("cart");
           console.log("Cart merged successfully.");
         }
-        // ---------------------------------------------------------
-        // END: CART MERGE LOGIC
-        // ---------------------------------------------------------
 
         dispatch({
           type: authConstants.LOGIN_SUCCESS,
@@ -105,7 +97,7 @@ export const register = (signUpData, navigate) => {
       dispatch({ type: authConstants.REGISTER_REQUEST });
 
       const res = await axios.post(
-        "http://172.20.10.4:3000/user/registerUser",
+        "http://localhost:3000/user/registerUser",
         signUpData
       );
 

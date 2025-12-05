@@ -8,7 +8,7 @@ export const addProduct = (form, navigate) => {
       const token = localStorage.getItem("token");
 
       const response = await axios.post(
-        "http://172.20.10.4:3000/product/addProducts",
+        "http://localhost:3000/product/addProducts",
         form,
         {
           headers: { Authorization: `Bearer ${token}` }, 
@@ -37,7 +37,7 @@ export const getProducts = () => {
     dispatch({ type: productConstants.GET_PRODUCTS_REQUEST });
     try {
       const response = await axios.get(
-        "http://172.20.10.4:3000/product/getProducts"
+        "http://localhost:3000/product/getProducts"
       );
 
       if (response.status === 200) {
@@ -68,7 +68,7 @@ export const deleteProduct = (id) => {
       const token = localStorage.getItem("token");
 
       const res = await axios.delete(
-        `http://172.20.10.4:3000/product/deleteProducts/${id}`,
+        `http://localhost:3000/product/deleteProducts/${id}`,
         {
           headers: { Authorization: `Bearer ${token}` }, 
         }
@@ -99,7 +99,7 @@ export const updateProduct = (id, form, navigate) => {
       const token = localStorage.getItem("token");
 
       const res = await axios.put(
-        `http://172.20.10.4:3000/product/updateProducts/${id}`,
+        `http://localhost:3000/product/updateProducts/${id}`,
         form,
         {
           headers: { Authorization: `Bearer ${token}` }, 

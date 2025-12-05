@@ -54,14 +54,14 @@ const CartPage = () => {
     }
   };
 
-  const handleCheckout = () => {
-    if (token) {
-      navigate("/checkout");
-    } else {
-      alert("You must be logged in to checkout!");
-      navigate("/signin", { state: { from: "/cart" } });
-    }
-  };
+  // const handleCheckout = () => {
+  //   if (token) {
+  //     navigate("/checkout");
+  //   } else {
+  //     alert("You must be logged in to checkout!");
+  //     navigate("/signin", { state: { from: "/cart" } });
+  //   }
+  // };
 
   const totalPrice =
     cartItems && Array.isArray(cartItems)
@@ -215,7 +215,7 @@ const CartPage = () => {
                 py: 1.5,
                 "&:hover": { bgcolor: "#144430" },
               }}
-              onClick={handleCheckout}
+              // onClick={handleCheckout}
             >
               {token ? "Checkout" : "Checkout"}
             </Button>

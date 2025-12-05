@@ -10,7 +10,7 @@ import CartPage from "./Container/CartPage";
 import UpdateProduct from "./Container/Products/updateProducts";
 import PrivateRoute from "./Container/PrivateRoute/PrivateRoute";
 import AboutPage from "./Container/AboutPage";
-import CheckoutPage from "./Container/CheckoutPage";
+
 
 function App() {
   return (
@@ -27,7 +27,6 @@ function App() {
           <Route element={<PrivateRoute />}>
             <Route path="/product/edit/:id" element={<UpdateProduct />} />
             <Route path="/addproducts" element={<AddProducts />} />
-            <Route path="/checkout" element={<CheckoutPage />} />
           </Route>
         </Routes>
       </div>
