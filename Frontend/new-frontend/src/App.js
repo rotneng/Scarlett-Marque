@@ -11,6 +11,8 @@ import UpdateProduct from "./Container/Products/updateProducts";
 import PrivateRoute from "./Container/PrivateRoute/PrivateRoute";
 import AboutPage from "./Container/AboutPage";
 import CheckoutPage from "./Container/Checkout";
+import AddressPage from "./Container/AddressPage";
+import PaymentPage from "./Container/PaymentPage";
 
 
 function App() {
@@ -29,6 +31,8 @@ function App() {
             <Route path="/product/edit/:id" element={<UpdateProduct />} />
             <Route path="/addproducts" element={<AddProducts />} />
             <Route path="/checkout" element={<CheckoutPage />} />
+            <Route path="/address" element={<AddressPage/>} />
+            <Route path="/payment" element={<PaymentPage/>} />
           </Route>
         </Routes>
       </div>
