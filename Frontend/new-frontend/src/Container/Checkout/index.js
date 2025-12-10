@@ -351,6 +351,7 @@ const CheckoutPage = () => {
           <Button
             variant="contained"
             disabled={!selectedAddress || loadingAddress}
+            onClick={() => navigate("/payment")}
             sx={{
               backgroundColor: "#0f2a1d",
               color: "white",
@@ -363,7 +364,6 @@ const CheckoutPage = () => {
               "&:hover": { bgcolor: "#144430" },
               "&.Mui-disabled": { bgcolor: "#ccc", color: "#666" },
             }}
-            onClick={() => navigate("/payment")}
           >
             Proceed →
           </Button>

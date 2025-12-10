@@ -5,9 +5,9 @@ const PaymentPage = () => {
 
     return(
         <Box>
-            Payment Page
+            PaymentPage
         </Box>
-    )
-}
+    );
+};
 
 export default PaymentPage;
