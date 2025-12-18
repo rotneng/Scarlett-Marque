@@ -13,7 +13,6 @@ import {
   RadioGroup,
   FormControlLabel,
   FormControl,
-  Alert,
 } from "@mui/material";
 
 import CreditCardIcon from "@mui/icons-material/CreditCard";
@@ -23,31 +22,46 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 const PaymentPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { selectedAddress, total } = location.state || {};
-  const { cartItems } = useSelector((state) => state.cart);
+
+  const {
+    shippingAddress,
+    selectedAddress: oldAddressName,
+    totalPrice,
+    total: oldTotalName,
+    itemsPrice,
+    cartItems: stateCartItems,
+  } = location.state || {};
+
+  const address = shippingAddress || oldAddressName;
+  const finalTotal = totalPrice || oldTotalName;
+
+  const { cartItems: reduxCartItems } = useSelector((state) => state.cart);
+  const finalCartItems = stateCartItems || reduxCartItems;
 
   const [paymentMethod, setPaymentMethod] = useState("Card");
   useEffect(() => {
-    if (!selectedAddress || !cartItems || cartItems.length === 0) {
+    if (!address || !finalCartItems || finalCartItems.length === 0) {
       navigate("/cart");
     }
-  }, [selectedAddress, cartItems, navigate]);
+  }, [address, finalCartItems, navigate]);
 
   const handleContinue = () => {
-    if (!selectedAddress) {
+    if (!address) {
       alert("Address is missing. Please go back and select an address.");
       return;
     }
     navigate("/place-order", {
       state: {
-        selectedAddress,
-        total,
+        shippingAddress: address,
         paymentMethod,
+        totalPrice: finalTotal,
+        itemsPrice: itemsPrice,
+        cartItems: finalCartItems,
       },
     });
   };
 
-  if (!selectedAddress) return null;
+  if (!address) return null;
 
   return (
     <Box
@@ -165,7 +179,7 @@ const PaymentPage = () => {
                       }}
                     >
                       <FormControlLabel
-                        value="POD"
+                        value="Pay On Delivery"
                         control={
                           <Radio
                             sx={{
@@ -199,7 +213,12 @@ const PaymentPage = () => {
           <Grid item xs={12} md={4}>
             <Card
               elevation={3}
-              sx={{ borderRadius: "12px", p: 3, position: "sticky", top: 20 }}
+              sx={{
+                borderRadius: "12px",
+                p: 3,
+                position: "sticky",
+                top: 20,
+              }}
             >
               <Typography
                 variant="h6"
@@ -209,7 +228,12 @@ const PaymentPage = () => {
                 Order Preview
               </Typography>
               <Box
-                sx={{ mb: 3, p: 2, bgcolor: "#f9f9f9", borderRadius: "8px" }}
+                sx={{
+                  mb: 3,
+                  p: 2,
+                  bgcolor: "#f9f9f9",
+                  borderRadius: "8px",
+                }}
               >
                 <Typography
                   variant="subtitle2"
@@ -219,25 +243,33 @@ const PaymentPage = () => {
                   Delivering to:
                 </Typography>
                 <Typography variant="body1" fontWeight="bold">
-                  {selectedAddress.fullName}
+                  {address.fullName}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  {selectedAddress.address}, {selectedAddress.city}
+                  {address.address}, {address.city}
                 </Typography>
               </Box>
               <Divider sx={{ my: 2 }} />
               <Box
-                sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  mb: 1,
+                }}
               >
                 <Typography color="text.secondary">
-                  Items ({cartItems ? cartItems.length : 0}):
+                  Items ({finalCartItems ? finalCartItems.length : 0}):
                 </Typography>
                 <Typography fontWeight="bold">
-                  ₦{total.toLocaleString()}
+                  ₦{finalTotal?.toLocaleString()}
                 </Typography>
               </Box>
               <Box
-                sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  mb: 2,
+                }}
               >
                 <Typography color="text.secondary">Delivery Fee:</Typography>
                 <Typography fontWeight="bold" color="success.main">
@@ -257,7 +289,7 @@ const PaymentPage = () => {
                   Total:
                 </Typography>
                 <Typography variant="h5" fontWeight="bold" color="#0f2a1d">
-                  ₦{total.toLocaleString()}
+                  ₦{finalTotal?.toLocaleString()}
                 </Typography>
               </Box>
 

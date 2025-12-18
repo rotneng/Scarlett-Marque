@@ -1,7 +1,6 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams, useNavigate } from "react-router-dom";
-import { usePaystackPayment } from "react-paystack";
 import {
   Box,
   Typography,
@@ -13,7 +12,7 @@ import {
   Button,
 } from "@mui/material";
 
-import { getOrderDetails, payOrder } from "../../Actions/order.actions";
+import { getOrderDetails } from "../../Actions/order.actions";
 
 const OrderPage = () => {
   const { id } = useParams();
@@ -23,63 +22,9 @@ const OrderPage = () => {
   const orderDetails = useSelector((state) => state.orderDetails);
   const { order, loading, error } = orderDetails;
 
-  const auth = useSelector((state) => state.auth);
-  const user = auth.user;
-
   useEffect(() => {
     dispatch(getOrderDetails(id));
   }, [dispatch, id]);
-  const rawAmount = order ? order.totalPrice : 0;
-  const paystackAmount = Math.round(rawAmount * 100);
-  const paystackEmail = user?.email || "error@example.com";
-  const paystackPublicKey = "pk_live_5c17380713f611c0d5ea7af4e04a5165033fef8d";
-  const config = {
-    reference: new Date().getTime().toString(),
-    email: paystackEmail,
-    amount: paystackAmount,
-    publicKey: paystackPublicKey,
-    metadata: {
-      name: user ? user.firstName : "",
-      phone: order?.shippingAddress?.phoneNumber,
-    },
-  };
-
-  const initializePayment = usePaystackPayment(config);
-
-  const onSuccess = (reference) => {
-    console.log("Payment Complete! Reference:", reference);
-    const paymentResult = {
-      id: reference.reference,
-      status: reference.status,
-      update_time: String(new Date().getTime()),
-      email_address: paystackEmail,
-    };
-    dispatch(payOrder(id, paymentResult));
-  };
-
-  const onClose = () => {
-    console.log("Payment closed");
-  };
-
-  const handlePayClick = () => {
-    console.log("Attempting Payment with config:", config);
-
-    if (!paystackPublicKey || paystackPublicKey.includes("YOUR_KEY")) {
-      alert("Error: Paystack Public Key is missing in code.");
-      return;
-    }
-    if (paystackAmount <= 0) {
-      alert("Error: Invalid Amount.");
-      return;
-    }
-
-    try {
-      initializePayment(onSuccess, onClose);
-    } catch (e) {
-      console.error("Paystack Error:", e);
-      alert("Payment initialization failed. Check console for details.");
-    }
-  };
 
   if (loading) {
     return (
@@ -101,9 +46,25 @@ const OrderPage = () => {
     return <Typography sx={{ p: 4 }}>Order not found</Typography>;
   }
 
+  const getDeliveryStatus = () => {
+    if (order.isDelivered) {
+      return { text: `Delivered at ${order.deliveredAt}`, severity: "success" };
+    } else if (order.isPaid || order.paymentMethod === "COD") {
+      return { text: "Delivering (Processing)", severity: "info" };
+    } else {
+      return { text: "Not Delivered", severity: "warning" };
+    }
+  };
+
+  const deliveryStatus = getDeliveryStatus();
+
   return (
     <Box
-      sx={{ padding: "40px", backgroundColor: "#f4f4f4", minHeight: "100vh" }}
+      sx={{
+        padding: { xs: 2, md: "40px" },
+        backgroundColor: "#f4f4f4",
+        minHeight: "100vh",
+      }}
     >
       <Typography
         variant="h4"
@@ -112,7 +73,7 @@ const OrderPage = () => {
       >
         Order Details
       </Typography>
-      <Typography variant="subtitle1" sx={{ mb: 4 }}>
+      <Typography variant="subtitle1" sx={{ mb: 4, wordBreak: "break-all" }}>
         ID: {order._id}
       </Typography>
 
@@ -127,22 +88,17 @@ const OrderPage = () => {
               {order.user ? order.user.firstName : "User"}
             </Typography>
             <Typography>
-              <strong>Address:</strong> {order.shippingAddress.address},{" "}
-              {order.shippingAddress.city}
+              <strong>Address:</strong> {order.shippingAddress?.address},{" "}
+              {order.shippingAddress?.city}
             </Typography>
             <Typography>
-              <strong>Phone:</strong> {order.shippingAddress.phoneNumber}
+              <strong>Phone:</strong> {order.shippingAddress?.phoneNumber}
             </Typography>
-            <Alert
-              severity={order.isDelivered ? "success" : "warning"}
-              sx={{ mt: 2 }}
-            >
-              {order.isDelivered
-                ? `Delivered at ${order.deliveredAt}`
-                : "Not Delivered"}
+
+            <Alert severity={deliveryStatus.severity} sx={{ mt: 2 }}>
+              {deliveryStatus.text}
             </Alert>
           </Card>
-
           <Card sx={{ p: 3, mb: 3 }}>
             <Typography variant="h6" fontWeight="bold">
               Payment Status
@@ -150,14 +106,16 @@ const OrderPage = () => {
             <Typography>
               <strong>Method:</strong> {order.paymentMethod}
             </Typography>
+
             <Alert
               severity={order.isPaid ? "success" : "warning"}
               sx={{ mt: 2 }}
             >
-              {order.isPaid ? `Paid on ${order.paidAt}` : "Not Paid"}
+              {order.isPaid
+                ? `Paid on ${new Date(order.paidAt).toLocaleDateString()}`
+                : "Not Paid"}
             </Alert>
           </Card>
-
           <Card sx={{ p: 3 }}>
             <Typography variant="h6" fontWeight="bold" sx={{ mb: 2 }}>
               Items Ordered
@@ -192,13 +150,13 @@ const OrderPage = () => {
               sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}
             >
               <Typography>Subtotal</Typography>
-              <Typography>₦{order.itemsPrice.toLocaleString()}</Typography>
+              <Typography>₦{order.itemsPrice?.toLocaleString()}</Typography>
             </Box>
             <Box
               sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}
             >
               <Typography>Shipping</Typography>
-              <Typography>₦{order.shippingPrice.toLocaleString()}</Typography>
+              <Typography>Free</Typography>
             </Box>
             <Divider sx={{ my: 1 }} />
             <Box
@@ -206,52 +164,15 @@ const OrderPage = () => {
             >
               <Typography fontWeight="bold">Total</Typography>
               <Typography fontWeight="bold" variant="h6">
-                ₦{order.totalPrice.toLocaleString()}
+                ₦{order.totalPrice?.toLocaleString()}
               </Typography>
             </Box>
 
-            {order.isPaid ? (
-              <Alert severity="success" variant="filled">
-                Payment Successful!
-              </Alert>
-            ) : (
-              <>
-                {order.paymentMethod === "COD" ||
-                order.paymentMethod === "POD" ? (
-                  <Box>
-                    <Alert severity="success" sx={{ mb: 2 }}>
-                      <strong>Order Placed Successfully!</strong>
-                    </Alert>
-                    <Typography variant="body2">
-                      Please have your cash or transfer ready upon delivery.
-                    </Typography>
-                  </Box>
-                ) : (
-                  <Box>
-                    <Alert severity="info" sx={{ mb: 2 }}>
-                      Order saved. Complete payment below.
-                    </Alert>
-
-                    <Button
-                      variant="contained"
-                      fullWidth
-                      disabled={!order || paystackAmount <= 0}
-                      onClick={handlePayClick}
-                      sx={{
-                        bgcolor: "#2c9f45",
-                        color: "white",
-                        fontWeight: "bold",
-                        borderRadius: "30px",
-                        padding: "12px",
-                        "&:hover": { bgcolor: "#25863a" },
-                      }}
-                    >
-                      Pay Now ₦{order.totalPrice.toLocaleString()}
-                    </Button>
-                  </Box>
-                )}
-              </>
-            )}
+            <Alert severity="success" variant="filled" sx={{ mb: 2 }}>
+              {order.isPaid
+                ? "Payment Successful!"
+                : "Order Placed Successfully"}
+            </Alert>
 
             <Button
               variant="outlined"

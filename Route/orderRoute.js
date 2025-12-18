@@ -11,7 +11,6 @@ const {
 } = require("../Controller/orderController");
 
 const { requireSignin, adminMiddleware } = require("../Middlewares/auth");
-
 router
   .route("/")
   .post(requireSignin, addOrderItems)

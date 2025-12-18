@@ -8,7 +8,6 @@ import {
   Grid,
   Card,
   CardContent,
-  IconButton,
   CircularProgress,
   Container,
 } from "@mui/material";
@@ -16,10 +15,9 @@ import {
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import PersonIcon from "@mui/icons-material/Person";
 import PhoneIcon from "@mui/icons-material/Phone";
+import LocationOnIcon from "@mui/icons-material/LocationOn";
 
 import { getAddresses, deleteAddress } from "../../Actions/address.actions";
 
@@ -28,7 +26,6 @@ const ManageAddressPage = () => {
   const dispatch = useDispatch();
 
   const token = localStorage.getItem("token");
-
   const addressState = useSelector((state) => state.addressList || {});
   const { addresses, loading, error } = addressState;
 
@@ -75,8 +72,10 @@ const ManageAddressPage = () => {
             backgroundColor: "#0f2a1d",
             fontWeight: "bold",
             color: "white",
-            padding: "15px",
-            borderRadius: "15px",
+            padding: "10px 20px",
+            borderRadius: "30px",
+            textTransform: "none",
+            "&:hover": { backgroundColor: "#144430" },
           }}
         >
           Back to Checkout
@@ -88,6 +87,8 @@ const ManageAddressPage = () => {
             justifyContent: "space-between",
             alignItems: "center",
             mb: 4,
+            flexWrap: "wrap",
+            gap: 2,
           }}
         >
           <Typography variant="h4" fontWeight="bold" color="#0f2a1d">
@@ -100,6 +101,9 @@ const ManageAddressPage = () => {
             sx={{
               bgcolor: "#0f2a1d",
               borderRadius: "30px",
+              padding: "10px 20px",
+              textTransform: "none",
+              fontWeight: "bold",
               "&:hover": { bgcolor: "#144430" },
             }}
           >
@@ -115,22 +119,26 @@ const ManageAddressPage = () => {
           <Typography color="error" align="center">
             {error}
           </Typography>
-        ) : addresses && addresses.length === 0 ? (
+        ) : !addresses || addresses.length === 0 ? (
           <Card sx={{ p: 5, textAlign: "center", borderRadius: "12px" }}>
-            <Typography variant="h6" color="text.secondary">
+            <LocationOnIcon sx={{ fontSize: 60, color: "#ccc", mb: 2 }} />
+            <Typography variant="h6" color="text.secondary" gutterBottom>
               No addresses found.
             </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+              Add a shipping address to speed up your checkout process.
+            </Typography>
             <Button
+              variant="outlined"
               onClick={handleAddNew}
               sx={{
-                mt: 2,
-                color: "white",
-                backgroundColor: "#0f2a1d",
-                padding: "15px",
-                borderRadius: "15px",
+                color: "#0f2a1d",
+                borderColor: "#0f2a1d",
+                borderRadius: "20px",
+                "&:hover": { borderColor: "#144430", bgcolor: "#f0fdf4" },
               }}
             >
-              Add Address
+              Add New Address
             </Button>
           </Card>
         ) : (
@@ -138,92 +146,111 @@ const ManageAddressPage = () => {
             {addresses.map((addr) => (
               <Grid item xs={12} key={addr._id}>
                 <Card
-                  elevation={2}
+                  elevation={0}
                   sx={{
-                    borderRadius: "12px",
-                    border: "1px solid #eee",
-                    transition: "0.3s",
-                    "&:hover": { boxShadow: "0 8px 16px rgba(0,0,0,0.1)" },
+                    borderRadius: "16px",
+                    border: "1px solid #e0e0e0",
+                    transition: "all 0.3s ease",
+                    "&:hover": {
+                      boxShadow: "0 10px 20px rgba(0,0,0,0.05)",
+                      borderColor: "#0f2a1d",
+                    },
                   }}
                 >
                   <CardContent
                     sx={{
                       display: "flex",
-                      flexDirection: { xs: "column", sm: "row" },
+                      flexDirection: { xs: "column", md: "row" },
                       justifyContent: "space-between",
-                      alignItems: "flex-start",
+                      alignItems: { xs: "flex-start", md: "center" },
                       p: 3,
+                      gap: 2,
                     }}
                   >
-                    <Box sx={{ mb: { xs: 2, sm: 0 } }}>
-                      <Box
-                        sx={{
-                          display: "flex",
-                          gap: 1,
-                          alignItems: "center",
-                          mb: 1,
-                        }}
-                      >
-                        <Typography variant="h6" fontWeight="bold">
-                          {addr.fullName}
-                        </Typography>
-                      </Box>
-
-                      <Typography
-                        variant="body1"
-                        sx={{ color: "#555", mb: 0.5 }}
-                      >
-                        {addr.address}
+                    {/* Address Details */}
+                    <Box sx={{ flex: 1 }}>
+                      <Typography variant="h6" fontWeight="bold" sx={{ mb: 1 }}>
+                        {addr.fullName}
                       </Typography>
 
                       <Box
                         sx={{
                           display: "flex",
-                          alignItems: "center",
+                          alignItems: "flex-start",
                           gap: 1,
-                          color: "#555",
+                          mb: 1,
                         }}
                       >
-                        <PhoneIcon fontSize="small" />
-                        <Typography variant="body2">{addr.phone}</Typography>
+                        <LocationOnIcon
+                          fontSize="small"
+                          sx={{ color: "#777", mt: 0.3 }}
+                        />
+                        <Typography variant="body1" sx={{ color: "#555" }}>
+                          {addr.address}, {addr.city}
+                        </Typography>
+                      </Box>
+
+                      <Box
+                        sx={{ display: "flex", alignItems: "center", gap: 1 }}
+                      >
+                        <PhoneIcon fontSize="small" sx={{ color: "#777" }} />
+                        <Typography variant="body2" sx={{ color: "#555" }}>
+                          {addr.phone || addr.phoneNumber}
+                        </Typography>
                       </Box>
                     </Box>
 
+                    {/* Action Buttons */}
                     <Box
                       sx={{
                         display: "flex",
-                        flexDirection: "column",
+                        flexDirection: { xs: "row", md: "column" },
+                        alignItems: { xs: "center", md: "flex-end" },
+                        width: { xs: "100%", md: "auto" },
                         gap: 1,
-                        minWidth: "160px",
-                        alignItems: { xs: "flex-start", sm: "flex-end" },
+                        mt: { xs: 2, md: 0 },
+                        borderTop: { xs: "1px solid #f0f0f0", md: "none" },
+                        pt: { xs: 2, md: 0 },
                       }}
                     >
                       <Button
                         variant="contained"
                         onClick={() => handleSelectAddress(addr)}
+                        fullWidth
                         sx={{
                           bgcolor: "#0f2a1d",
                           color: "white",
                           textTransform: "none",
-                          width: "100%",
-                          mb: 1,
+                          borderRadius: "20px",
+                          px: 4,
                           "&:hover": { bgcolor: "#144430" },
                         }}
                       >
-                        Choose
+                        Select
                       </Button>
-                      <Box>
+
+                      <Box sx={{ display: "flex", gap: 1 }}>
                         <Button
+                          size="small"
                           startIcon={<EditIcon />}
                           onClick={() => handleEdit(addr)}
-                          sx={{ color: "#1976d2", textTransform: "none" }}
+                          sx={{
+                            color: "#555",
+                            textTransform: "none",
+                            minWidth: "auto",
+                          }}
                         >
                           Edit
                         </Button>
                         <Button
+                          size="small"
                           startIcon={<DeleteIcon />}
                           onClick={() => handleDelete(addr._id)}
-                          sx={{ color: "#d32f2f", textTransform: "none" }}
+                          sx={{
+                            color: "#d32f2f",
+                            textTransform: "none",
+                            minWidth: "auto",
+                          }}
                         >
                           Delete
                         </Button>

@@ -59,8 +59,10 @@ const CheckoutPage = () => {
     if (selectedAddress) {
       navigate("/payment", {
         state: {
-          selectedAddress: selectedAddress,
-          total: total,
+          shippingAddress: selectedAddress,
+          cartItems: cartItems,
+          totalPrice: total,
+          itemsPrice: subTotal,
         },
       });
     }
@@ -119,7 +121,7 @@ const CheckoutPage = () => {
                     fontWeight: "bold",
                   }}
                 >
-                  {selectedAddress ? "Add Address" : "Add Address"}
+                  {selectedAddress ? "Change Address" : "Add Address"}
                 </Button>
               </Box>
 

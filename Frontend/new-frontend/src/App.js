@@ -17,6 +17,7 @@ import ManageAddressPage from "./Container/ManageAddress";
 import OrderPage from "./Container/OrderPage";
 import PlaceOrderPage from "./Container/PlaceOrderPage"; 
 import TrackOrderPage from "./Container/TrackOrderPage";
+import AdminOrdersPage from "./Container/AdminOrderPage";
 
 function App() {
   return (
@@ -33,6 +34,7 @@ function App() {
           <Route element={<PrivateRoute />}>
             <Route path="/product/edit/:id" element={<UpdateProduct />} />
             <Route path="/addproducts" element={<AddProducts />} />
+            <Route path="/admin/orders" element={<AdminOrdersPage />} />
             <Route path="/checkout" element={<CheckoutPage />} />
             <Route path="/address" element={<AddressPage/>} />
             <Route path="/manageAddress" element={<ManageAddressPage/>} />

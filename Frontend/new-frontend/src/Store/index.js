@@ -9,6 +9,7 @@ import {
   orderDetailsReducer,
   orderPayReducer,
   orderListMyReducer,
+  orderListReducer,
 } from "../Reducers/orderReducer";
 
 const store = configureStore({
@@ -22,6 +23,7 @@ const store = configureStore({
     orderDetails: orderDetailsReducer,
     orderPay: orderPayReducer,
     orderMyList: orderListMyReducer,
+    orderList: orderListReducer
   },
 });
 

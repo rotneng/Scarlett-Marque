@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import {
   Box,
   Typography,
@@ -19,6 +19,8 @@ import RemoveIcon from "@mui/icons-material/Remove";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ShoppingBagIcon from "@mui/icons-material/ShoppingBag";
 import LoginIcon from "@mui/icons-material/Login";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 
 import {
   getCartItems,
@@ -29,10 +31,11 @@ import {
 const CartPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const { cartItems, updatingCart } = useSelector((state) => state.cart);
-
   const token = localStorage.getItem("token");
+  const { orderSuccess, orderId } = location.state || {};
 
   useEffect(() => {
     dispatch(getCartItems());
@@ -66,6 +69,75 @@ const CartPage = () => {
     cartItems && Array.isArray(cartItems)
       ? cartItems.reduce((acc, item) => acc + item.qty * item.price, 0)
       : 0;
+  if (orderSuccess) {
+    return (
+      <Box
+        sx={{
+          textAlign: "center",
+          mt: { xs: 5, md: 10 },
+          p: 3,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          minHeight: "60vh",
+        }}
+      >
+        <CheckCircleIcon sx={{ fontSize: 80, color: "#2e7d32", mb: 2 }} />
+
+        <Typography
+          variant="h4"
+          fontWeight="bold"
+          sx={{ mb: 1, color: "#0f2a1d" }}
+        >
+          Order Placed Successfully!
+        </Typography>
+
+        <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
+          Thank you for your purchase. Your order ID is{" "}
+          <strong>{orderId}</strong>
+        </Typography>
+
+        <Box
+          sx={{
+            display: "flex",
+            gap: 2,
+            flexDirection: { xs: "column", sm: "row" },
+          }}
+        >
+          <Button
+            variant="contained"
+            startIcon={<LocalShippingIcon />}
+            onClick={() => navigate(`/track-order/${orderId}`)}
+            sx={{
+              bgcolor: "#0f2a1d",
+              borderRadius: "30px",
+              px: 4,
+              py: 1.5,
+              "&:hover": { bgcolor: "#144430" },
+            }}
+          >
+            Track My Order
+          </Button>
+
+          <Button
+            variant="outlined"
+            onClick={() => {
+              navigate("/", { state: {} });
+            }}
+            sx={{
+              borderColor: "#0f2a1d",
+              color: "#0f2a1d",
+              borderRadius: "30px",
+              px: 4,
+              py: 1.5,
+            }}
+          >
+            Continue Shopping
+          </Button>
+        </Box>
+      </Box>
+    );
+  }
 
   if (!cartItems || cartItems.length === 0) {
     return (

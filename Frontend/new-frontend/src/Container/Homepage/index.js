@@ -21,6 +21,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import InfoIcon from "@mui/icons-material/Info";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import ListAltIcon from "@mui/icons-material/ListAlt"; 
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { getProducts, deleteProduct } from "../../Actions/product.actions";
@@ -149,20 +150,32 @@ const Homepage = () => {
                 sx={{ color: "white" }}
               >
                 <InfoIcon />
-                {/* <p>About</p> */}
               </IconButton>
             </Tooltip>
           )}
+
+          {/* ADMIN BUTTONS */}
           {isAdmin && (
-            <Tooltip title=" Add Products">
-              <IconButton
-                onClick={() => navigate("/addproducts")}
-                sx={{ color: "white" }}
-              >
-                <AddIcon />
-                {/* <p>Add Products</p> */}
-              </IconButton>
-            </Tooltip>
+            <>
+              {/* NEW: View Orders Button */}
+              <Tooltip title="View Customer Orders">
+                <IconButton
+                  onClick={() => navigate("/admin/orders")}
+                  sx={{ color: "white" }}
+                >
+                  <ListAltIcon />
+                </IconButton>
+              </Tooltip>
+
+              <Tooltip title=" Add Products">
+                <IconButton
+                  onClick={() => navigate("/addproducts")}
+                  sx={{ color: "white" }}
+                >
+                  <AddIcon />
+                </IconButton>
+              </Tooltip>
+            </>
           )}
 
           {!isAdmin && (
@@ -172,7 +185,6 @@ const Homepage = () => {
                 style={{ color: "white" }}
               >
                 <ShoppingCartIcon />
-                {/* <p>Cart</p> */}
               </IconButton>
             </Tooltip>
           )}
@@ -193,7 +205,6 @@ const Homepage = () => {
               <Tooltip title="Logout">
                 <IconButton onClick={handleLogout} style={{ color: "white" }}>
                   <LogoutIcon />
-                  {/* <p>Logout</p> */}
                 </IconButton>
               </Tooltip>
             </Box>
@@ -204,7 +215,6 @@ const Homepage = () => {
                 style={{ color: "white" }}
               >
                 <AccountCircleIcon />
-                {/* <p>SignIn</p> */}
               </IconButton>
             </Tooltip>
           )}
