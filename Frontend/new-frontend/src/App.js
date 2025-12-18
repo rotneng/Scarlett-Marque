@@ -16,6 +16,7 @@ import PaymentPage from "./Container/PaymentPage";
 import ManageAddressPage from "./Container/ManageAddress";
 import OrderPage from "./Container/OrderPage";
 import PlaceOrderPage from "./Container/PlaceOrderPage"; 
+import TrackOrderPage from "./Container/TrackOrderPage";
 
 function App() {
   return (
@@ -38,6 +39,7 @@ function App() {
             <Route path="/payment" element={<PaymentPage/>} />
             <Route path="/place-order" element={<PlaceOrderPage />} />
             <Route path="/order/:id" element={<OrderPage />} />
+            <Route path="/track-order/:id" element={<TrackOrderPage />} />
           </Route>
         </Routes>
       </div>

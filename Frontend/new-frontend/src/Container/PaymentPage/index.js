@@ -149,15 +149,18 @@ const PaymentPage = () => {
                       />
                     </Box>
                     <Box
-                      onClick={() => setPaymentMethod("POD")}
+                      onClick={() => setPaymentMethod("Pay On Delivery")}
                       sx={{
                         border:
-                          paymentMethod === "POD"
+                          paymentMethod === "Pay On Delivery"
                             ? "2px solid #0f2a1d"
                             : "1px solid #e0e0e0",
                         borderRadius: "8px",
                         p: 2,
-                        bgcolor: paymentMethod === "POD" ? "#f0fdf4" : "white",
+                        bgcolor:
+                          paymentMethod === "Pay On Delivery"
+                            ? "#f0fdf4"
+                            : "white",
                         cursor: "pointer",
                       }}
                     >

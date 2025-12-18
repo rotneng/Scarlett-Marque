@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { usePaystackPayment } from "react-paystack";
 import {
   Box,
@@ -18,6 +18,7 @@ import { getOrderDetails, payOrder } from "../../Actions/order.actions";
 const OrderPage = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const orderDetails = useSelector((state) => state.orderDetails);
   const { order, loading, error } = orderDetails;
@@ -251,6 +252,23 @@ const OrderPage = () => {
                 )}
               </>
             )}
+
+            <Button
+              variant="outlined"
+              fullWidth
+              onClick={() => navigate(`/track-order/${order._id}`)}
+              sx={{
+                mt: 2,
+                borderRadius: "30px",
+                padding: "12px",
+                borderColor: "#0f2a1d",
+                color: "#0f2a1d",
+                fontWeight: "bold",
+                "&:hover": { borderColor: "#2c9f45", color: "#2c9f45" },
+              }}
+            >
+              Track Order Status
+            </Button>
           </Card>
         </Grid>
       </Grid>
