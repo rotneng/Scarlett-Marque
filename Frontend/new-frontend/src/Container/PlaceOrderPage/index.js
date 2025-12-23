@@ -12,7 +12,6 @@ import {
   Divider,
   Radio,
   RadioGroup,
-  FormControlLabel,
   Container,
   Paper,
   Stack,
@@ -33,6 +32,7 @@ import LockIcon from "@mui/icons-material/Lock";
 import { createOrder } from "../../Actions/order.actions";
 import { orderConstants } from "../../Actions/constant";
 import { removeCartItem } from "../../Actions/cartActions";
+import { getProducts } from "../../Actions/product.actions";
 
 const PlaceOrderPage = () => {
   const dispatch = useDispatch();
@@ -69,7 +69,10 @@ const PlaceOrderPage = () => {
           if (id) dispatch(removeCartItem(id));
         });
       }
+
       dispatch({ type: orderConstants.ORDER_CREATE_RESET });
+
+      dispatch(getProducts());
 
       navigate("/cart", {
         state: {

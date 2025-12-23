@@ -307,8 +307,8 @@ const AdminOrdersPage = () => {
                               bgcolor: isIssue ? "error.main" : "#0f2a1d",
                             }}
                           >
-                            {order.user?.firstName ? (
-                              order.user.firstName.charAt(0)
+                            {order.user?.username ? (
+                              order.user.username.charAt(0)
                             ) : (
                               <PersonIcon fontSize="small" />
                             )}
@@ -316,11 +316,31 @@ const AdminOrdersPage = () => {
                           <Box>
                             <Typography variant="body2" fontWeight="500">
                               {order.user
-                                ? `${order.user.firstName} ${
-                                    order.user.lastName || ""
+                                ? `${order.user.username} ${
+                                    order.user.username || ""
                                   }`
                                 : "Deleted User"}
                             </Typography>
+
+                            {order.user && (
+                              <Typography
+                                variant="caption"
+                                color="primary"
+                                sx={{
+                                  display: "block",
+                                  fontSize: "11px",
+                                  mt: -0.2,
+                                  maxWidth: "140px",
+                                  overflow: "hidden",
+                                  textOverflow: "ellipsis",
+                                  whiteSpace: "nowrap",
+                                }}
+                              >
+                                {order.user.username
+                                  ? `@${order.user.username}`
+                                  : order.user.email}
+                              </Typography>
+                            )}
                           </Box>
                         </Stack>
                       </TableCell>

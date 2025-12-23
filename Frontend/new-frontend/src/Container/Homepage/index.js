@@ -31,6 +31,7 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import ListAltIcon from "@mui/icons-material/ListAlt";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import SearchOffIcon from "@mui/icons-material/SearchOff";
+import BlockIcon from "@mui/icons-material/Block";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { getProducts, deleteProduct } from "../../Actions/product.actions";
@@ -65,8 +66,16 @@ const Homepage = () => {
     );
   }, [products, searchTerm]);
 
-  const handleProductClick = (id) => {
-    navigate(`/product/${id}`);
+  const getStock = (p) => {
+    if (!p) return null;
+    if (p.quantity !== undefined) return p.quantity;
+    if (p.stock !== undefined) return p.stock;
+    if (p.countInStock !== undefined) return p.countInStock;
+    return null;
+  };
+
+  const handleProductClick = (item) => {
+    navigate(`/product/${item._id}`);
   };
 
   const handleEditClick = (e, id) => {
@@ -268,155 +277,211 @@ const Homepage = () => {
         ) : (
           <Grid container spacing={4}>
             {filteredProducts.length > 0 ? (
-              filteredProducts.map((item) => (
-                <Grid item key={item._id} xs={12} sm={6} md={4} lg={3}>
-                  <Card
-                    onClick={() => handleProductClick(item._id)}
-                    elevation={0}
-                    sx={{
-                      height: "100%",
-                      display: "flex",
-                      flexDirection: "column",
-                      borderRadius: "16px",
-                      position: "relative",
-                      cursor: "pointer",
-                      transition: "all 0.3s ease",
-                      border: "1px solid #eee",
-                      "&:hover": {
-                        transform: "translateY(-8px)",
-                        boxShadow: "0 12px 24px rgba(0,0,0,0.1)",
-                      },
-                    }}
-                  >
-                    {isAdmin && (
-                      <Box
-                        sx={{
-                          position: "absolute",
-                          top: 12,
-                          right: 12,
-                          display: "flex",
-                          gap: 1,
-                          zIndex: 2,
-                        }}
-                      >
-                        <Tooltip title="Edit Product">
-                          <IconButton
-                            onClick={(e) => handleEditClick(e, item._id)}
-                            size="small"
-                            sx={{
-                              bgcolor: "white",
-                              boxShadow: 1,
-                              "&:hover": { bgcolor: "#f5f5f5" },
-                            }}
-                          >
-                            <EditIcon fontSize="small" color="primary" />
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip title="Delete Product">
-                          <IconButton
-                            onClick={(e) => handleDeleteClick(e, item._id)}
-                            size="small"
-                            sx={{
-                              bgcolor: "white",
-                              boxShadow: 1,
-                              "&:hover": { bgcolor: "#ffebee" },
-                            }}
-                          >
-                            <DeleteIcon fontSize="small" color="error" />
-                          </IconButton>
-                        </Tooltip>
-                      </Box>
-                    )}
+              filteredProducts.map((item) => {
+                const stockLevel = getStock(item);
+                const currentStock = stockLevel !== null ? stockLevel : 1000;
 
-                    <Box
+                const isOutOfStock = currentStock <= 0;
+                const isLowStock = currentStock > 0 && currentStock < 5;
+
+                return (
+                  <Grid item key={item._id} xs={12} sm={6} md={4} lg={3}>
+                    <Card
+                      onClick={() => handleProductClick(item)}
+                      elevation={0}
                       sx={{
+                        height: "100%",
+                        display: "flex",
+                        flexDirection: "column",
+                        borderRadius: "16px",
                         position: "relative",
-                        pt: "100%",
-                        overflow: "hidden",
+                        cursor: "pointer",
+                        transition: "all 0.3s ease",
+                        border: "1px solid #eee",
+                        opacity: isOutOfStock ? 0.8 : 1,
+                        "&:hover": {
+                          transform: "translateY(-8px)",
+                          boxShadow: "0 12px 24px rgba(0,0,0,0.1)",
+                        },
                       }}
                     >
-                      <CardMedia
-                        component="img"
-                        image={item.image || "https://via.placeholder.com/300"}
-                        alt={item.title}
-                        sx={{
-                          position: "absolute",
-                          top: 0,
-                          left: 0,
-                          width: "100%",
-                          height: "100%",
-                          objectFit: "cover",
-                          transition: "transform 0.5s",
-                          "&:hover": { transform: "scale(1.05)" },
-                        }}
-                      />
-                    </Box>
-
-                    <CardContent sx={{ flexGrow: 1, pt: 3, px: 2.5 }}>
-                      <Chip
-                        label={item.category}
-                        size="small"
-                        sx={{
-                          mb: 1,
-                          bgcolor: alpha("#0f2a1d", 0.05),
-                          color: "#0f2a1d",
-                          fontWeight: 600,
-                          fontSize: "0.7rem",
-                          textTransform: "uppercase",
-                        }}
-                      />
-
-                      <Typography
-                        gutterBottom
-                        variant="h6"
-                        sx={{
-                          fontWeight: 700,
-                          fontSize: "1rem",
-                          lineHeight: 1.4,
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                          display: "-webkit-box",
-                          WebkitLineClamp: 2,
-                          WebkitBoxOrient: "vertical",
-                          minHeight: "2.8em",
-                        }}
-                      >
-                        {item.title}
-                      </Typography>
-
-                      <Box
-                        sx={{
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "space-between",
-                          mt: 2,
-                        }}
-                      >
-                        <Typography
-                          variant="h6"
-                          sx={{ color: "#0f2a1d", fontWeight: "bold" }}
-                        >
-                          ₦{item.price?.toLocaleString()}
-                        </Typography>
+                      {isOutOfStock && (
                         <Box
                           sx={{
-                            width: 32,
-                            height: 32,
-                            borderRadius: "50%",
-                            bgcolor: "#f5f5f5",
+                            position: "absolute",
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            bottom: 0,
+                            bgcolor: "rgba(255,255,255,0.5)",
+                            zIndex: 1,
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
-                            color: "#0f2a1d",
                           }}
                         >
-                          <AddIcon fontSize="small" />
+                          <Chip
+                            label="SOLD OUT"
+                            color="error"
+                            sx={{ fontWeight: "bold", fontSize: "1rem" }}
+                          />
                         </Box>
+                      )}
+
+                      {isAdmin && (
+                        <Box
+                          sx={{
+                            position: "absolute",
+                            top: 12,
+                            right: 12,
+                            display: "flex",
+                            gap: 1,
+                            zIndex: 2,
+                          }}
+                        >
+                          <Tooltip title="Edit Product">
+                            <IconButton
+                              onClick={(e) => handleEditClick(e, item._id)}
+                              size="small"
+                              sx={{
+                                bgcolor: "white",
+                                boxShadow: 1,
+                                "&:hover": { bgcolor: "#f5f5f5" },
+                              }}
+                            >
+                              <EditIcon fontSize="small" color="primary" />
+                            </IconButton>
+                          </Tooltip>
+                          <Tooltip title="Delete Product">
+                            <IconButton
+                              onClick={(e) => handleDeleteClick(e, item._id)}
+                              size="small"
+                              sx={{
+                                bgcolor: "white",
+                                boxShadow: 1,
+                                "&:hover": { bgcolor: "#ffebee" },
+                              }}
+                            >
+                              <DeleteIcon fontSize="small" color="error" />
+                            </IconButton>
+                          </Tooltip>
+                        </Box>
+                      )}
+
+                      <Box
+                        sx={{
+                          position: "relative",
+                          pt: "100%",
+                          overflow: "hidden",
+                        }}
+                      >
+                        <CardMedia
+                          component="img"
+                          image={
+                            item.image || "https://via.placeholder.com/300"
+                          }
+                          alt={item.title}
+                          sx={{
+                            position: "absolute",
+                            top: 0,
+                            left: 0,
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "cover",
+                            transition: "transform 0.5s",
+                            filter: isOutOfStock ? "grayscale(100%)" : "none",
+                            "&:hover": { transform: "scale(1.05)" },
+                          }}
+                        />
                       </Box>
-                    </CardContent>
-                  </Card>
-                </Grid>
-              ))
+
+                      <CardContent sx={{ flexGrow: 1, pt: 3, px: 2.5 }}>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "flex-start",
+                          }}
+                        >
+                          <Chip
+                            label={item.category}
+                            size="small"
+                            sx={{
+                              mb: 1,
+                              bgcolor: alpha("#0f2a1d", 0.05),
+                              color: "#0f2a1d",
+                              fontWeight: 600,
+                              fontSize: "0.7rem",
+                              textTransform: "uppercase",
+                            }}
+                          />
+                          {isLowStock && (
+                            <Typography
+                              variant="caption"
+                              color="error"
+                              fontWeight="bold"
+                            >
+                              Only {currentStock} left!
+                            </Typography>
+                          )}
+                        </Box>
+
+                        <Typography
+                          gutterBottom
+                          variant="h6"
+                          sx={{
+                            fontWeight: 700,
+                            fontSize: "1rem",
+                            lineHeight: 1.4,
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            display: "-webkit-box",
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: "vertical",
+                            minHeight: "2.8em",
+                          }}
+                        >
+                          {item.title}
+                        </Typography>
+
+                        <Box
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "space-between",
+                            mt: 2,
+                          }}
+                        >
+                          <Typography
+                            variant="h6"
+                            sx={{ color: "#0f2a1d", fontWeight: "bold" }}
+                          >
+                            ₦{item.price?.toLocaleString()}
+                          </Typography>
+                          <Box
+                            sx={{
+                              width: 32,
+                              height: 32,
+                              borderRadius: "50%",
+                              bgcolor: isOutOfStock ? "#ffebee" : "#f5f5f5",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              color: isOutOfStock ? "error.main" : "#0f2a1d",
+                            }}
+                          >
+                            {isOutOfStock ? (
+                              <BlockIcon fontSize="small" />
+                            ) : (
+                              <AddIcon fontSize="small" />
+                            )}
+                          </Box>
+                        </Box>
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                );
+              })
             ) : (
               <Box
                 sx={{

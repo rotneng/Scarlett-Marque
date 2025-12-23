@@ -28,6 +28,7 @@ import HomeIcon from "@mui/icons-material/HomeOutlined";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import VerifiedUserIcon from "@mui/icons-material/VerifiedUserOutlined";
 import LocalShippingIcon from "@mui/icons-material/LocalShippingOutlined";
+import BlockIcon from "@mui/icons-material/Block";
 
 import { getProducts } from "../../Actions/product.actions";
 import { addItemToCart } from "../../Actions/cartActions";
@@ -37,17 +38,17 @@ const ProductDetails = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const productState = useSelector((state) => state.product);
-  const products = productState?.products || [];
-  const loading = productState?.loading || false;
+  const product = useSelector((state) =>
+    state.product.products.find((p) => p._id === id)
+  );
+
+  const loading = useSelector((state) => state.product.loading);
 
   const userString = localStorage.getItem("user");
   const user = userString ? JSON.parse(userString) : null;
   const isAdmin = user && user.role === "admin";
 
-  const [product, setProduct] = useState(null);
   const [qty, setQty] = useState(1);
-
   const [toast, setToast] = useState({
     open: false,
     message: "",
@@ -55,17 +56,49 @@ const ProductDetails = () => {
   });
 
   useEffect(() => {
-    if (products.length > 0) {
-      const foundProduct = products.find((p) => p._id === id);
-      setProduct(foundProduct);
-    } else {
+    if (!product && !loading) {
       dispatch(getProducts());
     }
-  }, [id, products, dispatch]);
+  }, [dispatch, id, product, loading]);
+
+  useEffect(() => {
+    if (product) {
+      console.log("Current Product Data:", product);
+      console.log("Quantity Field:", product.quantity);
+      console.log("Stock Field:", product.stock);
+      console.log("CountInStock Field:", product.countInStock);
+    }
+  }, [product]);
+  const stockCount = product
+    ? Number(product.quantity || product.countInStock || product.stock || 0)
+    : 0;
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat("en-NG", {
+      style: "currency",
+      currency: "NGN",
+    }).format(amount);
+  };
+  const isOutOfStock = stockCount === 0;
+
+  const stockLabel =
+    stockCount > 10
+      ? "In Stock"
+      : stockCount > 0
+      ? `Low Stock: Only ${stockCount} left`
+      : "Out of Stock";
+
+  const stockColor =
+    stockCount > 10 ? "success" : stockCount > 0 ? "warning" : "error";
 
   const handleIncreaseQty = () => {
-    if (product && qty < product.stock) {
+    if (product && qty < stockCount) {
       setQty((prev) => prev + 1);
+    } else {
+      setToast({
+        open: true,
+        message: `Only ${stockCount} items available in stock`,
+        severity: "warning",
+      });
     }
   };
 
@@ -78,7 +111,16 @@ const ProductDetails = () => {
   const handleAddToCart = () => {
     if (!product) return;
 
-    if (qty > product.stock) {
+    if (stockCount === 0) {
+      setToast({
+        open: true,
+        message: "This item is currently out of stock",
+        severity: "error",
+      });
+      return;
+    }
+
+    if (qty > stockCount) {
       setToast({
         open: true,
         message: "Cannot add more items than available in stock",
@@ -126,15 +168,6 @@ const ProductDetails = () => {
       </Box>
     );
   }
-
-  const stockColor =
-    product.stock > 10 ? "success" : product.stock > 0 ? "warning" : "error";
-  const stockLabel =
-    product.stock > 10
-      ? "In Stock"
-      : product.stock > 0
-      ? `Low Stock: ${product.stock} left`
-      : "Out of Stock";
 
   return (
     <Box sx={{ bgcolor: "#fff", minHeight: "100vh", pb: 8 }}>
@@ -184,8 +217,36 @@ const ProductDetails = () => {
                 justifyContent: "center",
                 overflow: "hidden",
                 border: "1px solid #eee",
+                position: "relative",
               }}
             >
+              {isOutOfStock && (
+                <Box
+                  sx={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    width: "100%",
+                    height: "100%",
+                    bgcolor: "rgba(255,255,255,0.6)",
+                    zIndex: 2,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <Chip
+                    label="SOLD OUT"
+                    color="error"
+                    sx={{
+                      fontSize: "1.5rem",
+                      fontWeight: "bold",
+                      py: 3,
+                      px: 2,
+                    }}
+                  />
+                </Box>
+              )}
               <Box
                 component="img"
                 src={product.image || "https://via.placeholder.com/500"}
@@ -195,6 +256,7 @@ const ProductDetails = () => {
                   maxHeight: "90%",
                   objectFit: "contain",
                   transition: "transform 0.3s ease",
+                  filter: isOutOfStock ? "grayscale(100%)" : "none",
                   "&:hover": { transform: "scale(1.05)" },
                 }}
               />
@@ -220,7 +282,7 @@ const ProductDetails = () => {
                   variant="filled"
                   sx={{ fontWeight: "bold", borderRadius: "8px" }}
                 />
-                {product.stock > 0 && (
+                {stockCount > 0 && (
                   <Chip
                     label="Ready to Ship"
                     size="small"
@@ -260,7 +322,7 @@ const ProductDetails = () => {
                 fontWeight="bold"
                 sx={{ mb: 3 }}
               >
-                ₦{product.price.toLocaleString()}
+                {formatCurrency(product.price)}
               </Typography>
 
               <Divider sx={{ mb: 3 }} />
@@ -271,6 +333,7 @@ const ProductDetails = () => {
               >
                 {product.description}
               </Typography>
+
               {!isAdmin ? (
                 <Box>
                   <Box
@@ -289,11 +352,12 @@ const ProductDetails = () => {
                         borderRadius: "50px",
                         p: "4px",
                         width: "fit-content",
+                        bgcolor: isOutOfStock ? "#f5f5f5" : "transparent",
                       }}
                     >
                       <IconButton
                         onClick={handleDecreaseQty}
-                        disabled={qty <= 1}
+                        disabled={qty <= 1 || isOutOfStock}
                         size="small"
                         sx={{ bgcolor: "#f5f5f5" }}
                       >
@@ -305,30 +369,36 @@ const ProductDetails = () => {
                           fontWeight: "bold",
                           minWidth: "20px",
                           textAlign: "center",
+                          color: isOutOfStock ? "#ccc" : "inherit",
                         }}
                       >
                         {qty}
                       </Typography>
                       <IconButton
                         onClick={handleIncreaseQty}
-                        disabled={qty >= product.stock}
+                        disabled={isOutOfStock || qty >= stockCount}
                         size="small"
                         sx={{
                           bgcolor: "#0f2a1d",
                           color: "white",
                           "&:hover": { bgcolor: "#144430" },
+                          "&.Mui-disabled": {
+                            bgcolor: "#e0e0e0",
+                            color: "#999",
+                          },
                         }}
                       >
                         <AddIcon fontSize="small" />
                       </IconButton>
                     </Box>
-
                     <Button
                       variant="contained"
                       size="large"
-                      startIcon={<ShoppingCartIcon />}
+                      startIcon={
+                        isOutOfStock ? <BlockIcon /> : <ShoppingCartIcon />
+                      }
                       onClick={handleAddToCart}
-                      disabled={product.stock === 0}
+                      disabled={isOutOfStock}
                       sx={{
                         flexGrow: 1,
                         bgcolor: "#0f2a1d",
@@ -342,10 +412,13 @@ const ProductDetails = () => {
                           bgcolor: "#144430",
                           boxShadow: "0 10px 20px rgba(15, 42, 29, 0.3)",
                         },
-                        "&.Mui-disabled": { bgcolor: "#e0e0e0", color: "#999" },
+                        "&.Mui-disabled": {
+                          bgcolor: "#e0e0e0",
+                          color: "#999",
+                        },
                       }}
                     >
-                      {product.stock === 0 ? "Out of Stock" : "Add to Cart"}
+                      {isOutOfStock ? "Out of Stock" : "Add to Cart"}
                     </Button>
                   </Box>
 

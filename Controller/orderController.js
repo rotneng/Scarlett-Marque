@@ -1,4 +1,5 @@
 const Order = require("../Models/orderModel");
+const Product = require("../Models/productModel");
 
 const addOrderItems = async (req, res) => {
   try {
@@ -41,6 +42,14 @@ const addOrderItems = async (req, res) => {
     });
 
     const createdOrder = await order.save();
+
+    for (const item of orderItems) {
+      await Product.updateOne(
+        { _id: item.product },
+        { $inc: { stock: -Number(item.qty) } }
+      );
+    }
+
     res.status(201).json(createdOrder);
   } catch (error) {
     console.log("Order Controller Error:", error);

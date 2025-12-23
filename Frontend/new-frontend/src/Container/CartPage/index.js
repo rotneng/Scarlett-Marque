@@ -52,13 +52,29 @@ const CartPage = () => {
       dispatch(getProducts());
     }
   }, [dispatch, products]);
+  const getStock = (p) => {
+    if (!p) return null;
+    if (p.quantity !== undefined) return p.quantity;
+    if (p.stock !== undefined) return p.stock;
+    if (p.countInStock !== undefined) return p.countInStock;
+    return null;
+  };
 
   const onQuantityIncrement = (item) => {
     const productId = item.product?._id || item.product || item._id;
     const realProduct = products.find((p) => p._id === productId);
-    const availableStock = realProduct ? realProduct.stock : item.stock;
 
-    if (availableStock !== undefined && item.qty >= availableStock) {
+    const productStock = getStock(realProduct);
+    const itemStock = getStock(item);
+
+    const availableStock =
+      productStock !== null
+        ? productStock
+        : itemStock !== null
+        ? itemStock
+        : 1000;
+
+    if (item.qty >= availableStock) {
       return;
     }
     dispatch(addItemToCart(item, 1));
@@ -201,6 +217,7 @@ const CartPage = () => {
     );
   }
 
+  // --- RENDER: CART ITEMS ---
   return (
     <Box sx={{ bgcolor: "#f4f6f8", minHeight: "100vh", py: 4 }}>
       <Container maxWidth="lg">
@@ -224,9 +241,16 @@ const CartPage = () => {
             {cartItems.map((item) => {
               const productId = item.product?._id || item.product || item._id;
               const realProduct = products.find((p) => p._id === productId);
-              const stockLimit = realProduct ? realProduct.stock : item.stock;
-              const isMaxedOut =
-                stockLimit !== undefined && item.qty >= stockLimit;
+
+              const productStock = getStock(realProduct);
+              const itemStock = getStock(item);
+              const stockLimit =
+                productStock !== null
+                  ? productStock
+                  : itemStock !== null
+                  ? itemStock
+                  : 1000;
+              const isMaxedOut = item.qty >= stockLimit;
 
               return (
                 <Card

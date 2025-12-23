@@ -1,7 +1,7 @@
 import axios from "axios";
 import { authConstants } from "./constant";
 
-export const login = (loginData, navigate) => {
+export const login = (loginData) => {
   return async (dispatch) => {
     try {
       dispatch({ type: authConstants.LOGIN_REQUEST });
@@ -22,30 +22,22 @@ export const login = (loginData, navigate) => {
           : [];
 
         if (localCart.length > 0) {
-          console.log("Merging guest cart...");
-
           const mergeRequests = localCart.map((item) => {
-            const payload = {
-              cartItems: {
-                product: item._id,
-                quantity: item.qty,
-                price: item.price,
-              },
-            };
-
             return axios.post(
               "http://localhost:3000/cart/user/cart/addtocart",
-              payload,
               {
-                headers: { Authorization: `Bearer ${token}` },
-              }
+                cartItems: {
+                  product: item._id,
+                  quantity: item.qty,
+                  price: item.price,
+                },
+              },
+              { headers: { Authorization: `Bearer ${token}` } }
             );
           });
 
           await Promise.all(mergeRequests);
-
           localStorage.removeItem("cart");
-          console.log("Cart merged successfully.");
         }
 
         dispatch({
@@ -55,12 +47,9 @@ export const login = (loginData, navigate) => {
             user: { username, role },
           },
         });
-
-        window.location.href = "/";
       }
     } catch (error) {
       console.log("error in login action", error);
-
       const errorMessage =
         error.response && error.response.data.message
           ? error.response.data.message
@@ -74,14 +63,12 @@ export const login = (loginData, navigate) => {
   };
 };
 
-export const logout = (navigate) => {
+export const logout = () => {
   return async (dispatch) => {
     try {
       dispatch({ type: authConstants.LOGOUT_REQUEST });
-
       localStorage.removeItem("token");
       localStorage.removeItem("user");
-
       dispatch({ type: authConstants.LOGOUT_SUCCESS });
 
       window.location.href = "/signin";
@@ -91,7 +78,7 @@ export const logout = (navigate) => {
   };
 };
 
-export const register = (signUpData, navigate) => {
+export const register = (signUpData) => {
   return async (dispatch) => {
     try {
       dispatch({ type: authConstants.REGISTER_REQUEST });
@@ -106,9 +93,6 @@ export const register = (signUpData, navigate) => {
           type: authConstants.REGISTER_SUCCESS,
           payload: { message: res.data.message },
         });
-
-        alert("Registration Successful! Please Sign In.");
-        navigate("/signin");
       }
     } catch (error) {
       console.log("error in register action", error);
