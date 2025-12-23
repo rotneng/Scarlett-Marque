@@ -1,7 +1,11 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams, useNavigate } from "react-router-dom";
-import { getOrderDetails, confirmDelivery } from "../../Actions/order.actions";
+import {
+  getOrderDetails,
+  confirmDelivery,
+  reportOrderIssue,
+} from "../../Actions/order.actions";
 import {
   Box,
   Container,
@@ -21,13 +25,14 @@ import {
   ListItem,
   ListItemAvatar,
   ListItemText,
-  Paper,
 } from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import InventoryIcon from "@mui/icons-material/Inventory";
 import HomeIcon from "@mui/icons-material/Home";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import PriorityHighIcon from "@mui/icons-material/PriorityHigh";
+import ReportProblemIcon from "@mui/icons-material/ReportProblem";
 
 const generatePublicUrl = (fileName) => {
   return `http://localhost:2000/public/${fileName}`;
@@ -65,7 +70,18 @@ const TrackOrderPage = () => {
     }
   };
 
-  const getActiveStep = (status) => {
+  const onReportIssue = () => {
+    if (
+      window.confirm(
+        "Has the order NOT arrived? We will notify the admin immediately."
+      )
+    ) {
+      dispatch(reportOrderIssue(order._id));
+      alert("Admin has been notified.");
+    }
+  };
+
+  const getActiveStep = (status, isDelivered) => {
     switch (status) {
       case "ordered":
         return 1;
@@ -74,7 +90,7 @@ const TrackOrderPage = () => {
       case "shipped":
         return 3;
       case "delivered":
-        return 4;
+        return isDelivered ? 4 : 3;
       default:
         return 0;
     }
@@ -99,16 +115,12 @@ const TrackOrderPage = () => {
       </Container>
     );
 
-  const activeStep = getActiveStep(order.orderStatus);
-
-  const isOrderOwner =
-    auth.user &&
-    order.user &&
-    auth.user._id.toString() === (order.user._id || order.user).toString();
+  const activeStep = getActiveStep(order.orderStatus, order.isDelivered);
+  const pendingConfirmation =
+    order.orderStatus === "delivered" && !order.isDelivered;
 
   return (
     <Container maxWidth="md" sx={{ py: 5 }}>
-      {/* Back Button */}
       <Button
         startIcon={<ArrowBackIcon />}
         onClick={() => navigate("/account/orders")}
@@ -121,7 +133,6 @@ const TrackOrderPage = () => {
         Order #{order._id?.substring(0, 10)}...
       </Typography>
 
-      {/* --- SECTION 1: STATUS STEPPER --- */}
       <Card sx={{ mb: 4, p: 3, borderRadius: "12px", boxShadow: 2 }}>
         <Stepper activeStep={activeStep} alternativeLabel>
           {steps.map((step, index) => (
@@ -151,44 +162,69 @@ const TrackOrderPage = () => {
         </Stepper>
 
         <Box sx={{ textAlign: "center", mt: 3 }}>
-          <Typography variant="h6" color="primary" fontWeight="bold">
+          <Typography
+            variant="h6"
+            fontWeight="bold"
+            color={pendingConfirmation ? "warning.main" : "primary"}
+          >
             Current Status:{" "}
-            {order.orderStatus ? order.orderStatus.toUpperCase() : "PROCESSING"}
+            {pendingConfirmation
+              ? "ARRIVED (Action Required)"
+              : order.orderStatus
+              ? order.orderStatus.toUpperCase()
+              : "PROCESSING"}
           </Typography>
         </Box>
       </Card>
 
-      {order.orderStatus === "shipped" &&
-        !order.isDelivered &&
-        isOrderOwner && (
-          <Alert
-            severity="info"
-            sx={{ mb: 4, borderRadius: "12px", alignItems: "center" }}
+      {pendingConfirmation && (
+        <Alert
+          severity="warning"
+          icon={<PriorityHighIcon fontSize="inherit" />}
+          sx={{ mb: 4, borderRadius: "12px", alignItems: "center" }}
+        >
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              width: "100%",
+              alignItems: "center",
+              flexWrap: "wrap",
+              gap: 2,
+            }}
           >
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                width: "100%",
-                alignItems: "center",
-              }}
-            >
-              <Typography variant="body1" fontWeight="bold">
-                Has your package arrived safely?
+            <Box>
+              <Typography variant="subtitle1" fontWeight="bold">
+                Delivery Reported
               </Typography>
+              <Typography variant="body2">
+                Our driver says this order has arrived. Do you have it?
+              </Typography>
+            </Box>
+            <Box sx={{ display: "flex", gap: 2 }}>
+              <Button
+                variant="outlined"
+                color="error"
+                startIcon={<ReportProblemIcon />}
+                onClick={onReportIssue}
+                sx={{ bgcolor: "white" }}
+              >
+                No, Report Issue
+              </Button>
               <Button
                 variant="contained"
                 color="success"
+                startIcon={<CheckCircleIcon />}
                 onClick={onConfirmDelivery}
                 sx={{ fontWeight: "bold" }}
               >
                 Yes, I Received It
               </Button>
             </Box>
-          </Alert>
-        )}
+          </Box>
+        </Alert>
+      )}
 
-      {/* Success Message */}
       {order.isDelivered && (
         <Alert severity="success" variant="filled" sx={{ mb: 4 }}>
           Order successfully delivered on{" "}
@@ -271,7 +307,8 @@ const TrackOrderPage = () => {
                 Name
               </Typography>
               <Typography variant="body1" gutterBottom>
-                {auth.user?.firstName} {auth.user?.lastName}
+                {order.user?.firstName || auth.user?.firstName}{" "}
+                {order.user?.lastName || auth.user?.lastName}
               </Typography>
 
               <Typography variant="subtitle2" color="text.secondary" mt={2}>

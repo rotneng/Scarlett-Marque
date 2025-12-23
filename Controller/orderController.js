@@ -142,24 +142,6 @@ const getOrders = async (req, res) => {
   }
 };
 
-const updateOrderToDelivered = async (req, res) => {
-  try {
-    const order = await Order.findById(req.params.id);
-
-    if (order) {
-      order.isDelivered = true;
-      order.deliveredAt = Date.now();
-      order.orderStatus = "delivered";
-      const updatedOrder = await order.save();
-      res.json(updatedOrder);
-    } else {
-      res.status(404).json({ message: "Order not found" });
-    }
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
 const updateOrderStatus = async (req, res) => {
   try {
     const order = await Order.findById(req.body.orderId);
@@ -173,8 +155,7 @@ const updateOrderStatus = async (req, res) => {
     }
 
     if (req.body.type === "delivered") {
-      order.isDelivered = true;
-      order.deliveredAt = Date.now();
+      order.orderStatus = "delivered";
     }
 
     await order.save();
@@ -212,6 +193,51 @@ const userConfirmDelivery = async (req, res) => {
   }
 };
 
+const reportOrderIssue = async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id);
+
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    const currentUserId = req.user.userId || req.user._id;
+
+    if (order.user.toString() !== currentUserId.toString()) {
+      return res
+        .status(403)
+        .json({ message: "Access denied. You did not place this order." });
+    }
+
+    order.orderStatus = "issue_reported";
+    order.isDelivered = false;
+
+    const updatedOrder = await order.save();
+    res.json(updatedOrder);
+  } catch (error) {
+    console.error("Report Order Issue Error:", error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+const updateOrderToDelivered = async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id);
+
+    if (order) {
+      order.isDelivered = true;
+      order.deliveredAt = Date.now();
+      order.orderStatus = "delivered";
+      const updatedOrder = await order.save();
+      res.json(updatedOrder);
+    } else {
+      res.status(404).json({ message: "Order not found" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   addOrderItems,
   getOrderById,
@@ -221,4 +247,5 @@ module.exports = {
   updateOrderToDelivered,
   updateOrderStatus,
   userConfirmDelivery,
+  reportOrderIssue,
 };

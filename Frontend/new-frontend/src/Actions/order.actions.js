@@ -192,3 +192,26 @@ export const confirmDelivery = (orderId) => {
     }
   };
 };
+
+export const reportOrderIssue = (orderId) => {
+  return async (dispatch) => {
+    try {
+      dispatch({ type: orderConstants.UPDATE_CUSTOMER_ORDER_REQUEST });
+
+      const res = await axios.put(`/order/${orderId}/report-issue`);
+
+      if (res.status === 200) {
+        dispatch({ type: orderConstants.UPDATE_CUSTOMER_ORDER_SUCCESS });
+        dispatch(getOrderDetails(orderId));
+      }
+    } catch (error) {
+      dispatch({
+        type: orderConstants.UPDATE_CUSTOMER_ORDER_FAILURE,
+        payload:
+          error.response && error.response.data.message
+            ? error.response.data.message
+            : error.message,
+      });
+    }
+  };
+};

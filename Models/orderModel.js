@@ -47,7 +47,7 @@ const orderSchema = mongoose.Schema(
       type: String,
       required: true,
       default: "ordered",
-      enum: ["ordered", "packed", "shipped", "delivered"],
+      enum: ["ordered", "packed", "shipped", "delivered", "issue_reported"],
     },
 
     isDelivered: { type: Boolean, required: true, default: false },

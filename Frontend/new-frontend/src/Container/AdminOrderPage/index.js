@@ -18,6 +18,7 @@ import {
   Chip,
   CircularProgress,
 } from "@mui/material";
+import ReportProblemIcon from "@mui/icons-material/ReportProblem";
 
 const AdminOrdersPage = () => {
   const dispatch = useDispatch();
@@ -119,19 +120,29 @@ const AdminOrdersPage = () => {
                     </TableCell>
 
                     <TableCell>
-                      <Chip
-                        label={order.orderStatus.toUpperCase()}
-                        color={
-                          order.orderStatus === "delivered"
-                            ? "success"
-                            : order.orderStatus === "shipped"
-                            ? "info"
-                            : order.orderStatus === "packed"
-                            ? "secondary"
-                            : "default"
-                        }
-                        size="small"
-                      />
+                      {order.orderStatus === "issue_reported" ? (
+                        <Chip
+                          icon={<ReportProblemIcon />}
+                          label="ISSUE IN DELIVERY"
+                          color="error"
+                          size="small"
+                          sx={{ fontWeight: "bold" }}
+                        />
+                      ) : (
+                        <Chip
+                          label={order.orderStatus.toUpperCase()}
+                          color={
+                            order.orderStatus === "delivered"
+                              ? "success"
+                              : order.orderStatus === "shipped"
+                              ? "info"
+                              : order.orderStatus === "packed"
+                              ? "secondary"
+                              : "default"
+                          }
+                          size="small"
+                        />
+                      )}
                     </TableCell>
 
                     <TableCell align="center">
@@ -153,6 +164,13 @@ const AdminOrdersPage = () => {
                           <MenuItem value="packed">Packed</MenuItem>
                           <MenuItem value="shipped">Shipped</MenuItem>
                           <MenuItem value="delivered">Delivered</MenuItem>
+                          <MenuItem
+                            value="issue_reported"
+                            disabled
+                            sx={{ color: "red", fontStyle: "italic" }}
+                          >
+                            Issue Reported
+                          </MenuItem>
                         </Select>
                       </FormControl>
                     </TableCell>
