@@ -7,20 +7,25 @@ import {
   Button,
   Grid,
   Card,
-  CardMedia,
+  CardContent,
   IconButton,
   CircularProgress,
   Divider,
+  Container,
+  Stack,
+  Avatar,
+  Tooltip,
 } from "@mui/material";
 
-import DeleteIcon from "@mui/icons-material/Delete";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import ShoppingBagIcon from "@mui/icons-material/ShoppingBag";
+import ShoppingBagOutlinedIcon from "@mui/icons-material/ShoppingBagOutlined";
 import LoginIcon from "@mui/icons-material/Login";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
+import ProductionQuantityLimitsIcon from "@mui/icons-material/ProductionQuantityLimits";
 
 import {
   getCartItems,
@@ -48,30 +53,23 @@ const CartPage = () => {
     }
   }, [dispatch, products]);
 
-  const onQuantityIncrement = (id) => {
-    const item = cartItems.find((x) => x._id === id);
-    if (!item) return;
-
+  const onQuantityIncrement = (item) => {
     const productId = item.product?._id || item.product || item._id;
     const realProduct = products.find((p) => p._id === productId);
-
     const availableStock = realProduct ? realProduct.stock : item.stock;
 
     if (availableStock !== undefined && item.qty >= availableStock) {
-      alert(`Sorry, only ${availableStock} items left in stock.`);
       return;
     }
-
     dispatch(addItemToCart(item, 1));
   };
 
-  const onQuantityDecrement = (id) => {
-    const item = cartItems.find((x) => x._id === id);
+  const onQuantityDecrement = (item) => {
     if (item && item.qty > 1) dispatch(addItemToCart(item, -1));
   };
 
   const onRemoveCartItem = (id) => {
-    if (window.confirm("Remove this item?")) {
+    if (window.confirm("Are you sure you want to remove this item?")) {
       dispatch(removeCartItem(id));
     }
   };
@@ -93,68 +91,74 @@ const CartPage = () => {
     return (
       <Box
         sx={{
-          textAlign: "center",
-          mt: { xs: 5, md: 10 },
-          p: 3,
           display: "flex",
-          flexDirection: "column",
+          justifyContent: "center",
           alignItems: "center",
-          minHeight: "60vh",
+          minHeight: "80vh",
+          bgcolor: "#f4f6f8",
         }}
       >
-        <CheckCircleIcon sx={{ fontSize: 80, color: "#2e7d32", mb: 2 }} />
-
-        <Typography
-          variant="h4"
-          fontWeight="bold"
-          sx={{ mb: 1, color: "#0f2a1d" }}
-        >
-          Order Placed Successfully!
-        </Typography>
-
-        <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
-          Thank you for your purchase. Your order ID is{" "}
-          <strong>{orderId}</strong>
-        </Typography>
-
-        <Box
+        <Card
           sx={{
-            display: "flex",
-            gap: 2,
-            flexDirection: { xs: "column", sm: "row" },
+            maxWidth: 600,
+            width: "100%",
+            textAlign: "center",
+            p: 5,
+            borderRadius: 4,
+            boxShadow: "0 8px 32px rgba(0,0,0,0.08)",
           }}
         >
-          <Button
-            variant="contained"
-            startIcon={<LocalShippingIcon />}
-            onClick={() => navigate(`/track-order/${orderId}`)}
-            sx={{
-              bgcolor: "#0f2a1d",
-              borderRadius: "30px",
-              px: 4,
-              py: 1.5,
-              "&:hover": { bgcolor: "#144430" },
-            }}
+          <CheckCircleOutlineIcon
+            sx={{ fontSize: 100, color: "#2e7d32", mb: 2 }}
+          />
+          <Typography
+            variant="h4"
+            fontWeight="800"
+            gutterBottom
+            color="#0f2a1d"
           >
-            Track My Order
-          </Button>
+            Order Confirmed!
+          </Typography>
+          <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
+            Thank you for your purchase. We have received your order.
+            <br />
+            Order ID: <strong>{orderId}</strong>
+          </Typography>
 
-          <Button
-            variant="outlined"
-            onClick={() => {
-              navigate("/", { state: {} });
-            }}
-            sx={{
-              borderColor: "#0f2a1d",
-              color: "#0f2a1d",
-              borderRadius: "30px",
-              px: 4,
-              py: 1.5,
-            }}
+          <Stack
+            direction={{ xs: "column", sm: "row" }}
+            spacing={2}
+            justifyContent="center"
           >
-            Continue Shopping
-          </Button>
-        </Box>
+            <Button
+              variant="contained"
+              startIcon={<LocalShippingIcon />}
+              onClick={() => navigate(`/track-order/${orderId}`)}
+              sx={{
+                bgcolor: "#0f2a1d",
+                borderRadius: "30px",
+                px: 4,
+                py: 1.5,
+                "&:hover": { bgcolor: "#144430" },
+              }}
+            >
+              Track Order
+            </Button>
+            <Button
+              variant="outlined"
+              onClick={() => navigate("/", { state: {} })}
+              sx={{
+                borderColor: "#0f2a1d",
+                color: "#0f2a1d",
+                borderRadius: "30px",
+                px: 4,
+                py: 1.5,
+              }}
+            >
+              Continue Shopping
+            </Button>
+          </Stack>
+        </Card>
       </Box>
     );
   }
@@ -163,31 +167,33 @@ const CartPage = () => {
     return (
       <Box
         sx={{
-          textAlign: "center",
-          mt: { xs: 5, md: 10 },
-          p: 3,
           display: "flex",
           flexDirection: "column",
+          justifyContent: "center",
           alignItems: "center",
+          minHeight: "70vh",
+          bgcolor: "#f9fafb",
         }}
       >
-        <ShoppingBagIcon
-          sx={{ fontSize: { xs: 60, md: 80 }, color: "#ccc", mb: 2 }}
-        />
-        <Typography
-          variant="h5"
-          sx={{
-            mb: 1,
-            fontWeight: "bold",
-            fontSize: { xs: "1.25rem", md: "1.5rem" },
-          }}
-        >
-          Your Cart is Empty
+        <Avatar sx={{ width: 120, height: 120, bgcolor: "#e0e0e0", mb: 3 }}>
+          <ShoppingBagOutlinedIcon sx={{ fontSize: 60, color: "#9e9e9e" }} />
+        </Avatar>
+        <Typography variant="h5" fontWeight="bold" gutterBottom color="#424242">
+          Your cart is currently empty
+        </Typography>
+        <Typography variant="body2" color="text.secondary" mb={4}>
+          Looks like you haven't added anything to your cart yet.
         </Typography>
         <Button
           onClick={() => navigate("/")}
           variant="contained"
-          sx={{ bgcolor: "#0f2a1d", borderRadius: "30px", mt: 2, px: 4 }}
+          size="large"
+          sx={{
+            bgcolor: "#0f2a1d",
+            borderRadius: "30px",
+            px: 6,
+            "&:hover": { bgcolor: "#144430" },
+          }}
         >
           Start Shopping
         </Button>
@@ -196,216 +202,277 @@ const CartPage = () => {
   }
 
   return (
-    <Box
-      sx={{
-        p: { xs: 2, md: 3 },
-        maxWidth: "1200px",
-        margin: "0 auto",
-        minHeight: "90vh",
-      }}
-    >
-      <Button
-        startIcon={<ArrowBackIcon />}
-        onClick={() => navigate("/")}
-        variant="contained"
-        sx={{
-          mt: 2,
-          bgcolor: "#0f2a1d",
-          mb: 3,
-          borderRadius: "20px",
-          width: { xs: "100%", sm: "auto" },
-        }}
-      >
-        Back to Store
-      </Button>
+    <Box sx={{ bgcolor: "#f4f6f8", minHeight: "100vh", py: 4 }}>
+      <Container maxWidth="lg">
+        <Stack direction="row" alignItems="center" spacing={2} mb={4}>
+          <IconButton
+            onClick={() => navigate("/")}
+            sx={{ bgcolor: "white", boxShadow: 1 }}
+          >
+            <ArrowBackIcon />
+          </IconButton>
+          <Typography variant="h4" fontWeight="800" color="#0f2a1d">
+            Shopping Cart
+          </Typography>
+          {updatingCart && (
+            <CircularProgress size={24} sx={{ color: "#0f2a1d" }} />
+          )}
+        </Stack>
 
-      <Typography
-        variant="h4"
-        fontWeight="bold"
-        sx={{
-          mb: 3,
-          display: "flex",
-          alignItems: "center",
-          fontSize: { xs: "1.5rem", md: "2.125rem" },
-        }}
-      >
-        Shopping Cart{" "}
-        {updatingCart && (
-          <CircularProgress size={24} sx={{ ml: 2, color: "#0f2a1d" }} />
-        )}
-      </Typography>
+        <Grid container spacing={4}>
+          <Grid item xs={12} md={8}>
+            {cartItems.map((item) => {
+              const productId = item.product?._id || item.product || item._id;
+              const realProduct = products.find((p) => p._id === productId);
+              const stockLimit = realProduct ? realProduct.stock : item.stock;
+              const isMaxedOut =
+                stockLimit !== undefined && item.qty >= stockLimit;
 
-      <Grid container spacing={{ xs: 2, md: 4 }}>
-        <Grid item xs={12} md={8}>
-          {cartItems.map((item) => {
-            const productId = item.product?._id || item.product || item._id;
-            const realProduct = products.find((p) => p._id === productId);
-            const stockLimit = realProduct ? realProduct.stock : item.stock;
-            const isMaxedOut =
-              stockLimit !== undefined && item.qty >= stockLimit;
-
-            return (
-              <Card
-                key={item._id}
-                elevation={3}
-                sx={{
-                  display: "flex",
-                  flexDirection: { xs: "column", sm: "row" },
-                  mb: 2,
-                  p: 2,
-                  alignItems: "center",
-                  borderRadius: "12px",
-                  textAlign: { xs: "center", sm: "left" },
-                }}
-              >
-                <CardMedia
-                  component="img"
-                  onClick={() => navigate(`/product/${productId}`)}
-                  sx={{
-                    width: { xs: 120, sm: 100 },
-                    height: { xs: 120, sm: 100 },
-                    objectFit: "contain",
-                    borderRadius: "8px",
-                    mb: { xs: 2, sm: 0 },
-                    cursor: "pointer",
-                    "&:hover": { opacity: 0.8 },
-                  }}
-                  image={item.image || "https://via.placeholder.com/100"}
-                  alt={item.title}
-                />
-
-                <Box
-                  sx={{
-                    flexGrow: 1,
-                    ml: { xs: 0, sm: 2 },
-                    mb: { xs: 2, sm: 0 },
-                    width: { xs: "100%", sm: "auto" },
-                  }}
-                >
-                  <Typography
-                    variant="h6"
-                    onClick={() => navigate(`/product/${productId}`)}
-                    sx={{
-                      fontSize: { xs: "1rem", sm: "1.25rem" },
-                      cursor: "pointer",
-                      "&:hover": {
-                        color: "#0f2a1d",
-                        textDecoration: "underline",
-                      },
-                    }}
-                  >
-                    {item.title}
-                  </Typography>
-
-                  <Typography variant="body2" color="text.secondary">
-                    {item.category}
-                  </Typography>
-                  <Typography color="green" fontWeight="bold" sx={{ mt: 0.5 }}>
-                    ₦{item.price ? item.price.toLocaleString() : 0}
-                  </Typography>
-
-                  {isMaxedOut && (
-                    <Typography
-                      variant="caption"
-                      color="error"
-                      sx={{ display: "block", mt: 0.5 }}
-                    >
-                      Max stock reached ({stockLimit})
-                    </Typography>
-                  )}
-                </Box>
-
-                <Box
+              return (
+                <Card
+                  key={item._id}
+                  elevation={0}
                   sx={{
                     display: "flex",
-                    alignItems: "center",
-                    width: { xs: "100%", sm: "auto" },
-                    justifyContent: { xs: "center", sm: "flex-end" },
+                    flexDirection: { xs: "column", sm: "row" },
+                    mb: 2,
+                    p: 2,
+                    borderRadius: "16px",
+                    border: "1px solid #e0e0e0",
+                    transition: "transform 0.2s, box-shadow 0.2s",
+                    "&:hover": {
+                      transform: "translateY(-2px)",
+                      boxShadow: "0 10px 20px rgba(0,0,0,0.05)",
+                    },
                   }}
                 >
-                  <Box sx={{ display: "flex", alignItems: "center", mr: 3 }}>
-                    <IconButton
-                      onClick={() => onQuantityDecrement(item._id)}
-                      disabled={item.qty <= 1 || updatingCart}
-                      sx={{ border: "1px solid #ddd", width: 30, height: 30 }}
-                    >
-                      <RemoveIcon fontSize="small" />
-                    </IconButton>
-                    <Typography sx={{ mx: 2, fontWeight: "bold" }}>
-                      {item.qty}
-                    </Typography>
-
-                    <IconButton
-                      onClick={() => onQuantityIncrement(item._id)}
-                      disabled={updatingCart || isMaxedOut}
-                      sx={{
-                        border: "1px solid #0f2a1d",
-                        width: 30,
-                        height: 30,
-                        color: "white",
-                        bgcolor: "#0f2a1d",
-                        "&:hover": { bgcolor: "#144430" },
-                        "&:disabled": { bgcolor: "#ccc", borderColor: "#ccc" },
+                  <Box
+                    onClick={() => navigate(`/product/${productId}`)}
+                    sx={{
+                      width: { xs: "100%", sm: 140 },
+                      height: 140,
+                      flexShrink: 0,
+                      borderRadius: "12px",
+                      overflow: "hidden",
+                      bgcolor: "#fff",
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <img
+                      src={item.image || "https://via.placeholder.com/150"}
+                      alt={item.title}
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "contain",
                       }}
-                    >
-                      <AddIcon fontSize="small" />
-                    </IconButton>
+                    />
                   </Box>
 
-                  <IconButton
-                    color="error"
-                    onClick={() => onRemoveCartItem(item._id)}
-                    disabled={updatingCart}
+                  {/* Details */}
+                  <CardContent
+                    sx={{
+                      flexGrow: 1,
+                      display: "flex",
+                      flexDirection: "column",
+                      justifyContent: "space-between",
+                      py: { xs: 2, sm: 1 },
+                    }}
                   >
-                    <DeleteIcon />
-                  </IconButton>
-                </Box>
-              </Card>
-            );
-          })}
-        </Grid>
+                    <Box>
+                      <Stack
+                        direction="row"
+                        justifyContent="space-between"
+                        alignItems="flex-start"
+                      >
+                        <Box>
+                          <Typography
+                            variant="h6"
+                            fontWeight="bold"
+                            onClick={() => navigate(`/product/${productId}`)}
+                            sx={{
+                              cursor: "pointer",
+                              "&:hover": {
+                                color: "#0f2a1d",
+                                textDecoration: "underline",
+                              },
+                            }}
+                          >
+                            {item.title}
+                          </Typography>
+                          <Typography
+                            variant="body2"
+                            color="text.secondary"
+                            sx={{
+                              textTransform: "uppercase",
+                              fontSize: "0.75rem",
+                              letterSpacing: 0.5,
+                              mt: 0.5,
+                            }}
+                          >
+                            {item.category}
+                          </Typography>
+                        </Box>
+                        <Tooltip title="Remove Item">
+                          <IconButton
+                            onClick={() => onRemoveCartItem(item._id)}
+                            color="error"
+                            size="small"
+                          >
+                            <DeleteOutlineIcon />
+                          </IconButton>
+                        </Tooltip>
+                      </Stack>
+                    </Box>
 
-        <Grid item xs={12} md={4}>
-          <Card
-            sx={{ p: 3, position: "sticky", top: 100, borderRadius: "16px" }}
-            elevation={4}
-          >
-            <Typography variant="h6" fontWeight="bold" gutterBottom>
-              Order Summary
-            </Typography>
-            <Divider sx={{ my: 2 }} />
-            <Box
+                    <Stack
+                      direction={{ xs: "column", sm: "row" }}
+                      justifyContent="space-between"
+                      alignItems={{ xs: "flex-start", sm: "center" }}
+                      spacing={2}
+                      mt={2}
+                    >
+                      <Typography
+                        variant="h6"
+                        color="#0f2a1d"
+                        fontWeight="bold"
+                      >
+                        ₦{item.price ? item.price.toLocaleString() : 0}
+                      </Typography>
+
+                      <Box>
+                        <Stack
+                          direction="row"
+                          alignItems="center"
+                          spacing={1}
+                          sx={{
+                            bgcolor: "#f5f5f5",
+                            borderRadius: "50px",
+                            px: 1,
+                            py: 0.5,
+                          }}
+                        >
+                          <IconButton
+                            size="small"
+                            onClick={() => onQuantityDecrement(item)}
+                            disabled={item.qty <= 1 || updatingCart}
+                          >
+                            <RemoveIcon fontSize="small" />
+                          </IconButton>
+                          <Typography
+                            fontWeight="bold"
+                            sx={{ minWidth: "20px", textAlign: "center" }}
+                          >
+                            {item.qty}
+                          </Typography>
+                          <IconButton
+                            size="small"
+                            onClick={() => onQuantityIncrement(item)}
+                            disabled={updatingCart || isMaxedOut}
+                            sx={{
+                              bgcolor: isMaxedOut ? "transparent" : "white",
+                              boxShadow: isMaxedOut ? "none" : 1,
+                              "&:hover": { bgcolor: "white" },
+                            }}
+                          >
+                            <AddIcon fontSize="small" />
+                          </IconButton>
+                        </Stack>
+                        {isMaxedOut && (
+                          <Typography
+                            variant="caption"
+                            color="error"
+                            sx={{
+                              display: "flex",
+                              alignItems: "center",
+                              mt: 0.5,
+                              fontSize: "0.7rem",
+                            }}
+                          >
+                            <ProductionQuantityLimitsIcon
+                              fontSize="inherit"
+                              sx={{ mr: 0.5 }}
+                            />{" "}
+                            Max Stock
+                          </Typography>
+                        )}
+                      </Box>
+                    </Stack>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </Grid>
+
+          <Grid item xs={12} md={4}>
+            <Card
+              elevation={0}
               sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                mt: 2,
-                mb: 3,
+                p: 3,
+                borderRadius: "16px",
+                border: "1px solid #e0e0e0",
+                position: "sticky",
+                top: 20,
               }}
             >
-              <Typography variant="h6">Total Price:</Typography>
-              <Typography variant="h6" color="green" fontWeight="bold">
-                ₦{totalPrice.toLocaleString()}
+              <Typography variant="h6" fontWeight="800" gutterBottom>
+                Order Summary
               </Typography>
-            </Box>
+              <Divider sx={{ my: 2 }} />
 
-            <Button
-              variant="contained"
-              fullWidth
-              size="large"
-              startIcon={!token ? <LoginIcon /> : null}
-              sx={{
-                bgcolor: "#0f2a1d",
-                borderRadius: "20px",
-                py: 1.5,
-                "&:hover": { bgcolor: "#144430" },
-              }}
-              onClick={handleCheckout}
-            >
-              Checkout
-            </Button>
-          </Card>
+              <Stack direction="row" justifyContent="space-between" mb={1}>
+                <Typography color="text.secondary">Subtotal</Typography>
+                <Typography fontWeight="500">
+                  ₦{totalPrice.toLocaleString()}
+                </Typography>
+              </Stack>
+              <Stack direction="row" justifyContent="space-between" mb={3}>
+                <Typography color="text.secondary">Shipping</Typography>
+                <Typography variant="caption" color="text.disabled">
+                  Calculated at checkout
+                </Typography>
+              </Stack>
+
+              <Divider sx={{ mb: 2, borderStyle: "dashed" }} />
+
+              <Stack direction="row" justifyContent="space-between" mb={4}>
+                <Typography variant="h6" fontWeight="bold">
+                  Total
+                </Typography>
+                <Typography variant="h5" fontWeight="bold" color="#0f2a1d">
+                  ₦{totalPrice.toLocaleString()}
+                </Typography>
+              </Stack>
+
+              <Button
+                variant="contained"
+                fullWidth
+                size="large"
+                startIcon={!token ? <LoginIcon /> : null}
+                onClick={handleCheckout}
+                sx={{
+                  bgcolor: "#0f2a1d",
+                  borderRadius: "30px",
+                  py: 1.5,
+                  fontWeight: "bold",
+                  fontSize: "1rem",
+                  textTransform: "none",
+                  boxShadow: "0 8px 16px rgba(15, 42, 29, 0.2)",
+                  "&:hover": {
+                    bgcolor: "#144430",
+                    boxShadow: "0 10px 20px rgba(15, 42, 29, 0.3)",
+                  },
+                }}
+              >
+                {token ? "Proceed to Checkout" : "Login to Checkout"}
+              </Button>
+            </Card>
+          </Grid>
         </Grid>
-      </Grid>
+      </Container>
     </Box>
   );
 };

@@ -12,12 +12,18 @@ import {
   Radio,
   RadioGroup,
   FormControlLabel,
-  FormControl,
+  Container,
+  Stack,
+  Paper,
+  alpha,
 } from "@mui/material";
 
 import CreditCardIcon from "@mui/icons-material/CreditCard";
-import LocalShippingIcon from "@mui/icons-material/LocalShipping";
+import LocalShippingIcon from "@mui/icons-material/LocalShippingOutlined";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import LockIcon from "@mui/icons-material/Lock";
+import PersonPinCircleIcon from "@mui/icons-material/PersonPinCircleOutlined";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 
 const PaymentPage = () => {
   const navigate = useNavigate();
@@ -39,6 +45,7 @@ const PaymentPage = () => {
   const finalCartItems = stateCartItems || reduxCartItems;
 
   const [paymentMethod, setPaymentMethod] = useState("Card");
+
   useEffect(() => {
     if (!address || !finalCartItems || finalCartItems.length === 0) {
       navigate("/cart");
@@ -63,255 +70,252 @@ const PaymentPage = () => {
 
   if (!address) return null;
 
-  return (
-    <Box
-      sx={{
-        padding: { xs: 2, md: "40px" },
-        backgroundColor: "#f4f4f4",
-        minHeight: "100vh",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "flex-start",
-      }}
-    >
-      <Box
+  const PaymentOption = ({ value, icon, title, subtitle }) => {
+    const isSelected = paymentMethod === value;
+    return (
+      <Paper
+        elevation={0}
+        onClick={() => setPaymentMethod(value)}
         sx={{
-          maxWidth: "1200px",
-          width: "100%",
-          display: "flex",
-          flexDirection: "column",
+          position: "relative",
+          p: 3,
+          mb: 2,
+          cursor: "pointer",
+          borderRadius: "16px",
+          border: "2px solid",
+          borderColor: isSelected ? "#0f2a1d" : "#e0e0e0",
+          backgroundColor: isSelected ? alpha("#0f2a1d", 0.04) : "#fff",
+          transition: "all 0.2s ease",
+          "&:hover": {
+            borderColor: isSelected ? "#0f2a1d" : "#bbb",
+            boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+          },
         }}
       >
-        <Button
-          startIcon={<ArrowBackIcon />}
-          onClick={() => navigate("/checkout")}
-          sx={{
-            mb: 3,
-            backgroundColor: "#0f2a1d",
-            color: "white",
-            padding: "12px 24px",
-            borderRadius: "40px",
-            fontWeight: "bold",
-            width: "fit-content",
-            "&:hover": { backgroundColor: "#144430" },
-          }}
-        >
-          Back to Address
-        </Button>
+        <Box sx={{ display: "flex", alignItems: "center", width: "100%" }}>
+          <Radio
+            checked={isSelected}
+            value={value}
+            sx={{
+              color: "#0f2a1d",
+              "&.Mui-checked": { color: "#0f2a1d" },
+              mr: 2,
+            }}
+          />
+          <Box
+            sx={{
+              p: 1.5,
+              borderRadius: "50%",
+              bgcolor: isSelected ? "#0f2a1d" : "#f5f5f5",
+              color: isSelected ? "white" : "#666",
+              display: "flex",
+              mr: 2,
+            }}
+          >
+            {icon}
+          </Box>
+          <Box>
+            <Typography
+              variant="h6"
+              fontWeight="bold"
+              color={isSelected ? "#0f2a1d" : "text.primary"}
+            >
+              {title}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              {subtitle}
+            </Typography>
+          </Box>
 
-        <Typography
-          variant="h4"
-          fontWeight="bold"
-          color="#0f2a1d"
-          sx={{ mb: 4 }}
-        >
-          Payment Method
-        </Typography>
+          {isSelected && (
+            <CheckCircleIcon
+              sx={{
+                position: "absolute",
+                top: 16,
+                right: 16,
+                color: "#0f2a1d",
+              }}
+            />
+          )}
+        </Box>
+      </Paper>
+    );
+  };
+
+  return (
+    <Box sx={{ backgroundColor: "#f8f9fa", minHeight: "100vh", py: 4 }}>
+      <Container maxWidth="lg">
+        <Box sx={{ mb: 4 }}>
+          <Button
+            startIcon={<ArrowBackIcon />}
+            onClick={() => navigate("/checkout")}
+            sx={{
+              mb: 2,
+              color: "#666",
+              textTransform: "none",
+              fontWeight: 600,
+              "&:hover": { color: "#0f2a1d", bgcolor: "transparent" },
+            }}
+          >
+            Back to Address
+          </Button>
+          <Typography variant="h4" fontWeight="800" color="#0f2a1d">
+            Payment Method
+          </Typography>
+          <Typography variant="body1" color="text.secondary" sx={{ mt: 1 }}>
+            Choose how you would like to pay for your order.
+          </Typography>
+        </Box>
 
         <Grid container spacing={4}>
           <Grid item xs={12} md={8}>
-            <Card elevation={3} sx={{ borderRadius: "12px", mb: 3 }}>
-              <Box sx={{ p: 3, borderBottom: "1px solid #eee" }}>
-                <Typography variant="h6" fontWeight="bold">
-                  Select Payment Option
-                </Typography>
-              </Box>
-              <CardContent sx={{ p: 3 }}>
-                <FormControl component="fieldset" fullWidth>
-                  <RadioGroup
-                    value={paymentMethod}
-                    onChange={(e) => setPaymentMethod(e.target.value)}
-                  >
-                    <Box
-                      onClick={() => setPaymentMethod("Card")}
-                      sx={{
-                        border:
-                          paymentMethod === "Card"
-                            ? "2px solid #0f2a1d"
-                            : "1px solid #e0e0e0",
-                        borderRadius: "8px",
-                        mb: 2,
-                        p: 2,
-                        bgcolor: paymentMethod === "Card" ? "#f0fdf4" : "white",
-                        cursor: "pointer",
-                      }}
-                    >
-                      <FormControlLabel
-                        value="Card"
-                        control={
-                          <Radio
-                            sx={{
-                              color: "#0f2a1d",
-                              "&.Mui-checked": { color: "#0f2a1d" },
-                            }}
-                          />
-                        }
-                        label={
-                          <Box
-                            sx={{
-                              display: "flex",
-                              alignItems: "center",
-                              gap: 2,
-                            }}
-                          >
-                            <CreditCardIcon sx={{ color: "#0f2a1d" }} />
-                            <Typography fontWeight="bold">
-                              Pay with Card (Paystack)
-                            </Typography>
-                          </Box>
-                        }
-                      />
-                    </Box>
-                    <Box
-                      onClick={() => setPaymentMethod("Pay On Delivery")}
-                      sx={{
-                        border:
-                          paymentMethod === "Pay On Delivery"
-                            ? "2px solid #0f2a1d"
-                            : "1px solid #e0e0e0",
-                        borderRadius: "8px",
-                        p: 2,
-                        bgcolor:
-                          paymentMethod === "Pay On Delivery"
-                            ? "#f0fdf4"
-                            : "white",
-                        cursor: "pointer",
-                      }}
-                    >
-                      <FormControlLabel
-                        value="Pay On Delivery"
-                        control={
-                          <Radio
-                            sx={{
-                              color: "#0f2a1d",
-                              "&.Mui-checked": { color: "#0f2a1d" },
-                            }}
-                          />
-                        }
-                        label={
-                          <Box
-                            sx={{
-                              display: "flex",
-                              alignItems: "center",
-                              gap: 2,
-                            }}
-                          >
-                            <LocalShippingIcon sx={{ color: "#0f2a1d" }} />
-                            <Typography fontWeight="bold">
-                              Pay on Delivery
-                            </Typography>
-                          </Box>
-                        }
-                      />
-                    </Box>
-                  </RadioGroup>
-                </FormControl>
-              </CardContent>
-            </Card>
+            <RadioGroup
+              value={paymentMethod}
+              onChange={(e) => setPaymentMethod(e.target.value)}
+            >
+              <PaymentOption
+                value="Card"
+                icon={<CreditCardIcon />}
+                title="Pay with Card"
+                subtitle="Secured by Paystack. Supports Visa, Mastercard & Verve."
+              />
+
+              <PaymentOption
+                value="Pay On Delivery"
+                icon={<LocalShippingIcon />}
+                title="Pay on Delivery"
+                subtitle="Pay via cash or transfer when your order arrives."
+              />
+            </RadioGroup>
           </Grid>
 
           <Grid item xs={12} md={4}>
             <Card
-              elevation={3}
+              elevation={0}
               sx={{
-                borderRadius: "12px",
-                p: 3,
+                borderRadius: "16px",
+                border: "1px solid #e0e0e0",
                 position: "sticky",
-                top: 20,
+                top: 24,
+                overflow: "hidden",
               }}
             >
-              <Typography
-                variant="h6"
-                fontWeight="bold"
-                sx={{ mb: 3, color: "#0f2a1d" }}
-              >
-                Order Preview
-              </Typography>
               <Box
                 sx={{
-                  mb: 3,
-                  p: 2,
-                  bgcolor: "#f9f9f9",
-                  borderRadius: "8px",
+                  p: 3,
+                  bgcolor: "#fcfcfc",
+                  borderBottom: "1px solid #eee",
                 }}
               >
-                <Typography
-                  variant="subtitle2"
-                  color="text.secondary"
-                  gutterBottom
-                >
-                  Delivering to:
-                </Typography>
-                <Typography variant="body1" fontWeight="bold">
-                  {address.fullName}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {address.address}, {address.city}
-                </Typography>
-              </Box>
-              <Divider sx={{ my: 2 }} />
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  mb: 1,
-                }}
-              >
-                <Typography color="text.secondary">
-                  Items ({finalCartItems ? finalCartItems.length : 0}):
-                </Typography>
-                <Typography fontWeight="bold">
-                  ₦{finalTotal?.toLocaleString()}
-                </Typography>
-              </Box>
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  mb: 2,
-                }}
-              >
-                <Typography color="text.secondary">Delivery Fee:</Typography>
-                <Typography fontWeight="bold" color="success.main">
-                  Free
-                </Typography>
-              </Box>
-              <Divider sx={{ my: 2 }} />
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  mb: 3,
-                }}
-              >
-                <Typography variant="h6" fontWeight="bold">
-                  Total:
-                </Typography>
-                <Typography variant="h5" fontWeight="bold" color="#0f2a1d">
-                  ₦{finalTotal?.toLocaleString()}
+                <Typography variant="h6" fontWeight="bold" color="#0f2a1d">
+                  Order Summary
                 </Typography>
               </Box>
 
-              <Button
-                fullWidth
-                variant="contained"
-                onClick={handleContinue}
-                sx={{
-                  bgcolor: "#0f2a1d",
-                  py: 1.5,
-                  borderRadius: "30px",
-                  fontSize: "1.1rem",
-                  fontWeight: "bold",
-                  "&:hover": { bgcolor: "#144430" },
-                }}
-              >
-                Continue to Confirm
-              </Button>
+              <CardContent sx={{ p: 3 }}>
+                <Box sx={{ display: "flex", mb: 3 }}>
+                  <PersonPinCircleIcon
+                    sx={{ color: "#0f2a1d", mr: 1, mt: 0.5 }}
+                    fontSize="small"
+                  />
+                  <Box>
+                    <Typography variant="subtitle2" color="text.secondary">
+                      Ship to:
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      fontWeight="600"
+                      sx={{ lineHeight: 1.4 }}
+                    >
+                      {address.fullName}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      {address.address}, {address.city}
+                    </Typography>
+                  </Box>
+                </Box>
+
+                <Divider sx={{ mb: 3 }} />
+
+                <Stack spacing={1.5} sx={{ mb: 3 }}>
+                  <Box
+                    sx={{ display: "flex", justifyContent: "space-between" }}
+                  >
+                    <Typography color="text.secondary">
+                      Items ({finalCartItems?.length})
+                    </Typography>
+                    <Typography fontWeight="500">
+                      ₦{finalTotal?.toLocaleString()}
+                    </Typography>
+                  </Box>
+                  <Box
+                    sx={{ display: "flex", justifyContent: "space-between" }}
+                  >
+                    <Typography color="text.secondary">Delivery Fee</Typography>
+                    <Typography fontWeight="bold" color="success.main">
+                      Free
+                    </Typography>
+                  </Box>
+                </Stack>
+
+                <Divider sx={{ mb: 3 }} />
+
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    mb: 4,
+                  }}
+                >
+                  <Typography variant="h6" fontWeight="bold">
+                    Total
+                  </Typography>
+                  <Typography variant="h5" fontWeight="bold" color="#0f2a1d">
+                    ₦{finalTotal?.toLocaleString()}
+                  </Typography>
+                </Box>
+
+                <Button
+                  fullWidth
+                  variant="contained"
+                  onClick={handleContinue}
+                  sx={{
+                    bgcolor: "#0f2a1d",
+                    py: 1.8,
+                    borderRadius: "50px",
+                    fontSize: "1rem",
+                    fontWeight: "bold",
+                    textTransform: "none",
+                    boxShadow: "0 8px 16px rgba(15, 42, 29, 0.2)",
+                    "&:hover": {
+                      bgcolor: "#144430",
+                      boxShadow: "0 10px 20px rgba(15, 42, 29, 0.3)",
+                    },
+                  }}
+                >
+                  Continue
+                </Button>
+
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    mt: 3,
+                    opacity: 0.7,
+                  }}
+                >
+                  <LockIcon sx={{ fontSize: 14, mr: 0.5, color: "#555" }} />
+                  <Typography variant="caption" color="text.secondary">
+                    Secure Encrypted Checkout
+                  </Typography>
+                </Box>
+              </CardContent>
             </Card>
           </Grid>
         </Grid>
-      </Box>
+      </Container>
     </Box>
   );
 };

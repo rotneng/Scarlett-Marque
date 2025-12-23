@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import {
   Box,
   TextField,
@@ -11,6 +11,13 @@ import {
   IconButton,
   CircularProgress,
   Tooltip,
+  AppBar,
+  Toolbar,
+  Container,
+  Stack,
+  Chip,
+  Badge,
+  alpha,
 } from "@mui/material";
 
 import SearchIcon from "@mui/icons-material/Search";
@@ -23,7 +30,7 @@ import InfoIcon from "@mui/icons-material/Info";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import ListAltIcon from "@mui/icons-material/ListAlt";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
-
+import SearchOffIcon from "@mui/icons-material/SearchOff";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { getProducts, deleteProduct } from "../../Actions/product.actions";
@@ -35,6 +42,7 @@ const Homepage = () => {
   const productState = useSelector((state) => state.product);
   const products = productState?.products || [];
   const loading = productState?.loading || false;
+  const cartItems = useSelector((state) => state.cart?.cartItems || []);
 
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -47,14 +55,15 @@ const Homepage = () => {
     dispatch(getProducts());
   }, [dispatch]);
 
-  const filteredProducts = products.filter((product) => {
-    if (searchTerm === "") return true;
+  const filteredProducts = useMemo(() => {
+    if (!searchTerm) return products;
     const lowerCaseSearch = searchTerm.toLowerCase();
-    return (
-      product.title.toLowerCase().includes(lowerCaseSearch) ||
-      product.category.toLowerCase().includes(lowerCaseSearch)
+    return products.filter(
+      (product) =>
+        product.title.toLowerCase().includes(lowerCaseSearch) ||
+        product.category.toLowerCase().includes(lowerCaseSearch)
     );
-  });
+  }, [products, searchTerm]);
 
   const handleProductClick = (id) => {
     navigate(`/product/${id}`);
@@ -82,223 +91,234 @@ const Homepage = () => {
   };
 
   return (
-    <Box>
-      <Box
+    <Box sx={{ bgcolor: "#f8f9fa", minHeight: "100vh" }}>
+      <AppBar
+        position="sticky"
+        elevation={0}
         sx={{
-          display: "flex",
-          flexWrap: "wrap",
-          padding: { xs: 2, md: "20px" },
-          backgroundColor: "#0f2a1d",
-          color: "white",
-          alignItems: "center",
-          justifyContent: "space-between",
-          position: "sticky",
-          top: 0,
-          zIndex: 1000,
-          boxShadow: "0px 2px 10px rgba(0,0,0,0.3)",
+          bgcolor: "#0f2a1d",
+          borderBottom: "1px solid rgba(255,255,255,0.1)",
         }}
       >
-        <Box
-          onClick={() => navigate("/")}
+        <Toolbar
           sx={{
-            color: "white",
-            fontWeight: "bolder",
-            fontSize: { xs: "1.5rem", md: "28px" },
-            cursor: "pointer",
-            mr: 2,
-            flexGrow: { xs: 1, md: 0 },
+            py: 1,
+            justifyContent: "space-between",
+            flexWrap: "wrap",
+            gap: 2,
           }}
         >
-          Scarlett Marque
-        </Box>
+          <Box
+            onClick={() => navigate("/")}
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              cursor: "pointer",
+              "&:hover": { opacity: 0.9 },
+            }}
+          >
+            <Typography
+              variant="h5"
+              noWrap
+              sx={{
+                fontFamily: '"Playfair Display", serif',
+                fontWeight: 700,
+                letterSpacing: ".1rem",
+                color: "white",
+              }}
+            >
+              Scarlett Marque
+            </Typography>
+          </Box>
 
-        <TextField
-          sx={{
-            backgroundColor: "white",
-            borderRadius: "150px",
-            width: { xs: "100%", md: "30%" },
-            minWidth: { xs: "auto", md: "200px" },
-            order: { xs: 3, md: 2 },
-            mt: { xs: 2, md: 0 },
-            "& .MuiOutlinedInput-root": {
-              borderRadius: "150px",
-            },
-          }}
-          type="text"
-          placeholder="Search items..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon style={{ color: "#888" }} />
-              </InputAdornment>
-            ),
-          }}
-        />
+          <Box
+            sx={{
+              flexGrow: 1,
+              display: "flex",
+              justifyContent: "center",
+              maxWidth: "600px",
+            }}
+          >
+            <TextField
+              fullWidth
+              variant="outlined"
+              placeholder="Search collections..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              size="small"
+              sx={{
+                bgcolor: "white",
+                borderRadius: "50px",
+                "& .MuiOutlinedInput-root": {
+                  borderRadius: "50px",
+                  "& fieldset": { border: "none" },
+                },
+              }}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon sx={{ color: "#0f2a1d" }} />
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </Box>
 
-        <Box
-          sx={{
-            display: "flex",
-            gap: { xs: 1, md: "10px" },
-            alignItems: "center",
-            order: { xs: 2, md: 3 },
-          }}
-        >
-          {!isAdmin && (
-            <Tooltip title="About">
-              <IconButton
-                onClick={() => navigate("/about")}
-                sx={{ color: "white" }}
-              >
-                <InfoIcon />
-              </IconButton>
-            </Tooltip>
-          )}
-
-          {isAdmin && (
-            <>
-              <Tooltip title="View Customer Orders">
+          <Stack direction="row" spacing={1} alignItems="center">
+            {!isAdmin && (
+              <Tooltip title="About Us">
                 <IconButton
-                  onClick={() => navigate("/admin/orders")}
+                  onClick={() => navigate("/about")}
                   sx={{ color: "white" }}
                 >
-                  <ListAltIcon />
+                  <InfoIcon />
                 </IconButton>
               </Tooltip>
+            )}
 
-              <Tooltip title=" Add Products">
-                <IconButton
-                  onClick={() => navigate("/addproducts")}
-                  sx={{ color: "white" }}
-                >
-                  <AddIcon />
-                </IconButton>
-              </Tooltip>
-            </>
-          )}
-
-          {!isAdmin && (
-            <>
-              {token && (
-                <Tooltip title="My Orders & Tracking">
+            {isAdmin ? (
+              <>
+                <Tooltip title="Orders">
                   <IconButton
-                    onClick={() => navigate("/account/orders")}
+                    onClick={() => navigate("/admin/orders")}
                     sx={{ color: "white" }}
                   >
-                    <LocalShippingIcon />
+                    <ListAltIcon />
                   </IconButton>
                 </Tooltip>
-              )}
+                <Tooltip title="Add Product">
+                  <IconButton
+                    onClick={() => navigate("/addproducts")}
+                    sx={{ color: "white" }}
+                  >
+                    <AddIcon />
+                  </IconButton>
+                </Tooltip>
+              </>
+            ) : (
+              <>
+                {token && (
+                  <Tooltip title="My Orders">
+                    <IconButton
+                      onClick={() => navigate("/account/orders")}
+                      sx={{ color: "white" }}
+                    >
+                      <LocalShippingIcon />
+                    </IconButton>
+                  </Tooltip>
+                )}
+                <Tooltip title="Cart">
+                  <IconButton
+                    onClick={() => navigate("/cart")}
+                    sx={{ color: "white" }}
+                  >
+                    <Badge badgeContent={cartItems.length} color="warning">
+                      <ShoppingCartIcon />
+                    </Badge>
+                  </IconButton>
+                </Tooltip>
+              </>
+            )}
 
-              <Tooltip title="View Cart">
-                <IconButton
-                  onClick={() => navigate("/cart")}
-                  style={{ color: "white" }}
-                >
-                  <ShoppingCartIcon />
-                </IconButton>
-              </Tooltip>
-            </>
-          )}
-
-          {token ? (
-            <Box sx={{ display: "flex", alignItems: "center" }}>
-              {user && (
-                <Typography
-                  sx={{
-                    mr: 1,
-                    fontSize: "0.9rem",
-                    display: { xs: "none", sm: "block" },
-                  }}
-                >
-                  Hi, {user.username}
-                </Typography>
-              )}
-              <Tooltip title="Logout">
-                <IconButton onClick={handleLogout} style={{ color: "white" }}>
-                  <LogoutIcon />
-                </IconButton>
-              </Tooltip>
-            </Box>
-          ) : (
-            <Tooltip title="Sign In">
-              <IconButton
-                onClick={() => navigate("/signIn")}
-                style={{ color: "white" }}
+            {token ? (
+              <Stack
+                direction="row"
+                alignItems="center"
+                spacing={1}
+                sx={{ ml: 1 }}
               >
-                <AccountCircleIcon />
-              </IconButton>
-            </Tooltip>
-          )}
-        </Box>
-      </Box>
+                <Typography
+                  variant="body2"
+                  sx={{ display: { xs: "none", md: "block" }, opacity: 0.9 }}
+                >
+                  {user?.username}
+                </Typography>
+                <Tooltip title="Logout">
+                  <IconButton onClick={handleLogout} sx={{ color: "white" }}>
+                    <LogoutIcon />
+                  </IconButton>
+                </Tooltip>
+              </Stack>
+            ) : (
+              <Tooltip title="Sign In">
+                <IconButton
+                  onClick={() => navigate("/signIn")}
+                  sx={{ color: "white" }}
+                >
+                  <AccountCircleIcon fontSize="large" />
+                </IconButton>
+              </Tooltip>
+            )}
+          </Stack>
+        </Toolbar>
+      </AppBar>
 
-      <Box
-        sx={{
-          padding: { xs: 2, md: "40px 20px" },
-          backgroundColor: "#f4f4f4",
-          minHeight: "90vh",
-        }}
-      >
+      <Container maxWidth="xl" sx={{ py: 5 }}>
         {loading ? (
           <Box
             sx={{
               display: "flex",
               justifyContent: "center",
-              marginTop: "100px",
+              alignItems: "center",
+              minHeight: "50vh",
             }}
           >
-            <CircularProgress style={{ color: "#0f2a1d" }} />
+            <CircularProgress sx={{ color: "#0f2a1d" }} />
           </Box>
         ) : (
-          <Grid container spacing={{ xs: 2, md: 4 }}>
-            {filteredProducts && filteredProducts.length > 0 ? (
+          <Grid container spacing={4}>
+            {filteredProducts.length > 0 ? (
               filteredProducts.map((item) => (
                 <Grid item key={item._id} xs={12} sm={6} md={4} lg={3}>
                   <Card
                     onClick={() => handleProductClick(item._id)}
-                    elevation={3}
+                    elevation={0}
                     sx={{
-                      cursor: "pointer",
                       height: "100%",
                       display: "flex",
                       flexDirection: "column",
-                      borderRadius: "12px",
+                      borderRadius: "16px",
                       position: "relative",
-                      transition: "0.3s",
-                      "&:hover": { transform: "translateY(-5px)" },
+                      cursor: "pointer",
+                      transition: "all 0.3s ease",
+                      border: "1px solid #eee",
+                      "&:hover": {
+                        transform: "translateY(-8px)",
+                        boxShadow: "0 12px 24px rgba(0,0,0,0.1)",
+                      },
                     }}
                   >
                     {isAdmin && (
                       <Box
                         sx={{
                           position: "absolute",
-                          top: 10,
-                          right: 10,
+                          top: 12,
+                          right: 12,
                           display: "flex",
                           gap: 1,
-                          zIndex: 10,
+                          zIndex: 2,
                         }}
                       >
-                        <Tooltip title="Edit">
+                        <Tooltip title="Edit Product">
                           <IconButton
                             onClick={(e) => handleEditClick(e, item._id)}
                             size="small"
                             sx={{
-                              bgcolor: "rgba(255,255,255,0.9)",
-                              "&:hover": { bgcolor: "#fff" },
+                              bgcolor: "white",
+                              boxShadow: 1,
+                              "&:hover": { bgcolor: "#f5f5f5" },
                             }}
                           >
                             <EditIcon fontSize="small" color="primary" />
                           </IconButton>
                         </Tooltip>
-                        <Tooltip title="Delete">
+                        <Tooltip title="Delete Product">
                           <IconButton
                             onClick={(e) => handleDeleteClick(e, item._id)}
                             size="small"
                             sx={{
-                              bgcolor: "rgba(255,255,255,0.9)",
+                              bgcolor: "white",
+                              boxShadow: 1,
                               "&:hover": { bgcolor: "#ffebee" },
                             }}
                           >
@@ -308,40 +328,91 @@ const Homepage = () => {
                       </Box>
                     )}
 
-                    <CardMedia
-                      component="img"
-                      height="250"
-                      image={item.image || "https://via.placeholder.com/250"}
-                      alt={item.title}
-                      sx={{ objectFit: "cover" }}
-                    />
+                    <Box
+                      sx={{
+                        position: "relative",
+                        pt: "100%",
+                        overflow: "hidden",
+                      }}
+                    >
+                      <CardMedia
+                        component="img"
+                        image={item.image || "https://via.placeholder.com/300"}
+                        alt={item.title}
+                        sx={{
+                          position: "absolute",
+                          top: 0,
+                          left: 0,
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                          transition: "transform 0.5s",
+                          "&:hover": { transform: "scale(1.05)" },
+                        }}
+                      />
+                    </Box>
 
-                    <CardContent style={{ flexGrow: 1 }}>
-                      <Typography variant="overline" color="text.secondary">
-                        {item.category}
-                      </Typography>
+                    <CardContent sx={{ flexGrow: 1, pt: 3, px: 2.5 }}>
+                      <Chip
+                        label={item.category}
+                        size="small"
+                        sx={{
+                          mb: 1,
+                          bgcolor: alpha("#0f2a1d", 0.05),
+                          color: "#0f2a1d",
+                          fontWeight: 600,
+                          fontSize: "0.7rem",
+                          textTransform: "uppercase",
+                        }}
+                      />
+
                       <Typography
                         gutterBottom
                         variant="h6"
-                        component="div"
                         sx={{
                           fontWeight: 700,
-                          lineHeight: 1.2,
-                          fontSize: { xs: "1rem", md: "1.25rem" },
+                          fontSize: "1rem",
+                          lineHeight: 1.4,
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          display: "-webkit-box",
+                          WebkitLineClamp: 2,
+                          WebkitBoxOrient: "vertical",
+                          minHeight: "2.8em",
                         }}
                       >
                         {item.title}
                       </Typography>
-                      <Typography
-                        variant="h6"
+
+                      <Box
                         sx={{
-                          color: "#0f2a1d",
-                          fontWeight: "bold",
-                          marginTop: "10px",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          mt: 2,
                         }}
                       >
-                        ₦{item.price.toLocaleString()}
-                      </Typography>
+                        <Typography
+                          variant="h6"
+                          sx={{ color: "#0f2a1d", fontWeight: "bold" }}
+                        >
+                          ₦{item.price?.toLocaleString()}
+                        </Typography>
+                        <Box
+                          sx={{
+                            width: 32,
+                            height: 32,
+                            borderRadius: "50%",
+                            bgcolor: "#f5f5f5",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            color: "#0f2a1d",
+                          }}
+                        >
+                          <AddIcon fontSize="small" />
+                        </Box>
+                      </Box>
                     </CardContent>
                   </Card>
                 </Grid>
@@ -350,20 +421,30 @@ const Homepage = () => {
               <Box
                 sx={{
                   width: "100%",
-                  textAlign: "center",
-                  marginTop: "50px",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  mt: 8,
+                  opacity: 0.7,
                 }}
               >
-                <Typography variant="h5" color="text.secondary">
-                  {searchTerm
-                    ? `No results for "${searchTerm}"`
-                    : "No Products Found"}
+                <SearchOffIcon sx={{ fontSize: 60, mb: 2, color: "#ccc" }} />
+                <Typography
+                  variant="h5"
+                  color="text.secondary"
+                  fontWeight="bold"
+                >
+                  No products found
+                </Typography>
+                <Typography variant="body1" color="text.secondary">
+                  Try adjusting your search terms or browse all categories.
                 </Typography>
               </Box>
             )}
           </Grid>
         )}
-      </Box>
+      </Container>
     </Box>
   );
 };

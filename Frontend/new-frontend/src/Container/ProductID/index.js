@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link as RouterLink } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import {
   Box,
@@ -10,12 +10,24 @@ import {
   CircularProgress,
   IconButton,
   Chip,
+  Breadcrumbs,
+  Link,
+  Rating,
+  Stack,
+  Snackbar,
+  Alert,
+  Divider,
+  Container,
 } from "@mui/material";
-import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCartOutlined";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
-import EditIcon from "@mui/icons-material/Edit";
+import EditIcon from "@mui/icons-material/EditOutlined";
+import HomeIcon from "@mui/icons-material/HomeOutlined";
+import NavigateNextIcon from "@mui/icons-material/NavigateNext";
+import VerifiedUserIcon from "@mui/icons-material/VerifiedUserOutlined";
+import LocalShippingIcon from "@mui/icons-material/LocalShippingOutlined";
 
 import { getProducts } from "../../Actions/product.actions";
 import { addItemToCart } from "../../Actions/cartActions";
@@ -35,6 +47,12 @@ const ProductDetails = () => {
 
   const [product, setProduct] = useState(null);
   const [qty, setQty] = useState(1);
+
+  const [toast, setToast] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
 
   useEffect(() => {
     if (products.length > 0) {
@@ -61,17 +79,36 @@ const ProductDetails = () => {
     if (!product) return;
 
     if (qty > product.stock) {
-      alert("Cannot add more items than available in stock");
+      setToast({
+        open: true,
+        message: "Cannot add more items than available in stock",
+        severity: "error",
+      });
       return;
     }
 
     dispatch(addItemToCart(product, qty));
-    alert(`Added ${qty} ${product.title} to cart`);
+    setToast({
+      open: true,
+      message: `Added ${qty} ${product.title} to cart`,
+      severity: "success",
+    });
+  };
+
+  const handleCloseToast = () => {
+    setToast({ ...toast, open: false });
   };
 
   if (loading) {
     return (
-      <Box sx={{ display: "flex", justifyContent: "center", mt: 10 }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          minHeight: "80vh",
+        }}
+      >
         <CircularProgress sx={{ color: "#0f2a1d" }} />
       </Box>
     );
@@ -80,168 +117,302 @@ const ProductDetails = () => {
   if (!product) {
     return (
       <Box sx={{ textAlign: "center", mt: 10 }}>
-        <Typography variant="h5">Product not found</Typography>
-        <Button onClick={() => navigate("/")} sx={{ mt: 2 }}>
-          Back to Home
+        <Typography variant="h5" color="text.secondary">
+          Product not found
+        </Typography>
+        <Button onClick={() => navigate("/")} sx={{ mt: 2 }} variant="outlined">
+          Return Home
         </Button>
       </Box>
     );
   }
 
-  return (
-    <Box
-      sx={{
-        p: { xs: 2, md: 4 },
-        maxWidth: "1200px",
-        margin: "0 auto",
-        minHeight: "100vh",
-      }}
-    >
-      <Button
-        startIcon={<ArrowBackIcon />}
-        onClick={() => navigate("/")}
-        variant="contained"
-        sx={{
-          mt: 2,
-          bgcolor: "#0f2a1d",
-          mb: 3,
-          borderRadius: "20px",
-          "&:hover": { bgcolor: "#144430" },
-          width: { xs: "100%", sm: "auto" },
-        }}
-      >
-        Back to Store
-      </Button>
+  const stockColor =
+    product.stock > 10 ? "success" : product.stock > 0 ? "warning" : "error";
+  const stockLabel =
+    product.stock > 10
+      ? "In Stock"
+      : product.stock > 0
+      ? `Low Stock: ${product.stock} left`
+      : "Out of Stock";
 
-      <Paper elevation={0} sx={{ p: { xs: 0, md: 0 }, borderRadius: 2 }}>
-        <Grid container spacing={{ xs: 4, md: 6 }}>
-          {" "}
+  return (
+    <Box sx={{ bgcolor: "#fff", minHeight: "100vh", pb: 8 }}>
+      <Container maxWidth="lg" sx={{ pt: 4 }}>
+        <Breadcrumbs
+          separator={<NavigateNextIcon fontSize="small" />}
+          aria-label="breadcrumb"
+          sx={{ mb: 4 }}
+        >
+          <Link
+            component={RouterLink}
+            to="/"
+            color="inherit"
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              textDecoration: "none",
+              "&:hover": { color: "#0f2a1d" },
+            }}
+          >
+            <HomeIcon sx={{ mr: 0.5 }} fontSize="inherit" />
+            Home
+          </Link>
+          <Link
+            component={RouterLink}
+            to="/"
+            color="inherit"
+            sx={{ textDecoration: "none", "&:hover": { color: "#0f2a1d" } }}
+          >
+            Shop
+          </Link>
+          <Typography color="text.primary" fontWeight="500">
+            {product.title}
+          </Typography>
+        </Breadcrumbs>
+
+        <Grid container spacing={6}>
+          <Grid item xs={12} md={6}>
+            <Paper
+              elevation={0}
+              sx={{
+                bgcolor: "#f8f9fa",
+                borderRadius: "24px",
+                height: { xs: "350px", md: "550px" },
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                overflow: "hidden",
+                border: "1px solid #eee",
+              }}
+            >
+              <Box
+                component="img"
+                src={product.image || "https://via.placeholder.com/500"}
+                alt={product.title}
+                sx={{
+                  maxWidth: "90%",
+                  maxHeight: "90%",
+                  objectFit: "contain",
+                  transition: "transform 0.3s ease",
+                  "&:hover": { transform: "scale(1.05)" },
+                }}
+              />
+            </Paper>
+          </Grid>
+
           <Grid item xs={12} md={6}>
             <Box
-              component="img"
-              src={product.image || "https://via.placeholder.com/500"}
-              alt={product.title}
               sx={{
-                width: "100%",
-                maxHeight: { xs: "350px", md: "500px" },
-                objectFit: "contain",
-              }}
-            />
-          </Grid>
-          <Grid item xs={12} md={6}>
-            <Typography
-              variant="h3"
-              fontWeight="bold"
-              sx={{ fontSize: { xs: "1.75rem", md: "3rem" } }}
-            >
-              {product.title}
-            </Typography>
-
-            <Typography
-              variant="h4"
-              sx={{
-                color: "#0f2a1d",
-                fontWeight: "bold",
-                my: 2,
-                fontSize: { xs: "1.5rem", md: "2.125rem" },
+                display: "flex",
+                flexDirection: "column",
+                height: "100%",
+                justifyContent: "center",
               }}
             >
-              ₦{product.price.toLocaleString()}
-            </Typography>
-            <Box sx={{ mb: 2 }}>
-              {product.stock > 0 ? (
-                <Chip
-                  label={`In Stock: ${product.stock}`}
-                  color="success"
-                  variant="outlined"
-                  sx={{ fontWeight: "bold" }}
-                />
-              ) : (
-                <Chip
-                  label="Out of Stock"
-                  color="error"
-                  variant="filled"
-                  sx={{ fontWeight: "bold" }}
-                />
-              )}
-            </Box>
-
-            <Typography
-              sx={{
-                mb: 4,
-                color: "#555",
-                lineHeight: 1.6,
-                fontSize: { xs: "0.9rem", md: "1rem" },
-              }}
-            >
-              {product.description}
-            </Typography>
-
-            {!isAdmin && (
               <Box
-                sx={{ display: "flex", alignItems: "center", gap: 2, mb: 3 }}
+                sx={{ mb: 2, display: "flex", alignItems: "center", gap: 1 }}
               >
-                <Typography fontWeight="bold">Quantity:</Typography>
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    border: "1px solid #ddd",
-                    borderRadius: "50px",
-                    px: 1,
-                  }}
-                >
-                  <IconButton onClick={handleDecreaseQty} disabled={qty <= 1}>
-                    <RemoveIcon />
-                  </IconButton>
-
-                  <Typography sx={{ mx: 2, fontWeight: "bold" }}>
-                    {qty}
-                  </Typography>
-
-                  <IconButton
-                    onClick={handleIncreaseQty}
-                    disabled={qty >= product.stock}
-                  >
-                    <AddIcon />
-                  </IconButton>
-                </Box>
+                <Chip
+                  label={stockLabel}
+                  color={stockColor}
+                  size="small"
+                  variant="filled"
+                  sx={{ fontWeight: "bold", borderRadius: "8px" }}
+                />
+                {product.stock > 0 && (
+                  <Chip
+                    label="Ready to Ship"
+                    size="small"
+                    variant="outlined"
+                    sx={{ borderRadius: "8px" }}
+                  />
+                )}
               </Box>
-            )}
 
-            {isAdmin ? (
-              <Button
-                variant="contained"
-                size="large"
-                startIcon={<EditIcon />}
-                onClick={() => navigate(`/product/edit/${product._id}`)}
-                fullWidth
-                sx={{ bgcolor: "#1976d2", py: 1.5, borderRadius: "30px" }}
-              >
-                Edit Product
-              </Button>
-            ) : (
-              <Button
-                variant="contained"
-                size="large"
-                startIcon={<ShoppingCartIcon />}
-                onClick={handleAddToCart}
-                fullWidth
-                disabled={product.stock === 0}
+              <Typography
+                variant="h3"
+                fontWeight="800"
                 sx={{
-                  bgcolor: "#0f2a1d",
-                  py: 1.5,
-                  borderRadius: "30px",
-                  "&:hover": { bgcolor: "#144430" },
-                  "&:disabled": { bgcolor: "#ccc" },
+                  mb: 1,
+                  color: "#1a1a1a",
+                  fontSize: { xs: "2rem", md: "2.5rem" },
                 }}
               >
-                {product.stock === 0 ? "Out of Stock" : "Add to Cart"}
-              </Button>
-            )}
+                {product.title}
+              </Typography>
+
+              <Stack
+                direction="row"
+                alignItems="center"
+                spacing={1}
+                sx={{ mb: 3 }}
+              >
+                <Rating value={4.5} precision={0.5} readOnly size="small" />
+                <Typography variant="caption" color="text.secondary">
+                  (45 verified reviews)
+                </Typography>
+              </Stack>
+
+              <Typography
+                variant="h4"
+                color="#0f2a1d"
+                fontWeight="bold"
+                sx={{ mb: 3 }}
+              >
+                ₦{product.price.toLocaleString()}
+              </Typography>
+
+              <Divider sx={{ mb: 3 }} />
+              <Typography
+                variant="body1"
+                color="text.secondary"
+                sx={{ mb: 4, lineHeight: 1.8 }}
+              >
+                {product.description}
+              </Typography>
+              {!isAdmin ? (
+                <Box>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 3,
+                      mb: 4,
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        border: "2px solid #e0e0e0",
+                        borderRadius: "50px",
+                        p: "4px",
+                        width: "fit-content",
+                      }}
+                    >
+                      <IconButton
+                        onClick={handleDecreaseQty}
+                        disabled={qty <= 1}
+                        size="small"
+                        sx={{ bgcolor: "#f5f5f5" }}
+                      >
+                        <RemoveIcon fontSize="small" />
+                      </IconButton>
+                      <Typography
+                        sx={{
+                          mx: 2.5,
+                          fontWeight: "bold",
+                          minWidth: "20px",
+                          textAlign: "center",
+                        }}
+                      >
+                        {qty}
+                      </Typography>
+                      <IconButton
+                        onClick={handleIncreaseQty}
+                        disabled={qty >= product.stock}
+                        size="small"
+                        sx={{
+                          bgcolor: "#0f2a1d",
+                          color: "white",
+                          "&:hover": { bgcolor: "#144430" },
+                        }}
+                      >
+                        <AddIcon fontSize="small" />
+                      </IconButton>
+                    </Box>
+
+                    <Button
+                      variant="contained"
+                      size="large"
+                      startIcon={<ShoppingCartIcon />}
+                      onClick={handleAddToCart}
+                      disabled={product.stock === 0}
+                      sx={{
+                        flexGrow: 1,
+                        bgcolor: "#0f2a1d",
+                        py: 1.5,
+                        borderRadius: "50px",
+                        textTransform: "none",
+                        fontSize: "1.1rem",
+                        fontWeight: "bold",
+                        boxShadow: "0 8px 16px rgba(15, 42, 29, 0.2)",
+                        "&:hover": {
+                          bgcolor: "#144430",
+                          boxShadow: "0 10px 20px rgba(15, 42, 29, 0.3)",
+                        },
+                        "&.Mui-disabled": { bgcolor: "#e0e0e0", color: "#999" },
+                      }}
+                    >
+                      {product.stock === 0 ? "Out of Stock" : "Add to Cart"}
+                    </Button>
+                  </Box>
+
+                  <Stack direction="row" spacing={3} sx={{ mt: 2 }}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        color: "text.secondary",
+                      }}
+                    >
+                      <VerifiedUserIcon sx={{ mr: 1, fontSize: 20 }} />
+                      <Typography variant="caption">
+                        Secure Transaction
+                      </Typography>
+                    </Box>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        color: "text.secondary",
+                      }}
+                    >
+                      <LocalShippingIcon sx={{ mr: 1, fontSize: 20 }} />
+                      <Typography variant="caption">Fast Delivery</Typography>
+                    </Box>
+                  </Stack>
+                </Box>
+              ) : (
+                <Button
+                  variant="outlined"
+                  size="large"
+                  startIcon={<EditIcon />}
+                  onClick={() => navigate(`/product/edit/${product._id}`)}
+                  fullWidth
+                  sx={{
+                    py: 1.5,
+                    borderRadius: "50px",
+                    borderColor: "#1976d2",
+                    color: "#1976d2",
+                    borderWidth: 2,
+                    "&:hover": { borderWidth: 2, bgcolor: "#f0f7ff" },
+                  }}
+                >
+                  Edit Product (Admin)
+                </Button>
+              )}
+            </Box>
           </Grid>
         </Grid>
-      </Paper>
+      </Container>
+
+      <Snackbar
+        open={toast.open}
+        autoHideDuration={4000}
+        onClose={handleCloseToast}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert
+          onClose={handleCloseToast}
+          severity={toast.severity}
+          variant="filled"
+          sx={{ width: "100%" }}
+        >
+          {toast.message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };

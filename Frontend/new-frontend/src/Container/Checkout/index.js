@@ -11,15 +11,26 @@ import {
   Divider,
   Avatar,
   CircularProgress,
+  Container,
+  Stack,
+  Stepper,
+  Step,
+  StepLabel,
+  Paper,
+  Chip,
 } from "@mui/material";
 
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import EditIcon from "@mui/icons-material/Edit";
-import PersonIcon from "@mui/icons-material/Person";
-import PhoneIcon from "@mui/icons-material/Phone";
+import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
+import PhoneIphoneIcon from "@mui/icons-material/PhoneIphone";
+import LocalShippingIcon from "@mui/icons-material/LocalShipping";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 
 import { getAddresses } from "../../Actions/address.actions";
+
+const steps = ["Cart", "Shipping Address", "Payment"];
 
 const CheckoutPage = () => {
   const navigate = useNavigate();
@@ -31,7 +42,6 @@ const CheckoutPage = () => {
   const { addresses, loading: loadingAddress } = addressState;
 
   const token = localStorage.getItem("token");
-
   const [selectedAddress, setSelectedAddress] = useState(null);
 
   useEffect(() => {
@@ -69,318 +79,327 @@ const CheckoutPage = () => {
   };
 
   return (
-    <Box
-      sx={{
-        padding: { xs: 2, md: "40px" },
-        backgroundColor: "#f4f4f4",
-        minHeight: "100vh",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "flex-start",
-      }}
-    >
-      <Box
-        sx={{
-          maxWidth: "1400px",
-          display: "flex",
-          justifyContent: "space-evenly",
-          flexDirection: "column",
-        }}
-      >
+    <Box sx={{ bgcolor: "#f4f6f8", minHeight: "100vh", pb: 8 }}>
+      <Container maxWidth="lg">
+        <Box sx={{ py: 4, mb: 2 }}>
+          <Stepper activeStep={1} alternativeLabel>
+            {steps.map((label) => (
+              <Step key={label}>
+                <StepLabel
+                  StepIconProps={{
+                    sx: {
+                      "&.Mui-active": { color: "#0f2a1d" },
+                      "&.Mui-completed": { color: "#0f2a1d" },
+                    },
+                  }}
+                >
+                  {label}
+                </StepLabel>
+              </Step>
+            ))}
+          </Stepper>
+        </Box>
+
         <Grid container spacing={4}>
           <Grid item xs={12} md={8}>
             <Card
-              elevation={3}
+              elevation={0}
               sx={{
-                borderRadius: "12px",
-                height: "100%",
-                minHeight: "500px",
+                borderRadius: "16px",
+                border: "1px solid #e0e0e0",
+                minHeight: "400px",
                 display: "flex",
                 flexDirection: "column",
+                position: "relative",
+                overflow: "visible",
               }}
             >
               <Box
                 sx={{
                   p: 3,
-                  borderBottom: "1px solid #eee",
+                  borderBottom: "1px solid #f0f0f0",
                   display: "flex",
                   justifyContent: "space-between",
                   alignItems: "center",
+                  bgcolor: "#fff",
+                  borderTopLeftRadius: "16px",
+                  borderTopRightRadius: "16px",
                 }}
               >
-                <Typography variant="h6" fontWeight="bold" color="#0f2a1d">
-                  Select Delivery Address
+                <Typography variant="h6" fontWeight="800" color="#0f2a1d">
+                  Shipping Details
                 </Typography>
-
                 <Button
-                  startIcon={<EditIcon />}
+                  startIcon={selectedAddress ? <EditIcon /> : null}
                   onClick={() => navigate("/manageAddress")}
+                  variant="outlined"
+                  size="small"
                   sx={{
                     color: "#0f2a1d",
+                    borderColor: "#0f2a1d",
+                    borderRadius: "20px",
                     textTransform: "none",
-                    fontWeight: "bold",
                   }}
                 >
                   {selectedAddress ? "Change Address" : "Add Address"}
                 </Button>
               </Box>
 
-              <CardContent
-                sx={{
-                  flexGrow: 1,
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: selectedAddress ? "flex-start" : "center",
-                  justifyContent: selectedAddress ? "flex-start" : "center",
-                  textAlign: selectedAddress ? "left" : "center",
-                  p: 4,
-                }}
-              >
+              <CardContent sx={{ flexGrow: 1, p: 4 }}>
                 {loadingAddress ? (
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "center",
-                      width: "100%",
-                      py: 5,
-                    }}
+                  <Stack
+                    justifyContent="center"
+                    alignItems="center"
+                    sx={{ height: "100%", minHeight: 200 }}
                   >
                     <CircularProgress sx={{ color: "#0f2a1d" }} />
-                  </Box>
+                  </Stack>
                 ) : !selectedAddress ? (
-                  <>
-                    <Box
+                  <Stack
+                    alignItems="center"
+                    justifyContent="center"
+                    sx={{ height: "100%", py: 4, textAlign: "center" }}
+                  >
+                    <Avatar
                       sx={{
-                        backgroundColor: "#eee",
-                        borderRadius: "50%",
-                        width: "120px",
-                        height: "120px",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        marginBottom: "24px",
+                        width: 80,
+                        height: 80,
+                        bgcolor: "#f5f5f5",
+                        mb: 2,
                       }}
                     >
-                      <LocationOnIcon
-                        sx={{ fontSize: "60px", color: "#999" }}
-                      />
-                    </Box>
-                    <Typography variant="h5" fontWeight="bold" gutterBottom>
-                      No Address Found
+                      <LocationOnIcon sx={{ fontSize: 40, color: "#bdbdbd" }} />
+                    </Avatar>
+                    <Typography
+                      variant="h6"
+                      gutterBottom
+                      color="text.secondary"
+                    >
+                      No delivery address found
                     </Typography>
                     <Typography
-                      variant="body1"
-                      color="text.secondary"
-                      sx={{ maxWidth: "400px", mb: 4, lineHeight: 1.6 }}
+                      variant="body2"
+                      color="text.disabled"
+                      sx={{ mb: 3, maxWidth: 300 }}
                     >
-                      You haven't added any delivery address yet.
+                      Please add a shipping address to verify delivery
+                      availability and costs.
                     </Typography>
                     <Button
                       variant="contained"
+                      onClick={() => navigate("/manageAddress")}
                       sx={{
-                        backgroundColor: "#0f2a1d",
-                        padding: "12px 40px",
+                        bgcolor: "#0f2a1d",
                         borderRadius: "30px",
-                        textTransform: "none",
-                        fontWeight: "bold",
-                        fontSize: "1rem",
-                        boxShadow: "0 4px 12px rgba(15, 42, 29, 0.2)",
+                        px: 4,
                         "&:hover": { bgcolor: "#144430" },
                       }}
-                      onClick={() => navigate("/manageAddress")}
                     >
-                      + Add New Address
+                      Add New Address
                     </Button>
-                  </>
+                  </Stack>
                 ) : (
-                  <Box sx={{ width: "100%" }}>
-                    <Box
+                  <Paper
+                    elevation={0}
+                    sx={{
+                      p: 3,
+                      border: "2px solid #0f2a1d",
+                      borderRadius: "12px",
+                      bgcolor: "#fcfdfc",
+                      position: "relative",
+                    }}
+                  >
+                    <Chip
+                      icon={
+                        <CheckCircleIcon sx={{ "&&": { color: "white" } }} />
+                      }
+                      label="Deliver Here"
                       sx={{
-                        p: 3,
-                        border: "1px solid #e0e0e0",
-                        borderRadius: "8px",
-                        bgcolor: "#fafafa",
-                        position: "relative",
+                        position: "absolute",
+                        top: -16,
+                        left: 24,
+                        bgcolor: "#0f2a1d",
+                        color: "white",
+                        fontWeight: "bold",
+                        height: 32,
                       }}
-                    >
-                      <Typography
-                        variant="h6"
-                        fontWeight="bold"
-                        sx={{
-                          mb: 2,
-                          display: "flex",
-                          alignItems: "center",
-                          gap: 1,
-                        }}
+                    />
+
+                    <Stack spacing={2} mt={1}>
+                      <Stack direction="row" spacing={1} alignItems="center">
+                        <PersonOutlineIcon color="action" />
+                        <Typography variant="h6" fontWeight="bold">
+                          {selectedAddress.fullName}
+                        </Typography>
+                      </Stack>
+
+                      <Stack direction="row" spacing={1} alignItems="center">
+                        <PhoneIphoneIcon color="action" />
+                        <Typography variant="body1">
+                          {selectedAddress.phone}
+                        </Typography>
+                      </Stack>
+
+                      <Divider sx={{ borderStyle: "dashed" }} />
+
+                      <Stack
+                        direction="row"
+                        spacing={1}
+                        alignItems="flex-start"
                       >
-                        <LocationOnIcon color="primary" /> Delivery Address
-                      </Typography>
-
-                      <Divider sx={{ mb: 2 }} />
-
-                      <Grid container spacing={2}>
-                        <Grid item xs={12} sm={6}>
-                          <Box
-                            sx={{
-                              display: "flex",
-                              gap: 1,
-                              mb: 1,
-                              color: "#555",
-                            }}
-                          >
-                            <PersonIcon fontSize="small" />
-                            <Typography variant="body1" fontWeight="500">
-                              {selectedAddress.fullName}
-                            </Typography>
-                          </Box>
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                          <Box
-                            sx={{
-                              display: "flex",
-                              gap: 1,
-                              mb: 1,
-                              color: "#555",
-                            }}
-                          >
-                            <PhoneIcon fontSize="small" />
-                            <Typography variant="body1">
-                              {selectedAddress.phone}
-                            </Typography>
-                          </Box>
-                        </Grid>
-                      </Grid>
-
-                      <Typography
-                        variant="body1"
-                        sx={{ mt: 2, lineHeight: 1.6 }}
-                      >
-                        {selectedAddress.address}, <br />
-                        {selectedAddress.city}, {selectedAddress.state}
-                      </Typography>
-                    </Box>
-                  </Box>
+                        <LocationOnIcon color="action" sx={{ mt: 0.5 }} />
+                        <Typography variant="body1" sx={{ lineHeight: 1.6 }}>
+                          {selectedAddress.address}
+                          <br />
+                          {selectedAddress.city}, {selectedAddress.state}
+                          <br />
+                          {selectedAddress.pinCode}
+                        </Typography>
+                      </Stack>
+                    </Stack>
+                  </Paper>
                 )}
               </CardContent>
+
+              <Box sx={{ p: 3, display: { xs: "none", md: "flex" }, gap: 2 }}>
+                <Button
+                  startIcon={<ArrowBackIcon />}
+                  onClick={() => navigate("/cart")}
+                  sx={{ color: "text.secondary" }}
+                >
+                  Back to Cart
+                </Button>
+              </Box>
             </Card>
           </Grid>
 
           <Grid item xs={12} md={4}>
-            <Card elevation={3} sx={{ borderRadius: "12px", p: 3 }}>
-              <Typography
-                variant="h6"
-                fontWeight="bold"
-                sx={{ mb: 3, color: "#0f2a1d" }}
-              >
-                Order Summary
-              </Typography>
+            <Card
+              elevation={0}
+              sx={{
+                borderRadius: "16px",
+                border: "1px solid #e0e0e0",
+                position: "sticky",
+                top: 20,
+              }}
+            >
               <Box
                 sx={{
-                  maxHeight: "350px",
-                  borderRadius: "4px",
+                  p: 3,
+                  bgcolor: "#fafafa",
+                  borderBottom: "1px solid #f0f0f0",
                 }}
               >
+                <Typography variant="h6" fontWeight="800">
+                  Order Summary
+                </Typography>
+              </Box>
+
+              <Box sx={{ p: 3, maxHeight: "40vh", overflowY: "auto" }}>
                 {cartItems &&
                   cartItems.map((item) => (
-                    <Box
+                    <Stack
                       key={item._id}
-                      sx={{
-                        display: "flex",
-                        gap: 2,
-                        mb: 2,
-                        p: 1,
-                        alignItems: "start",
-                      }}
+                      direction="row"
+                      spacing={2}
+                      sx={{ mb: 2 }}
                     >
                       <Avatar
                         variant="rounded"
                         src={item.image}
-                        alt={item.title}
-                        sx={{ width: 60, height: 60, bgcolor: "#eee" }}
+                        sx={{
+                          width: 56,
+                          height: 56,
+                          bgcolor: "#fff",
+                          border: "1px solid #eee",
+                        }}
                       />
                       <Box sx={{ flexGrow: 1 }}>
-                        <Typography variant="body2" fontWeight="bold">
+                        <Typography
+                          variant="body2"
+                          fontWeight="600"
+                          sx={{
+                            display: "-webkit-box",
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: "vertical",
+                            overflow: "hidden",
+                          }}
+                        >
                           {item.title}
                         </Typography>
                         <Typography variant="caption" color="text.secondary">
-                          Qty: {item.qty}
+                          Qty: {item.qty} × ₦{item.price.toLocaleString()}
                         </Typography>
                       </Box>
                       <Typography variant="body2" fontWeight="bold">
                         ₦{(item.price * item.qty).toLocaleString()}
                       </Typography>
-                    </Box>
+                    </Stack>
                   ))}
               </Box>
-              <Divider sx={{ my: 2 }} />
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  mb: 3,
-                }}
-              >
-                <Typography variant="h6" fontWeight="bold">
-                  Total:
-                </Typography>
-                <Typography variant="h5" fontWeight="bold" color="#0f2a1d">
-                  ₦{total.toLocaleString()}
-                </Typography>
+
+              <Divider />
+
+              <Box sx={{ p: 3 }}>
+                <Stack direction="row" justifyContent="space-between" mb={1}>
+                  <Typography color="text.secondary">Subtotal</Typography>
+                  <Typography fontWeight="500">
+                    ₦{subTotal.toLocaleString()}
+                  </Typography>
+                </Stack>
+                <Stack direction="row" justifyContent="space-between" mb={2}>
+                  <Typography color="text.secondary">Shipping</Typography>
+                  <Typography color="#2e7d32" fontWeight="500">
+                    Free
+                  </Typography>
+                </Stack>
+
+                <Divider sx={{ borderStyle: "dashed", mb: 2 }} />
+
+                <Stack direction="row" justifyContent="space-between" mb={3}>
+                  <Typography variant="h6" fontWeight="bold">
+                    Total
+                  </Typography>
+                  <Typography variant="h5" fontWeight="bold" color="#0f2a1d">
+                    ₦{total.toLocaleString()}
+                  </Typography>
+                </Stack>
+
+                <Button
+                  variant="contained"
+                  fullWidth
+                  size="large"
+                  disabled={!selectedAddress || loadingAddress}
+                  onClick={handleProceedToPayment}
+                  endIcon={<LocalShippingIcon />}
+                  sx={{
+                    bgcolor: "#0f2a1d",
+                    borderRadius: "30px",
+                    py: 1.5,
+                    fontSize: "1rem",
+                    textTransform: "none",
+                    "&:hover": { bgcolor: "#144430" },
+                    "&.Mui-disabled": { bgcolor: "#e0e0e0" },
+                  }}
+                >
+                  Proceed to Payment
+                </Button>
+                <Button
+                  fullWidth
+                  onClick={() => navigate("/cart")}
+                  sx={{
+                    mt: 2,
+                    display: { xs: "block", md: "none" },
+                    color: "text.secondary",
+                  }}
+                >
+                  Back to Cart
+                </Button>
               </Box>
             </Card>
           </Grid>
         </Grid>
-
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            marginTop: "30px",
-            flexWrap: "wrap",
-            gap: 2,
-          }}
-        >
-          <Button
-            startIcon={<ArrowBackIcon />}
-            onClick={() => navigate("/cart")}
-            sx={{
-              backgroundColor: "#0f2a1d",
-              color: "white",
-              padding: "12px 40px",
-              borderRadius: "30px",
-              textTransform: "none",
-              fontWeight: "bold",
-              fontSize: "1rem",
-              boxShadow: "0 4px 12px rgba(15, 42, 29, 0.2)",
-              "&:hover": { bgcolor: "#144430" },
-            }}
-          >
-            Back to Cart
-          </Button>
-
-          <Button
-            variant="contained"
-            disabled={!selectedAddress || loadingAddress}
-            onClick={handleProceedToPayment}
-            sx={{
-              backgroundColor: "#0f2a1d",
-              color: "white",
-              padding: "12px 40px",
-              borderRadius: "30px",
-              textTransform: "none",
-              fontWeight: "bold",
-              fontSize: "1rem",
-              boxShadow: "0 4px 12px rgba(15, 42, 29, 0.2)",
-              "&:hover": { bgcolor: "#144430" },
-              "&.Mui-disabled": { bgcolor: "#ccc", color: "#666" },
-            }}
-          >
-            Proceed →
-          </Button>
-        </Box>
-      </Box>
+      </Container>
     </Box>
   );
 };

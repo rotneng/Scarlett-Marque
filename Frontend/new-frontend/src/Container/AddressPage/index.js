@@ -12,6 +12,9 @@ import {
   TextField,
   InputAdornment,
   CircularProgress,
+  Container,
+  Alert,
+  Stack,
 } from "@mui/material";
 
 import PersonIcon from "@mui/icons-material/Person";
@@ -19,6 +22,9 @@ import PhoneIcon from "@mui/icons-material/Phone";
 import HomeIcon from "@mui/icons-material/Home";
 import LocationCityIcon from "@mui/icons-material/LocationCity";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import MapIcon from "@mui/icons-material/Map";
+import SaveIcon from "@mui/icons-material/Save";
+
 import { addAddress, updateAddress } from "../../Actions/address.actions";
 
 const AddressPage = () => {
@@ -75,205 +81,222 @@ const AddressPage = () => {
   return (
     <Box
       sx={{
-        padding: { xs: 2, md: "40px" },
-        backgroundColor: "#f4f4f4",
+        backgroundColor: "#f4f6f8",
         minHeight: "100vh",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "flex-start",
+        py: 6,
       }}
     >
-      <Box
-        sx={{
-          maxWidth: "1400px",
-          width: "100%",
-          display: "flex",
-          justifyContent: "space-evenly",
-          flexDirection: "column",
-        }}
-      >
-        <Grid container spacing={4}>
-          <Grid item xs={12} md={8}>
-            <Card
-              elevation={3}
-              sx={{
-                borderRadius: "12px",
-                height: "100%",
-                minHeight: "500px",
-                display: "flex",
-                flexDirection: "column",
-              }}
-            >
-              <Box sx={{ p: 3, borderBottom: "1px solid #eee" }}>
-                <Typography variant="h6" fontWeight="bold" color="#0f2a1d">
-                  {addressToEdit ? "Edit Address" : "Add New Address"}
-                </Typography>
-              </Box>
+      <Container maxWidth="md">
+        <Box sx={{ mb: 4, textAlign: "center" }}>
+          <Typography variant="h4" fontWeight="800" color="#0f2a1d">
+            {addressToEdit ? "Edit Address" : "New Address"}
+          </Typography>
+          <Typography variant="body1" color="text.secondary">
+            {addressToEdit
+              ? "Update your existing delivery details below."
+              : "Where should we send your order?"}
+          </Typography>
+        </Box>
 
-              <CardContent sx={{ p: 4 }}>
-                <Box component="form" noValidate autoComplete="off">
-                  <Typography
-                    variant="subtitle1"
-                    sx={{ color: "#0f2a1d", fontWeight: "bold", mb: 2 }}
-                  >
-                    Personal Information
-                  </Typography>
-                  <Grid container spacing={3} sx={{ mb: 4 }}>
-                    <Grid item xs={12} md={6}>
-                      <TextField
-                        fullWidth
-                        label="Full Name"
-                        name="fullName"
-                        value={formData.fullName}
-                        onChange={handleChange}
-                        InputProps={{
-                          startAdornment: (
-                            <InputAdornment position="start">
-                              <PersonIcon color="action" />
-                            </InputAdornment>
-                          ),
-                        }}
-                      />
-                    </Grid>
-                    <Grid item xs={12} md={6}>
-                      <TextField
-                        fullWidth
-                        label="Phone Number"
-                        name="phone"
-                        value={formData.phone}
-                        onChange={handleChange}
-                        InputProps={{
-                          startAdornment: (
-                            <InputAdornment position="start">
-                              <PhoneIcon color="action" />
-                            </InputAdornment>
-                          ),
-                        }}
-                      />
-                    </Grid>
-                  </Grid>
-
-                  <Divider sx={{ mb: 4 }} />
-
-                  <Typography
-                    variant="subtitle1"
-                    sx={{ color: "#0f2a1d", fontWeight: "bold", mb: 2 }}
-                  >
-                    Delivery Details
-                  </Typography>
-                  <Grid container spacing={3}>
-                    <Grid item xs={12}>
-                      <TextField
-                        fullWidth
-                        label="Address / Street"
-                        name="address"
-                        placeholder="e.g. 12 Scarlett Avenue"
-                        value={formData.address}
-                        onChange={handleChange}
-                        InputProps={{
-                          startAdornment: (
-                            <InputAdornment position="start">
-                              <HomeIcon color="action" />
-                            </InputAdornment>
-                          ),
-                        }}
-                      />
-                    </Grid>
-                    <Grid item xs={12} md={6}>
-                      <TextField
-                        fullWidth
-                        label="City"
-                        name="city"
-                        value={formData.city}
-                        onChange={handleChange}
-                        InputProps={{
-                          startAdornment: (
-                            <InputAdornment position="start">
-                              <LocationCityIcon color="action" />
-                            </InputAdornment>
-                          ),
-                        }}
-                      />
-                    </Grid>
-                    <Grid item xs={12} md={6}>
-                      <TextField
-                        fullWidth
-                        label="State"
-                        name="state"
-                        value={formData.state}
-                        onChange={handleChange}
-                      />
-                    </Grid>
-                  </Grid>
-
-                  {error && (
-                    <Typography color="error" sx={{ mt: 2 }}>
-                      {typeof error === "object"
-                        ? JSON.stringify(error)
-                        : error}
-                    </Typography>
-                  )}
-                </Box>
-              </CardContent>
-            </Card>
-          </Grid>
-        </Grid>
-
-        <Box
+        <Card
+          elevation={0}
           sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            marginTop: "30px",
-            flexWrap: "wrap",
-            gap: 2,
+            borderRadius: "16px",
+            border: "1px solid #e0e0e0",
+            boxShadow: "0 4px 24px rgba(0,0,0,0.05)",
+            overflow: "visible",
           }}
+        >
+          <CardContent sx={{ p: { xs: 3, md: 5 } }}>
+            <Box component="form" noValidate autoComplete="off">
+              {error && (
+                <Alert severity="error" sx={{ mb: 4, borderRadius: "8px" }}>
+                  {typeof error === "object" ? JSON.stringify(error) : error}
+                </Alert>
+              )}
+
+              <Typography
+                variant="h6"
+                sx={{
+                  color: "#0f2a1d",
+                  fontWeight: "bold",
+                  mb: 3,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 1,
+                }}
+              >
+                <PersonIcon color="primary" /> Contact Information
+              </Typography>
+
+              <Grid container spacing={3} sx={{ mb: 4 }}>
+                <Grid item xs={12} md={6}>
+                  <TextField
+                    fullWidth
+                    label="Full Name"
+                    name="fullName"
+                    value={formData.fullName}
+                    onChange={handleChange}
+                    variant="outlined"
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <PersonIcon color="action" fontSize="small" />
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                </Grid>
+                <Grid item xs={12} md={6}>
+                  <TextField
+                    fullWidth
+                    label="Phone Number"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    variant="outlined"
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <PhoneIcon color="action" fontSize="small" />
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                </Grid>
+              </Grid>
+
+              <Divider sx={{ mb: 4, borderStyle: "dashed" }} />
+
+              <Typography
+                variant="h6"
+                sx={{
+                  color: "#0f2a1d",
+                  fontWeight: "bold",
+                  mb: 3,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 1,
+                }}
+              >
+                <HomeIcon color="primary" /> Delivery Details
+              </Typography>
+
+              <Grid container spacing={3}>
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    label="Street Address"
+                    name="address"
+                    placeholder="e.g. 12 Scarlett Avenue, Flat 4B"
+                    value={formData.address}
+                    onChange={handleChange}
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <HomeIcon color="action" fontSize="small" />
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                </Grid>
+                <Grid item xs={12} md={6}>
+                  <TextField
+                    fullWidth
+                    label="City"
+                    name="city"
+                    value={formData.city}
+                    onChange={handleChange}
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <LocationCityIcon color="action" fontSize="small" />
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                </Grid>
+                <Grid item xs={12} md={6}>
+                  <TextField
+                    fullWidth
+                    label="State / Province"
+                    name="state"
+                    value={formData.state}
+                    onChange={handleChange}
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <MapIcon color="action" fontSize="small" />
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                </Grid>
+              </Grid>
+            </Box>
+          </CardContent>
+        </Card>
+        <Stack
+          direction={{ xs: "column-reverse", sm: "row" }}
+          justifyContent="space-between"
+          alignItems="center"
+          spacing={2}
+          sx={{ mt: 4 }}
         >
           <Button
             startIcon={<ArrowBackIcon />}
             onClick={() => navigate("/checkout")}
+            variant="outlined"
+            size="large"
+            fullWidth
             sx={{
-              backgroundColor: "#0f2a1d",
-              color: "white",
-              padding: "12px 40px",
+              borderColor: "#0f2a1d",
+              color: "#0f2a1d",
               borderRadius: "30px",
               textTransform: "none",
               fontWeight: "bold",
-              fontSize: "1rem",
-              boxShadow: "0 4px 12px rgba(15, 42, 29, 0.2)",
-              "&:hover": { bgcolor: "#144430" },
+              maxWidth: { sm: "200px" },
+              "&:hover": {
+                borderColor: "#144430",
+                bgcolor: "rgba(15, 42, 29, 0.05)",
+              },
             }}
           >
-            Back
+            Back to Checkout
           </Button>
 
           <Button
             variant="contained"
             onClick={handleSaveAndProceed}
             disabled={loading}
+            startIcon={!loading && <SaveIcon />}
+            size="large"
+            fullWidth
             sx={{
               backgroundColor: "#0f2a1d",
               color: "white",
-              padding: "12px 40px",
               borderRadius: "30px",
               textTransform: "none",
               fontWeight: "bold",
-              fontSize: "1rem",
-              boxShadow: "0 4px 12px rgba(15, 42, 29, 0.2)",
-              "&:hover": { bgcolor: "#144430" },
+              boxShadow: "0 8px 16px rgba(15, 42, 29, 0.2)",
+              maxWidth: { sm: "250px" },
+              "&:hover": {
+                bgcolor: "#144430",
+                boxShadow: "0 10px 20px rgba(15, 42, 29, 0.3)",
+              },
               "&.Mui-disabled": { bgcolor: "#ccc" },
             }}
           >
             {loading ? (
-              <CircularProgress size={24} />
+              <CircularProgress size={24} color="inherit" />
             ) : addressToEdit ? (
               "Update Address"
             ) : (
               "Save & Proceed"
             )}
           </Button>
-        </Box>
-      </Box>
+        </Stack>
+      </Container>
     </Box>
   );
 };

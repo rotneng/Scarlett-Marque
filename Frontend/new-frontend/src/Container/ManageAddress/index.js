@@ -5,19 +5,25 @@ import {
   Box,
   Typography,
   Button,
-  Grid,
   Card,
   CardContent,
   CircularProgress,
   Container,
+  Stack,
+  IconButton,
+  Divider,
+  Paper,
+  alpha,
 } from "@mui/material";
 
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/EditOutlined";
+import DeleteIcon from "@mui/icons-material/DeleteOutline";
 import AddIcon from "@mui/icons-material/Add";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import PhoneIcon from "@mui/icons-material/Phone";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
+import HomeIcon from "@mui/icons-material/HomeWorkOutlined";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 
 import { getAddresses, deleteAddress } from "../../Actions/address.actions";
 
@@ -58,75 +64,117 @@ const ManageAddressPage = () => {
   return (
     <Box
       sx={{
-        backgroundColor: "#f4f4f4",
+        backgroundColor: "#f8f9fa",
         minHeight: "100vh",
-        padding: "40px 20px",
+        pb: 8,
+        pt: 4,
       }}
     >
       <Container maxWidth="md">
-        <Button
-          startIcon={<ArrowBackIcon />}
-          onClick={() => navigate("/checkout")}
-          sx={{
-            mb: 3,
-            backgroundColor: "#0f2a1d",
-            fontWeight: "bold",
-            color: "white",
-            padding: "10px 20px",
-            borderRadius: "30px",
-            textTransform: "none",
-            "&:hover": { backgroundColor: "#144430" },
-          }}
-        >
-          Back to Checkout
-        </Button>
-
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            mb: 4,
-            flexWrap: "wrap",
-            gap: 2,
-          }}
-        >
-          <Typography variant="h4" fontWeight="bold" color="#0f2a1d">
-            My Addresses
-          </Typography>
+        <Box sx={{ mb: 4 }}>
           <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            onClick={handleAddNew}
+            startIcon={<ArrowBackIcon />}
+            onClick={() => navigate("/checkout")}
             sx={{
-              bgcolor: "#0f2a1d",
-              borderRadius: "30px",
-              padding: "10px 20px",
+              mb: 2,
+              color: "#555",
               textTransform: "none",
-              fontWeight: "bold",
-              "&:hover": { bgcolor: "#144430" },
+              fontWeight: 600,
+              "&:hover": { backgroundColor: "transparent", color: "#0f2a1d" },
             }}
           >
-            Add Address
+            Return to Checkout
           </Button>
-        </Box>
 
+          <Stack
+            direction={{ xs: "column", sm: "row" }}
+            justifyContent="space-between"
+            alignItems={{ xs: "flex-start", sm: "center" }}
+            spacing={2}
+          >
+            <Box>
+              <Typography variant="h4" fontWeight="800" color="#0f2a1d">
+                Shipping Addresses
+              </Typography>
+              <Typography
+                variant="body1"
+                color="text.secondary"
+                sx={{ mt: 0.5 }}
+              >
+                Manage your delivery locations
+              </Typography>
+            </Box>
+
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={handleAddNew}
+              sx={{
+                bgcolor: "#0f2a1d",
+                borderRadius: "50px",
+                padding: "10px 24px",
+                textTransform: "none",
+                fontWeight: "bold",
+                boxShadow: "0 4px 12px rgba(15, 42, 29, 0.3)",
+                "&:hover": { bgcolor: "#144430" },
+              }}
+            >
+              Add New Address
+            </Button>
+          </Stack>
+        </Box>
         {loading ? (
           <Box sx={{ display: "flex", justifyContent: "center", mt: 10 }}>
-            <CircularProgress sx={{ color: "#0f2a1d" }} />
+            <CircularProgress size={50} sx={{ color: "#0f2a1d" }} />
           </Box>
         ) : error ? (
-          <Typography color="error" align="center">
-            {error}
-          </Typography>
+          <Paper
+            sx={{
+              p: 4,
+              textAlign: "center",
+              bgcolor: "#fff0f0",
+              color: "#d32f2f",
+            }}
+          >
+            <Typography variant="h6">Error Loading Addresses</Typography>
+            <Typography>{error}</Typography>
+          </Paper>
         ) : !addresses || addresses.length === 0 ? (
-          <Card sx={{ p: 5, textAlign: "center", borderRadius: "12px" }}>
-            <LocationOnIcon sx={{ fontSize: 60, color: "#ccc", mb: 2 }} />
-            <Typography variant="h6" color="text.secondary" gutterBottom>
-              No addresses found.
+          <Paper
+            elevation={0}
+            sx={{
+              p: 6,
+              textAlign: "center",
+              borderRadius: "24px",
+              border: "2px dashed #e0e0e0",
+              bgcolor: "white",
+            }}
+          >
+            <Box
+              sx={{
+                width: 80,
+                height: 80,
+                borderRadius: "50%",
+                bgcolor: "#f5f5f5",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                mx: "auto",
+                mb: 3,
+              }}
+            >
+              <LocationOnIcon sx={{ fontSize: 40, color: "#999" }} />
+            </Box>
+            <Typography variant="h5" fontWeight="bold" gutterBottom>
+              No addresses found
             </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-              Add a shipping address to speed up your checkout process.
+            <Typography
+              variant="body1"
+              color="text.secondary"
+              sx={{ mb: 4, maxWidth: "400px", mx: "auto" }}
+            >
+              It looks like you haven't saved any shipping addresses yet. Add
+              one to speed up your checkout.
             </Typography>
             <Button
               variant="outlined"
@@ -134,110 +182,136 @@ const ManageAddressPage = () => {
               sx={{
                 color: "#0f2a1d",
                 borderColor: "#0f2a1d",
-                borderRadius: "20px",
-                "&:hover": { borderColor: "#144430", bgcolor: "#f0fdf4" },
+                borderWidth: 2,
+                borderRadius: "50px",
+                px: 4,
+                fontWeight: "bold",
+                "&:hover": {
+                  borderColor: "#144430",
+                  borderWidth: 2,
+                  bgcolor: "#f0fdf4",
+                },
               }}
             >
-              Add New Address
+              Create Address
             </Button>
-          </Card>
+          </Paper>
         ) : (
-          <Grid container spacing={3}>
+          <Stack spacing={2}>
             {addresses.map((addr) => (
-              <Grid item xs={12} key={addr._id}>
-                <Card
-                  elevation={0}
-                  sx={{
-                    borderRadius: "16px",
-                    border: "1px solid #e0e0e0",
-                    transition: "all 0.3s ease",
-                    "&:hover": {
-                      boxShadow: "0 10px 20px rgba(0,0,0,0.05)",
-                      borderColor: "#0f2a1d",
-                    },
-                  }}
-                >
-                  <CardContent
-                    sx={{
-                      display: "flex",
-                      flexDirection: { xs: "column", md: "row" },
-                      justifyContent: "space-between",
-                      alignItems: { xs: "flex-start", md: "center" },
-                      p: 3,
-                      gap: 2,
-                    }}
+              <Card
+                key={addr._id}
+                elevation={0}
+                sx={{
+                  borderRadius: "16px",
+                  border: "1px solid #e0e0e0",
+                  transition: "all 0.2s ease",
+                  overflow: "visible",
+                  "&:hover": {
+                    borderColor: "#0f2a1d",
+                    boxShadow: "0 8px 24px rgba(0,0,0,0.08)",
+                    transform: "translateY(-2px)",
+                  },
+                }}
+              >
+                <CardContent sx={{ p: 3 }}>
+                  <Stack
+                    direction={{ xs: "column", md: "row" }}
+                    justifyContent="space-between"
+                    alignItems={{ xs: "flex-start", md: "center" }}
+                    spacing={3}
                   >
-                    {/* Address Details */}
                     <Box sx={{ flex: 1 }}>
-                      <Typography variant="h6" fontWeight="bold" sx={{ mb: 1 }}>
-                        {addr.fullName}
-                      </Typography>
+                      <Stack
+                        direction="row"
+                        alignItems="center"
+                        spacing={1}
+                        sx={{ mb: 1 }}
+                      >
+                        <HomeIcon sx={{ color: "#0f2a1d", fontSize: 28 }} />
+                        <Typography
+                          variant="h6"
+                          fontWeight="bold"
+                          sx={{ color: "#333" }}
+                        >
+                          {addr.fullName}
+                        </Typography>
+                      </Stack>
 
-                      <Box
+                      <Typography
+                        variant="body1"
                         sx={{
-                          display: "flex",
-                          alignItems: "flex-start",
-                          gap: 1,
-                          mb: 1,
+                          ml: 4.5,
+                          mb: 0.5,
+                          color: "#555",
+                          fontWeight: 500,
                         }}
                       >
-                        <LocationOnIcon
-                          fontSize="small"
-                          sx={{ color: "#777", mt: 0.3 }}
-                        />
-                        <Typography variant="body1" sx={{ color: "#555" }}>
-                          {addr.address}, {addr.city}
-                        </Typography>
-                      </Box>
+                        {addr.address}, {addr.city}
+                      </Typography>
 
-                      <Box
-                        sx={{ display: "flex", alignItems: "center", gap: 1 }}
+                      <Stack
+                        direction="row"
+                        alignItems="center"
+                        spacing={1}
+                        sx={{ ml: 4.5 }}
                       >
-                        <PhoneIcon fontSize="small" sx={{ color: "#777" }} />
-                        <Typography variant="body2" sx={{ color: "#555" }}>
+                        <PhoneIcon sx={{ fontSize: 16, color: "#888" }} />
+                        <Typography variant="body2" color="text.secondary">
                           {addr.phone || addr.phoneNumber}
                         </Typography>
-                      </Box>
+                      </Stack>
                     </Box>
 
-                    {/* Action Buttons */}
+                    <Divider
+                      sx={{
+                        display: { xs: "block", md: "none" },
+                        width: "100%",
+                      }}
+                    />
+
                     <Box
                       sx={{
                         display: "flex",
                         flexDirection: { xs: "row", md: "column" },
                         alignItems: { xs: "center", md: "flex-end" },
                         width: { xs: "100%", md: "auto" },
-                        gap: 1,
-                        mt: { xs: 2, md: 0 },
-                        borderTop: { xs: "1px solid #f0f0f0", md: "none" },
-                        pt: { xs: 2, md: 0 },
+                        gap: 1.5,
                       }}
                     >
                       <Button
                         variant="contained"
                         onClick={() => handleSelectAddress(addr)}
-                        fullWidth
+                        startIcon={<CheckCircleIcon />}
                         sx={{
-                          bgcolor: "#0f2a1d",
+                          bgcolor: alpha("#0f2a1d", 0.9),
                           color: "white",
                           textTransform: "none",
-                          borderRadius: "20px",
-                          px: 4,
-                          "&:hover": { bgcolor: "#144430" },
+                          borderRadius: "10px",
+                          px: 3,
+                          width: { xs: "100%", md: "160px" },
+                          boxShadow: "none",
+                          "&:hover": {
+                            bgcolor: "#0f2a1d",
+                            boxShadow: "0 4px 10px rgba(0,0,0,0.2)",
+                          },
                         }}
                       >
-                        Select
+                        Deliver Here
                       </Button>
 
-                      <Box sx={{ display: "flex", gap: 1 }}>
+                      <Stack direction="row" spacing={1}>
                         <Button
                           size="small"
                           startIcon={<EditIcon />}
                           onClick={() => handleEdit(addr)}
                           sx={{
-                            color: "#555",
+                            color: "#666",
                             textTransform: "none",
-                            minWidth: "auto",
+                            "&:hover": {
+                              color: "#0f2a1d",
+                              bgcolor: "transparent",
+                            },
                           }}
                         >
                           Edit
@@ -249,18 +323,18 @@ const ManageAddressPage = () => {
                           sx={{
                             color: "#d32f2f",
                             textTransform: "none",
-                            minWidth: "auto",
+                            "&:hover": { bgcolor: "#ffebee" },
                           }}
                         >
                           Delete
                         </Button>
-                      </Box>
+                      </Stack>
                     </Box>
-                  </CardContent>
-                </Card>
-              </Grid>
+                  </Stack>
+                </CardContent>
+              </Card>
             ))}
-          </Grid>
+          </Stack>
         )}
       </Container>
     </Box>
