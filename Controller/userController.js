@@ -70,7 +70,11 @@ exports.loginUser = async (req, res) => {
   try {
     const { username, password } = req.body;
 
-    const user = await User.findOne({ username });
+    // FIX: Clean the input here too!
+    const cleanUsername = username ? username.trim() : "";
+
+    // Find user using the cleaned username
+    const user = await User.findOne({ username: cleanUsername });
 
     if (!user) {
       return res.status(400).json({ message: "Invalid credentials" }); 
