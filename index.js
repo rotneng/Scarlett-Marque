@@ -17,16 +17,27 @@ const orderRoutes = require("./Route/orderRoute");
 const app = express();
 const port = process.env.PORT || 3000;
 
-app.use(helmet());
+// --- CHANGE 1: Trust the Proxy (Required for Render + Cookies) ---
+app.set("trust proxy", 1); 
+
+// --- CHANGE 2: Relax Helmet for Cross-Origin (Vercel) ---
+app.use(
+  helmet({
+    crossOriginResourcePolicy: false, // Allows Vercel to fetch data/images
+  })
+);
+
 app.use(
   cors({
     origin: ["http://localhost:3000", "https://scarlett-marque.vercel.app"],
     credentials: true,
   })
 );
+
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(express.json());
+
 app.use("/product", productRoute);
 app.use("/messages", messageRoute);
 app.use("/user", userRoute);
