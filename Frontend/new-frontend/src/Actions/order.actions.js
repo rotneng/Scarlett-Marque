@@ -1,14 +1,34 @@
-import axios from "../helpers/axios";
+import axios from "axios"; // Change: Import standard axios, not the helper
 import { orderConstants, cartConstants } from "../Actions/constant";
+
+// --- SMART URL SWITCH ---
+const BASE_URL = window.location.hostname === "localhost" 
+  ? "http://localhost:3000" 
+  : "https://scarlett-marque.onrender.com";
+
+// --- HELPER FOR HEADERS ---
+// This ensures every request sends your login token
+const getAuthConfig = () => {
+  const token = localStorage.getItem("token");
+  return {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+  };
+};
 
 export const createOrder = (order) => {
   return async (dispatch) => {
     dispatch({ type: orderConstants.ORDER_CREATE_REQUEST });
     try {
-      console.log("Sending Order to Backend:", order);
-      const res = await axios.post("/order", order);
+      // UPDATED: Use BASE_URL and Explicit Auth Config
+      const res = await axios.post(
+        `${BASE_URL}/order`, 
+        order, 
+        getAuthConfig()
+      );
 
-      console.log("Backend Response:", res);
       if (res.status === 201) {
         dispatch({
           type: orderConstants.ORDER_CREATE_SUCCESS,
@@ -45,7 +65,12 @@ export const createOrderAfterPayment = (paymentResult, orderData) => {
         paymentMethod: "Card",
       };
 
-      const res = await axios.post("/order/create-after-payment", payload);
+      // UPDATED: Use BASE_URL and Explicit Auth Config
+      const res = await axios.post(
+        `${BASE_URL}/order/create-after-payment`, 
+        payload,
+        getAuthConfig()
+      );
 
       if (res.status === 201) {
         dispatch({
@@ -72,7 +97,11 @@ export const getOrderDetails = (id) => {
     try {
       dispatch({ type: orderConstants.GET_ORDER_DETAILS_REQUEST });
 
-      const res = await axios.get(`/order/${id}`);
+      // UPDATED: Use BASE_URL and Explicit Auth Config
+      const res = await axios.get(
+        `${BASE_URL}/order/${id}`, 
+        getAuthConfig()
+      );
 
       dispatch({
         type: orderConstants.GET_ORDER_DETAILS_SUCCESS,
@@ -94,7 +123,12 @@ export const payOrder = (orderId, paymentResult) => async (dispatch) => {
   try {
     dispatch({ type: "ORDER_PAY_REQUEST" });
 
-    const { data } = await axios.put(`/order/${orderId}/pay`, paymentResult);
+    // UPDATED: Use BASE_URL and Explicit Auth Config
+    const { data } = await axios.put(
+      `${BASE_URL}/order/${orderId}/pay`, 
+      paymentResult,
+      getAuthConfig()
+    );
 
     dispatch({ type: "ORDER_PAY_SUCCESS", payload: data });
 
@@ -115,7 +149,11 @@ export const listMyOrders = () => {
     try {
       dispatch({ type: orderConstants.ORDER_MY_LIST_REQUEST });
 
-      const res = await axios.get("/order/myorders");
+      // UPDATED: Use BASE_URL and Explicit Auth Config
+      const res = await axios.get(
+        `${BASE_URL}/order/myorders`, 
+        getAuthConfig()
+      );
 
       dispatch({
         type: orderConstants.ORDER_MY_LIST_SUCCESS,
@@ -138,7 +176,11 @@ export const getAllOrders = () => {
     try {
       dispatch({ type: "ORDER_LIST_REQUEST" });
 
-      const res = await axios.get("/order");
+      // UPDATED: Use BASE_URL and Explicit Auth Config
+      const res = await axios.get(
+        `${BASE_URL}/order`, 
+        getAuthConfig()
+      );
 
       dispatch({
         type: "ORDER_LIST_SUCCESS",
@@ -160,7 +202,12 @@ export const updateOrder = (payload) => {
   return async (dispatch) => {
     dispatch({ type: orderConstants.UPDATE_CUSTOMER_ORDER_REQUEST });
     try {
-      const res = await axios.post("/order/update", payload);
+      // UPDATED: Use BASE_URL and Explicit Auth Config
+      const res = await axios.post(
+        `${BASE_URL}/order/update`, 
+        payload, 
+        getAuthConfig()
+      );
 
       if (res.status === 201) {
         dispatch({ type: orderConstants.UPDATE_CUSTOMER_ORDER_SUCCESS });
@@ -175,7 +222,12 @@ export const confirmDelivery = (orderId) => {
     try {
       dispatch({ type: orderConstants.UPDATE_CUSTOMER_ORDER_REQUEST });
 
-      const res = await axios.put(`/order/${orderId}/confirm-delivery`);
+      // UPDATED: Use BASE_URL and Explicit Auth Config
+      const res = await axios.put(
+        `${BASE_URL}/order/${orderId}/confirm-delivery`, 
+        {}, // Empty body for put request
+        getAuthConfig()
+      );
 
       if (res.status === 200) {
         dispatch({ type: orderConstants.UPDATE_CUSTOMER_ORDER_SUCCESS });
@@ -198,7 +250,12 @@ export const reportOrderIssue = (orderId) => {
     try {
       dispatch({ type: orderConstants.UPDATE_CUSTOMER_ORDER_REQUEST });
 
-      const res = await axios.put(`/order/${orderId}/report-issue`);
+      // UPDATED: Use BASE_URL and Explicit Auth Config
+      const res = await axios.put(
+        `${BASE_URL}/order/${orderId}/report-issue`, 
+        {}, // Empty body
+        getAuthConfig()
+      );
 
       if (res.status === 200) {
         dispatch({ type: orderConstants.UPDATE_CUSTOMER_ORDER_SUCCESS });

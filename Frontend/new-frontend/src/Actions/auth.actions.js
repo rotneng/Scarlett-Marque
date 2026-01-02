@@ -1,14 +1,27 @@
 import axios from "axios";
 import { authConstants } from "./constant";
 
+// --- SMART URL SWITCH ---
+// Automatically picks Localhost or Render
+const BASE_URL = window.location.hostname === "localhost" 
+  ? "http://localhost:3000" 
+  : "https://scarlett-marque.onrender.com";
+
 export const login = (loginData) => {
   return async (dispatch) => {
     try {
       dispatch({ type: authConstants.LOGIN_REQUEST });
 
+      // FIX: Clean inputs (Mobile keyboards often add accidental spaces)
+      const cleanLoginData = {
+        ...loginData,
+        username: loginData.username ? loginData.username.trim() : "",
+      };
+
+      // UPDATED: Uses BASE_URL
       const res = await axios.post(
-        "http://localhost:3000/user/loginUser",
-        loginData
+        `${BASE_URL}/user/loginUser`,
+        cleanLoginData
       );
 
       if (res.status === 200) {
@@ -21,10 +34,12 @@ export const login = (loginData) => {
           ? JSON.parse(localStorage.getItem("cart"))
           : [];
 
+        // MERGE CART ITEMS (If any exist)
         if (localCart.length > 0) {
           const mergeRequests = localCart.map((item) => {
+            // UPDATED: Uses BASE_URL for Cart merging too
             return axios.post(
-              "http://localhost:3000/cart/user/cart/addtocart",
+              `${BASE_URL}/cart/user/cart/addtocart`,
               {
                 cartItems: {
                   product: item._id,
@@ -83,9 +98,17 @@ export const register = (signUpData) => {
     try {
       dispatch({ type: authConstants.REGISTER_REQUEST });
 
+      // FIX: Clean inputs for Registration too
+      const cleanSignUpData = {
+        ...signUpData,
+        username: signUpData.username ? signUpData.username.trim() : "",
+        email: signUpData.email ? signUpData.email.trim().toLowerCase() : "",
+      };
+
+      // UPDATED: Uses BASE_URL
       const res = await axios.post(
-        "http://localhost:3000/user/registerUser",
-        signUpData
+        `${BASE_URL}/user/registerUser`,
+        cleanSignUpData
       );
 
       if (res.status === 201 || res.status === 200) {

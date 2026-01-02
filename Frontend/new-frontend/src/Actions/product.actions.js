@@ -1,5 +1,12 @@
 import axios from "axios";
 import { productConstants } from "./constant";
+
+// --- SMART URL SWITCH ---
+// Automatically selects Localhost (for coding) or Render (for mobile/Vercel)
+const BASE_URL = window.location.hostname === "localhost" 
+  ? "http://localhost:3000" 
+  : "https://scarlett-marque.onrender.com";
+
 export const addProduct = (form, navigate) => {
   return async (dispatch) => {
     dispatch({ type: productConstants.ADD_PRODUCT_REQUEST });
@@ -25,8 +32,9 @@ export const addProduct = (form, navigate) => {
         dataToSend = formData;
       }
 
+      // UPDATED: Uses BASE_URL
       const response = await axios.post(
-        "http://localhost:3000/product/addProducts",
+        `${BASE_URL}/product/addProducts`,
         dataToSend,
         {
           headers: {
@@ -58,8 +66,9 @@ export const getProducts = () => {
   return async (dispatch) => {
     dispatch({ type: productConstants.GET_PRODUCTS_REQUEST });
     try {
+      // UPDATED: Uses BASE_URL
       const response = await axios.get(
-        "http://localhost:3000/product/getProducts"
+        `${BASE_URL}/product/getProducts`
       );
 
       if (response.status === 200) {
@@ -89,8 +98,9 @@ export const deleteProduct = (id) => {
     try {
       const token = localStorage.getItem("token");
 
+      // UPDATED: Uses BASE_URL
       const res = await axios.delete(
-        `http://localhost:3000/product/deleteProducts/${id}`,
+        `${BASE_URL}/product/deleteProducts/${id}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -139,8 +149,10 @@ export const updateProduct = (id, form, navigate) => {
         }
         dataToSend = formData;
       }
+      
+      // UPDATED: Uses BASE_URL
       const res = await axios.put(
-        `http://localhost:3000/product/updateProducts/${id}`,
+        `${BASE_URL}/product/updateProducts/${id}`,
         dataToSend,
         {
           headers: { Authorization: `Bearer ${token}` },
