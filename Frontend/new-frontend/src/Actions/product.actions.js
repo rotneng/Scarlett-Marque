@@ -3,7 +3,7 @@ import { productConstants } from "./constant";
 
 const BASE_URL =
   window.location.hostname === "localhost"
-    ? "http://localhost:%000"
+    ? "http://localhost:5000"
     : "https://scarlett-marque.onrender.com";
 
 export const addProduct = (form, navigate) => {

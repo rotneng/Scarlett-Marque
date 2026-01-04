@@ -3,7 +3,7 @@ import { orderConstants, cartConstants } from "../Actions/constant";
 
 const BASE_URL =
   window.location.hostname === "localhost"
-    ? "http://localhost:%000"
+    ? "http://localhost:5000"
     : "https://scarlett-marque.onrender.com";
 
 const getAuthConfig = () => {
