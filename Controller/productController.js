@@ -1,5 +1,4 @@
 const Product = require("../Models/productModel");
-const cloudinary = require("../Util/cloudinary");
 const { newCloud } = require("../Util/cloudinary");
 
 exports.getProducts = async (req, res) => {
@@ -37,6 +36,8 @@ exports.addProducts = async (req, res) => {
             img: uploadResult.url,
             public_id: uploadResult.public_id,
           });
+        } else {
+          console.log("Failed to upload image (Check Env Vars)");
         }
       }
       console.log("Images uploaded to cloudinary:", imageUrls);
@@ -61,7 +62,7 @@ exports.addProducts = async (req, res) => {
     });
 
     const saveProduct = await product.save();
-    console.log("product added succesfully");
+    console.log("Product added successfully");
 
     return res
       .status(200)
@@ -98,7 +99,6 @@ exports.updateProducts = async (req, res) => {
     if (req.body.colors) product.colors = req.body.colors;
 
     let retainedImages = [];
-
     if (req.body.existingImages) {
       const incomingImages = Array.isArray(req.body.existingImages)
         ? req.body.existingImages
@@ -111,13 +111,13 @@ exports.updateProducts = async (req, res) => {
         });
       }
     }
-
     const imageFiles = req.files;
     let newImageUrls = [];
 
     if (imageFiles && imageFiles.length > 0) {
       for (const file of imageFiles) {
         const uploadResult = await newCloud(file.path);
+
         if (uploadResult && uploadResult.url) {
           newImageUrls.push({
             img: uploadResult.url,
@@ -130,6 +130,7 @@ exports.updateProducts = async (req, res) => {
     product.images = [...retainedImages, ...newImageUrls];
 
     const update = await product.save();
+    console.log("Product updated successfully");
 
     if (update) {
       return res
@@ -149,7 +150,6 @@ exports.deleteProducts = async (req, res) => {
   try {
     const product = await Product.findOneAndDelete({ _id: id });
     if (product) {
-      console.log("Product deleted succesfully");
       return res.status(200).json({ message: "product deleted" });
     } else {
       return res.status(404).json({ message: "Product not found" });
