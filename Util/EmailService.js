@@ -2,24 +2,27 @@ const nodemailer = require("nodemailer");
 require("dotenv").config();
 
 const createTransporter = async () => {
-  // 1. Safety Check: Ensure variables exist
+  // Safety Check
   if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-    console.error("CRITICAL ERROR: EMAIL_USER or EMAIL_PASS is missing in .env or Render Environment Variables!");
-    throw new Error("Missing Email Credentials");
+    throw new Error("Missing Email Credentials in Environment Variables");
   }
 
   return nodemailer.createTransport({
+    service: "gmail", // Use the built-in 'gmail' service shortcut
     host: "smtp.gmail.com",
-    port: 465,
-    secure: true, // Use SSL
+    port: 587,        // Changed from 465 to 587 (Better for Cloud Servers)
+    secure: false,    // Must be false for Port 587
     auth: {
       user: process.env.EMAIL_USER,
       pass: process.env.EMAIL_PASS,
     },
-    // 2. Fix for Cloud Server SSL Issues
     tls: {
-      rejectUnauthorized: false
-    }
+      rejectUnauthorized: false, // Fixes SSL errors
+    },
+    // TIMEOUT SETTINGS (Fix for 'Connection timeout')
+    connectionTimeout: 10000, // Wait max 10 seconds to connect
+    greetingTimeout: 5000,    // Wait max 5 seconds for greeting
+    socketTimeout: 10000,     // Close socket if idle for 10 seconds
   });
 };
 
@@ -43,8 +46,12 @@ const emailLayout = (otp) => {
 const sendEmail = async (email, otp) => {
   try {
     const transporter = await createTransporter();
-
-    console.log(`Attempting to send OTP to: ${email}`);
+    
+    console.log(`Attempting to send OTP to: ${email} via Port 587...`);
+    
+    // Verify connection configuration
+    await transporter.verify();
+    console.log("Transporter Verified. Sending now...");
 
     const info = await transporter.sendMail({
       from: `"Scarlett Marque" <${process.env.EMAIL_USER}>`,
@@ -57,7 +64,9 @@ const sendEmail = async (email, otp) => {
     console.log("SUCCESS: Email sent. Message ID:", info.messageId);
   } catch (error) {
     console.error("EMAIL FAILED TO SEND:", error.message);
-    // We log the error but don't crash the server
+    if(error.code === 'ETIMEDOUT') {
+        console.error("TIP: Google might be blocking the connection. Check 'less secure apps' or App Password.");
+    }
   }
 };
 
