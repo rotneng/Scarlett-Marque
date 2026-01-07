@@ -1,53 +1,271 @@
-const nodemailer = require("nodemailer");
-require("dotenv").config();
+const User = require("../Models/userModel");
+const Token = require("../Models/tokenModel");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
+const { sendEmail } = require("../Util/EmailService");
 
-const createTransporter = async () => {
-  return nodemailer.createTransport({
-    host: "smtp.gmail.com", // Explicit Host
-    port: 465,              // Explicit Port (Secure)
-    secure: true,           // TRUE for Port 465
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
-    },
-  });
-};
-
-const emailLayout = (otp) => {
-  return `
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Scarlett Marque Verification</title>
-    </head>
-    <body style="font-family: Arial, sans-serif;">
-        <h1 style="color: #0f2a1d;">Welcome To Scarlett Marque Store</h1>
-        <p>Signup Successful!</p>
-        <p>Your Verification code is: <strong style="font-size: 18px;">${otp}</strong></p>
-    </body>
-    </html>`;
-};
-
-const sendEmail = async (email, otp) => {
+exports.registerUser = async (req, res) => {
   try {
-    const transporter = await createTransporter();
+    const { username, password, email, role } = req.body;
+    const existingUser = await User.findOne({ username });
+    if (existingUser) {
+      return res.status(400).json({ message: "User already exists" });
+    }
 
-    console.log("Attempting to send email to:", email); // This will show in Render Logs
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
 
-    const info = await transporter.sendMail({
-      from: `"Scarlett Marque" <${process.env.EMAIL_USER}>`,
-      to: email,
-      subject: "Welcome to Scarlett Marque",
-      text: `Your verification token is ${otp}`,
-      html: emailLayout(otp),
+    const user = new User({
+      username,
+      password: hashedPassword,
+      email,
+      role,
     });
 
-    console.log("Message sent: %s", info.messageId);
+    try {
+      const otp = Math.floor(100000 + Math.random() * 900000);
+      const token = new Token({
+        email,
+        token: otp,
+      });
+      await token.save();
+
+      await sendEmail(email, otp);
+      console.log("OTP Email sent successfully");
+    } catch (emailError) {
+      console.log("Error sending OTP email:", emailError);
+    }
+
+    await user.save();
+    return res.status(200).json({
+      message: "User registered successfully. Please check email for OTP.",
+    });
   } catch (error) {
-    console.error("EMAIL ERROR:", error); // Check Render Logs for this
+    console.log("Error registering user:", error);
+    return res.status(500).json({ message: "Error registering user" });
   }
 };
 
-module.exports = { createTransporter, sendEmail };
+exports.loginUser = async (req, res) => {
+  try {
+    const { username, password } = req.body;
+
+    const user = await User.findOne({ username });
+    if (!user) {
+      return res.status(400).json({ message: "Invalid credentials" });
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ message: "Invalid credentials" });
+    }
+
+    const token = jwt.sign(
+      {
+        userId: user._id,
+        username: user.username,
+        role: user.role,
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" }
+    );
+
+    return res.status(200).json({
+      message: "Login successful",
+      token,
+      role: user.role,
+      username: user.username,
+    });
+  } catch (error) {
+    console.log("Error in login:", error);
+    return res.status(500).json({ message: "Server error during login" });
+  }
+};
+
+exports.verifyEmail = async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+    const tokenDoc = await Token.findOne({ email, token: otp });
+
+    if (!tokenDoc) {
+      return res.status(400).json({ message: "Invalid or expired OTP" });
+    }
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ message: "User not found" });
+    }
+
+    user.isVerified = true;
+    await user.save();
+    await Token.findByIdAndDelete(tokenDoc._id);
+
+    const authToken = jwt.sign(
+      {
+        userId: user._id,
+        username: user.username,
+        role: user.role,
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" }
+    );
+
+    return res.status(200).json({
+      message: "Email verified and logged in successfully",
+      token: authToken,
+      user: {
+        username: user.username,
+        role: user.role,
+        email: user.email,
+      },
+    });
+  } catch (error) {
+    console.log("Error verifying email:", error);
+    return res
+      .status(500)
+      .json({ message: "Server error during verification" });
+  }
+};
+
+exports.resendOtp = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const otp = Math.floor(100000 + Math.random() * 900000);
+
+    await Token.findOneAndUpdate(
+      { email },
+      { token: otp },
+      { upsert: true, new: true }
+    );
+
+    await sendEmail(email, otp);
+
+    return res.status(200).json({ message: "OTP resent successfully" });
+  } catch (error) {
+    console.log("Error resending OTP:", error);
+    return res.status(500).json({ message: "Error resending OTP" });
+  }
+};
+
+exports.forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res
+        .status(404)
+        .json({ message: "User with this email does not exist" });
+    }
+
+    const resetToken = crypto.randomBytes(32).toString("hex");
+    user.resetPasswordToken = resetToken;
+    user.resetPasswordExpires = Date.now() + 3600000; // 1 Hour
+    await user.save();
+
+    const clientUrl =
+      process.env.NODE_ENV === "production"
+        ? "https://scarlett-marque.onrender.com"
+        : "http://localhost:3000";
+
+    const resetUrl = `${clientUrl}/reset-password/${resetToken}`;
+
+    const { createTransporter } = require("../Util/EmailService");
+    const transporter = await createTransporter();
+
+    const mailOptions = {
+      from: `"Scarlett Marque" <${process.env.EMAIL_USER}>`,
+      to: user.email,
+      subject: "Password Reset Request",
+      html: `
+        <h3>Password Reset Request</h3>
+        <p>You requested a password reset. Please click the link below to verify your identity and set a new password:</p>
+        <a href="${resetUrl}" clicktracking=off>${resetUrl}</a>
+        <p>This link expires in 1 hour.</p>
+        <p>If you did not request this, please ignore this email.</p>
+      `,
+    };
+
+    await transporter.sendMail(mailOptions);
+
+    return res
+      .status(200)
+      .json({ message: "Password reset link sent to email" });
+  } catch (error) {
+    console.log("Error in forgotPassword:", error);
+    return res.status(500).json({ message: "Error sending reset email" });
+  }
+};
+
+exports.resetPassword = async (req, res) => {
+  try {
+    const { token, newPassword } = req.body;
+
+    const user = await User.findOne({
+      resetPasswordToken: token,
+      resetPasswordExpires: { $gt: Date.now() },
+    });
+
+    if (!user) {
+      return res
+        .status(400)
+        .json({ message: "Invalid or expired reset token" });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+    user.password = hashedPassword;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpires = undefined;
+
+    await user.save();
+
+    return res
+      .status(200)
+      .json({ message: "Password reset successfully. Please login." });
+  } catch (error) {
+    console.log("Error in resetPassword:", error);
+    return res.status(500).json({ message: "Error resetting password" });
+  }
+};
+
+exports.saveShippingAddress = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const { fullName, phone, address, city, state } = req.body;
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    user.shippingAddress = { fullName, phone, address, city, state };
+    await user.save();
+
+    return res.status(200).json({
+      message: "Address saved successfully",
+      shippingAddress: user.shippingAddress,
+    });
+  } catch (error) {
+    console.log("Error saving address:", error);
+    return res.status(500).json({ message: "Error saving address" });
+  }
+};
+
+exports.getShippingAddress = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    return res.status(200).json(user.shippingAddress || {});
+  } catch (error) {
+    console.log("Error fetching address:", error);
+    return res.status(500).json({ message: "Error fetching address" });
+  }
+};
