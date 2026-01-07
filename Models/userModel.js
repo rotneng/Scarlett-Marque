@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
-const { nonEmptyString } = require("../validator"); 
+const { nonEmptyString } = require("../validator");
 
 const userSchema = mongoose.Schema({
   username: {
@@ -31,13 +31,13 @@ const userSchema = mongoose.Schema({
     lowercase: true,
     validate: {
       validator: nonEmptyString,
-      message: "Email Cannot be Empty!!!", 
+      message: "Email Cannot be Empty!!!",
     },
   },
 
   isVerified: {
     type: Boolean,
-    default: false, 
+    default: false,
   },
 
   shippingAddress: {
@@ -52,6 +52,13 @@ const userSchema = mongoose.Schema({
     type: String,
     enum: ["admin", "user"],
     default: "user",
+  },
+
+  resetPasswordToken: {
+    type: String,
+  },
+  resetPasswordExpires: {
+    type: Date,
   },
 });
 

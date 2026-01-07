@@ -20,6 +20,8 @@ import TrackOrderPage from "./Container/TrackOrderPage";
 import AdminOrdersPage from "./Container/AdminOrderPage";
 import MyOrdersPage from "./Container/MyOdersPage";
 import OtpVerification from "./Container/OTPpage";
+import ForgotPassword from "./Container/ForgotPassword";
+import ResetPassword from "./Container/ResetPassword";
 
 function App() {
   return (
@@ -33,6 +35,8 @@ function App() {
           <Route path="/cart" element={<CartPage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/otp-verify" element={<OtpVerification />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password/:token" element={<ResetPassword />} />
 
           <Route element={<PrivateRoute />}>
             <Route path="/product/edit/:id" element={<UpdateProduct />} />

@@ -17,6 +17,7 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import PersonIcon from "@mui/icons-material/Person";
 import { login } from "../../Actions/auth.actions";
+import { authConstants } from "../../Actions/constant";
 
 const SignIn = () => {
   const navigate = useNavigate();
@@ -29,6 +30,13 @@ const SignIn = () => {
   const [showPassword, setShowPassword] = useState(false);
 
   const [localError, setLocalError] = useState("");
+
+  useEffect(() => {
+    dispatch({
+      type: authConstants.LOGIN_FAILURE,
+      payload: { error: null },
+    });
+  }, [dispatch]);
 
   const handleSignIn = (e) => {
     e.preventDefault();
@@ -127,30 +135,50 @@ const SignIn = () => {
             }}
           />
 
-          <TextField
-            type={showPassword ? "text" : "password"}
-            label="Password"
-            fullWidth
-            value={password}
-            onChange={handleInput(setPassword)}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <LockIcon color="action" />
-                </InputAdornment>
-              ),
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton
-                    onClick={() => setShowPassword(!showPassword)}
-                    edge="end"
-                  >
-                    {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
-                  </IconButton>
-                </InputAdornment>
-              ),
-            }}
-          />
+          <Box sx={{ width: "100%" }}>
+            <TextField
+              type={showPassword ? "text" : "password"}
+              label="Password"
+              fullWidth
+              value={password}
+              onChange={handleInput(setPassword)}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <LockIcon color="action" />
+                  </InputAdornment>
+                ),
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={() => setShowPassword(!showPassword)}
+                      edge="end"
+                    >
+                      {showPassword ? (
+                        <VisibilityOffIcon />
+                      ) : (
+                        <VisibilityIcon />
+                      )}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+            />
+            <Typography
+              variant="body2"
+              sx={{
+                textAlign: "right",
+                mt: 1,
+                color: "#0f2a1d",
+                fontWeight: "bold",
+                cursor: "pointer",
+                "&:hover": { textDecoration: "underline" },
+              }}
+              onClick={() => navigate("/forgot-password")}
+            >
+              Forgot Password?
+            </Typography>
+          </Box>
 
           <Button
             type="submit"
@@ -161,7 +189,7 @@ const SignIn = () => {
               backgroundColor: "#0f2a1d",
               color: "white",
               padding: "12px 40px",
-              marginTop: 2,
+              marginTop: 1,
               borderRadius: "30px",
               "&:hover": { backgroundColor: "#1a4d33" },
               width: { xs: "100%", sm: "50%" },

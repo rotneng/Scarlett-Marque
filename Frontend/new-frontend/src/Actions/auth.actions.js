@@ -166,3 +166,56 @@ export const logout = () => {
     }
   };
 };
+
+export const forgotPassword = (email) => {
+  return async (dispatch) => {
+    try {
+      dispatch({ type: authConstants.FORGOT_PASSWORD_REQUEST });
+      const res = await axios.post(`${BASE_URL}/user/forgot-password`, {
+        email,
+      });
+
+      if (res.status === 200) {
+        dispatch({
+          type: authConstants.FORGOT_PASSWORD_SUCCESS,
+          payload: { message: res.data.message },
+        });
+      }
+    } catch (error) {
+      dispatch({
+        type: authConstants.FORGOT_PASSWORD_FAILURE,
+        payload: {
+          error: error.response?.data?.message || "Something went wrong",
+        },
+      });
+    }
+  };
+};
+
+export const resetPassword = (token, newPassword) => {
+  return async (dispatch) => {
+    try {
+      dispatch({ type: authConstants.RESET_PASSWORD_REQUEST });
+      const res = await axios.post(`${BASE_URL}/user/reset-password`, {
+        token,
+        newPassword,
+      });
+
+      if (res.status === 200) {
+        dispatch({
+          type: authConstants.RESET_PASSWORD_SUCCESS,
+          payload: { message: res.data.message },
+        });
+        return true;
+      }
+    } catch (error) {
+      dispatch({
+        type: authConstants.RESET_PASSWORD_FAILURE,
+        payload: {
+          error: error.response?.data?.message || "Failed to reset password",
+        },
+      });
+      return false;
+    }
+  };
+};
