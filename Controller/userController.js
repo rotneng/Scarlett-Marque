@@ -4,7 +4,6 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { sendEmail } = require("../Util/EmailService");
 
-// --- 1. Register User ---
 exports.registerUser = async (req, res) => {
   try {
     const { username, password, email, role } = req.body;
@@ -23,13 +22,11 @@ exports.registerUser = async (req, res) => {
       role,
     });
 
-    // Generate OTP
     try {
       const otp = Math.floor(100000 + Math.random() * 900000);
       const token = new Token({ email, token: otp });
       await token.save();
 
-      // Send OTP (No await, so it doesn't block loading)
       sendEmail(email, otp).catch(err => console.log("Background Email Failed:", err));
       
       console.log("OTP Email process started...");
@@ -47,7 +44,6 @@ exports.registerUser = async (req, res) => {
   }
 };
 
-// --- 2. Login User ---
 exports.loginUser = async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -84,7 +80,6 @@ exports.loginUser = async (req, res) => {
   }
 };
 
-// --- 3. Verify Email ---
 exports.verifyEmail = async (req, res) => {
   try {
     const { email, otp } = req.body;
@@ -128,7 +123,6 @@ exports.verifyEmail = async (req, res) => {
   }
 };
 
-// --- 4. Resend OTP ---
 exports.resendOtp = async (req, res) => {
   try {
     const { email } = req.body;
@@ -149,7 +143,6 @@ exports.resendOtp = async (req, res) => {
   }
 };
 
-// --- 5. Save Shipping Address ---
 exports.saveShippingAddress = async (req, res) => {
   try {
     const userId = req.user.userId;
@@ -173,7 +166,6 @@ exports.saveShippingAddress = async (req, res) => {
   }
 };
 
-// --- 6. Get Shipping Address ---
 exports.getShippingAddress = async (req, res) => {
   try {
     const userId = req.user.userId;
