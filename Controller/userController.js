@@ -3,8 +3,9 @@ const Token = require("../Models/tokenModel");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
-const { sendEmail } = require("../Util/EmailService");
+const { sendEmail, createTransporter } = require("../Util/EmailService"); // Import both here
 
+// --- 1. Register User (Fixed: Non-blocking Email) ---
 exports.registerUser = async (req, res) => {
   try {
     const { username, password, email, role } = req.body;
@@ -23,6 +24,7 @@ exports.registerUser = async (req, res) => {
       role,
     });
 
+    // Generate OTP
     try {
       const otp = Math.floor(100000 + Math.random() * 900000);
       const token = new Token({
@@ -31,10 +33,14 @@ exports.registerUser = async (req, res) => {
       });
       await token.save();
 
-      await sendEmail(email, otp);
-      console.log("OTP Email sent successfully");
+      // --- FIX: FIRE AND FORGET ---
+      // We removed 'await'. The server will NOT wait for this to finish.
+      // It sends the success response immediately.
+      sendEmail(email, otp).catch(err => console.log("Background Email Failed:", err));
+      
+      console.log("OTP Email process started in background...");
     } catch (emailError) {
-      console.log("Error sending OTP email:", emailError);
+      console.log("Error preparing OTP:", emailError);
     }
 
     await user.save();
@@ -47,6 +53,7 @@ exports.registerUser = async (req, res) => {
   }
 };
 
+// --- 2. Login User ---
 exports.loginUser = async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -83,6 +90,7 @@ exports.loginUser = async (req, res) => {
   }
 };
 
+// --- 3. Verify Email ---
 exports.verifyEmail = async (req, res) => {
   try {
     const { email, otp } = req.body;
@@ -128,6 +136,7 @@ exports.verifyEmail = async (req, res) => {
   }
 };
 
+// --- 4. Resend OTP (Fixed: Non-blocking Email) ---
 exports.resendOtp = async (req, res) => {
   try {
     const { email } = req.body;
@@ -139,7 +148,8 @@ exports.resendOtp = async (req, res) => {
       { upsert: true, new: true }
     );
 
-    await sendEmail(email, otp);
+    // Removed 'await' here too
+    sendEmail(email, otp).catch(err => console.log("Resend Email Failed:", err));
 
     return res.status(200).json({ message: "OTP resent successfully" });
   } catch (error) {
@@ -148,6 +158,7 @@ exports.resendOtp = async (req, res) => {
   }
 };
 
+// --- 5. Forgot Password (Fixed: Non-blocking Email) ---
 exports.forgotPassword = async (req, res) => {
   try {
     const { email } = req.body;
@@ -161,7 +172,7 @@ exports.forgotPassword = async (req, res) => {
 
     const resetToken = crypto.randomBytes(32).toString("hex");
     user.resetPasswordToken = resetToken;
-    user.resetPasswordExpires = Date.now() + 3600000; // 1 Hour
+    user.resetPasswordExpires = Date.now() + 3600000;
     await user.save();
 
     const clientUrl =
@@ -171,23 +182,32 @@ exports.forgotPassword = async (req, res) => {
 
     const resetUrl = `${clientUrl}/reset-password/${resetToken}`;
 
-    const { createTransporter } = require("../Util/EmailService");
-    const transporter = await createTransporter();
-
-    const mailOptions = {
-      from: `"Scarlett Marque" <${process.env.EMAIL_USER}>`,
-      to: user.email,
-      subject: "Password Reset Request",
-      html: `
-        <h3>Password Reset Request</h3>
-        <p>You requested a password reset. Please click the link below to verify your identity and set a new password:</p>
-        <a href="${resetUrl}" clicktracking=off>${resetUrl}</a>
-        <p>This link expires in 1 hour.</p>
-        <p>If you did not request this, please ignore this email.</p>
-      `,
+    // Prepare email logic
+    // We wrap this in an async IIFE or just call it without await to prevent blocking
+    const sendResetEmail = async () => {
+        try {
+            const transporter = await createTransporter();
+            const mailOptions = {
+                from: `"Scarlett Marque" <${process.env.EMAIL_USER}>`,
+                to: user.email,
+                subject: "Password Reset Request",
+                html: `
+                  <h3>Password Reset Request</h3>
+                  <p>You requested a password reset. Please click the link below to verify your identity and set a new password:</p>
+                  <a href="${resetUrl}" clicktracking=off>${resetUrl}</a>
+                  <p>This link expires in 1 hour.</p>
+                  <p>If you did not request this, please ignore this email.</p>
+                `,
+            };
+            await transporter.sendMail(mailOptions);
+            console.log("Reset email sent");
+        } catch (err) {
+            console.log("Reset email failed:", err);
+        }
     };
 
-    await transporter.sendMail(mailOptions);
+    // Execute sending without 'await'
+    sendResetEmail();
 
     return res
       .status(200)
@@ -198,6 +218,7 @@ exports.forgotPassword = async (req, res) => {
   }
 };
 
+// --- 6. Reset Password ---
 exports.resetPassword = async (req, res) => {
   try {
     const { token, newPassword } = req.body;
@@ -231,6 +252,7 @@ exports.resetPassword = async (req, res) => {
   }
 };
 
+// --- 7. Save Address ---
 exports.saveShippingAddress = async (req, res) => {
   try {
     const userId = req.user.userId;
@@ -254,6 +276,7 @@ exports.saveShippingAddress = async (req, res) => {
   }
 };
 
+// --- 8. Get Address ---
 exports.getShippingAddress = async (req, res) => {
   try {
     const userId = req.user.userId;
