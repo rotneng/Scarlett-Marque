@@ -164,20 +164,7 @@ const SignIn = () => {
                 ),
               }}
             />
-            <Typography
-              variant="body2"
-              sx={{
-                textAlign: "right",
-                mt: 1,
-                color: "#0f2a1d",
-                fontWeight: "bold",
-                cursor: "pointer",
-                "&:hover": { textDecoration: "underline" },
-              }}
-              onClick={() => navigate("/forgot-password")}
-            >
-              Forgot Password?
-            </Typography>
+            {/* REMOVED FORGOT PASSWORD LINK HERE */}
           </Box>
 
           <Button

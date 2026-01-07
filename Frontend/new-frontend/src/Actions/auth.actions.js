@@ -6,6 +6,7 @@ const BASE_URL =
     ? "http://localhost:5000"
     : "https://scarlett-marque.onrender.com";
 
+// --- Helper: Merge Cart ---
 const mergeCart = async (token) => {
   const localCart = localStorage.getItem("cart")
     ? JSON.parse(localStorage.getItem("cart"))
@@ -31,6 +32,7 @@ const mergeCart = async (token) => {
   }
 };
 
+// --- 1. Login Action ---
 export const login = (loginData) => {
   return async (dispatch) => {
     try {
@@ -77,12 +79,14 @@ export const login = (loginData) => {
   };
 };
 
+// --- 2. Verify OTP Action ---
 export const verifyOtp = (otpData) => {
   return async (dispatch) => {
     try {
       const res = await axios.post(`${BASE_URL}/user/verify-email`, otpData);
 
       if (res.status === 200) {
+        // Clearing errors upon success
         dispatch({
           type: authConstants.LOGIN_FAILURE,
           payload: { error: null },
@@ -101,6 +105,7 @@ export const verifyOtp = (otpData) => {
   };
 };
 
+// --- 3. Resend OTP Action ---
 export const resendOtp = (data) => {
   return async (dispatch) => {
     try {
@@ -111,6 +116,7 @@ export const resendOtp = (data) => {
   };
 };
 
+// --- 4. Register Action ---
 export const register = (signUpData) => {
   return async (dispatch) => {
     try {
@@ -151,6 +157,7 @@ export const register = (signUpData) => {
   };
 };
 
+// --- 5. Logout Action ---
 export const logout = () => {
   return async (dispatch) => {
     try {
@@ -167,55 +174,4 @@ export const logout = () => {
   };
 };
 
-export const forgotPassword = (email) => {
-  return async (dispatch) => {
-    try {
-      dispatch({ type: authConstants.FORGOT_PASSWORD_REQUEST });
-      const res = await axios.post(`${BASE_URL}/user/forgot-password`, {
-        email,
-      });
-
-      if (res.status === 200) {
-        dispatch({
-          type: authConstants.FORGOT_PASSWORD_SUCCESS,
-          payload: { message: res.data.message },
-        });
-      }
-    } catch (error) {
-      dispatch({
-        type: authConstants.FORGOT_PASSWORD_FAILURE,
-        payload: {
-          error: error.response?.data?.message || "Something went wrong",
-        },
-      });
-    }
-  };
-};
-
-export const resetPassword = (token, newPassword) => {
-  return async (dispatch) => {
-    try {
-      dispatch({ type: authConstants.RESET_PASSWORD_REQUEST });
-      const res = await axios.post(`${BASE_URL}/user/reset-password`, {
-        token,
-        newPassword,
-      });
-
-      if (res.status === 200) {
-        dispatch({
-          type: authConstants.RESET_PASSWORD_SUCCESS,
-          payload: { message: res.data.message },
-        });
-        return true;
-      }
-    } catch (error) {
-      dispatch({
-        type: authConstants.RESET_PASSWORD_FAILURE,
-        payload: {
-          error: error.response?.data?.message || "Failed to reset password",
-        },
-      });
-      return false;
-    }
-  };
-};
+// ForgotPassword and ResetPassword have been removed.

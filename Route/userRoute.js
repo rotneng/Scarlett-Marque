@@ -6,24 +6,25 @@ const {
   getShippingAddress,
   verifyEmail,
   resendOtp,
-  forgotPassword, 
-  resetPassword, 
+  // forgotPassword and resetPassword removed from here
 } = require("../Controller/userController");
 
 const { requireSignin } = require("../Middlewares/auth");
 const router = express.Router();
 
+// --- Auth Routes ---
 router.post("/registerUser", registerUser);
 router.post("/verify-email", verifyEmail);
 router.post("/resend-otp", resendOtp);
 router.post("/loginUser", loginUser);
 
-router.post("/forgot-password", forgotPassword); 
-router.post("/reset-password", resetPassword); 
+// Forgot/Reset Password routes removed entirely
 
+// --- Protected Routes ---
 router.post("/shipping", requireSignin, saveShippingAddress);
 router.get("/shipping", requireSignin, getShippingAddress);
 
+// --- Profile Routes ---
 router.get("/profile", requireSignin, (req, res) => {
   res.status(200).json({ message: "user profile", user: req.user });
 });

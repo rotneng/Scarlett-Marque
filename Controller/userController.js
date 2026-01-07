@@ -2,10 +2,9 @@ const User = require("../Models/userModel");
 const Token = require("../Models/tokenModel");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const crypto = require("crypto");
-const { sendEmail, createTransporter } = require("../Util/EmailService"); // Import both here
+const { sendEmail } = require("../Util/EmailService");
 
-// --- 1. Register User (Fixed: Non-blocking Email) ---
+// --- 1. Register User ---
 exports.registerUser = async (req, res) => {
   try {
     const { username, password, email, role } = req.body;
@@ -27,18 +26,13 @@ exports.registerUser = async (req, res) => {
     // Generate OTP
     try {
       const otp = Math.floor(100000 + Math.random() * 900000);
-      const token = new Token({
-        email,
-        token: otp,
-      });
+      const token = new Token({ email, token: otp });
       await token.save();
 
-      // --- FIX: FIRE AND FORGET ---
-      // We removed 'await'. The server will NOT wait for this to finish.
-      // It sends the success response immediately.
+      // Send OTP (No await, so it doesn't block loading)
       sendEmail(email, otp).catch(err => console.log("Background Email Failed:", err));
       
-      console.log("OTP Email process started in background...");
+      console.log("OTP Email process started...");
     } catch (emailError) {
       console.log("Error preparing OTP:", emailError);
     }
@@ -130,13 +124,11 @@ exports.verifyEmail = async (req, res) => {
     });
   } catch (error) {
     console.log("Error verifying email:", error);
-    return res
-      .status(500)
-      .json({ message: "Server error during verification" });
+    return res.status(500).json({ message: "Server error during verification" });
   }
 };
 
-// --- 4. Resend OTP (Fixed: Non-blocking Email) ---
+// --- 4. Resend OTP ---
 exports.resendOtp = async (req, res) => {
   try {
     const { email } = req.body;
@@ -148,7 +140,6 @@ exports.resendOtp = async (req, res) => {
       { upsert: true, new: true }
     );
 
-    // Removed 'await' here too
     sendEmail(email, otp).catch(err => console.log("Resend Email Failed:", err));
 
     return res.status(200).json({ message: "OTP resent successfully" });
@@ -158,101 +149,7 @@ exports.resendOtp = async (req, res) => {
   }
 };
 
-// --- 5. Forgot Password (Fixed: Non-blocking Email) ---
-exports.forgotPassword = async (req, res) => {
-  try {
-    const { email } = req.body;
-    const user = await User.findOne({ email });
-
-    if (!user) {
-      return res
-        .status(404)
-        .json({ message: "User with this email does not exist" });
-    }
-
-    const resetToken = crypto.randomBytes(32).toString("hex");
-    user.resetPasswordToken = resetToken;
-    user.resetPasswordExpires = Date.now() + 3600000;
-    await user.save();
-
-    const clientUrl =
-      process.env.NODE_ENV === "production"
-        ? "https://scarlett-marque.onrender.com"
-        : "http://localhost:3000";
-
-    const resetUrl = `${clientUrl}/reset-password/${resetToken}`;
-
-    // Prepare email logic
-    // We wrap this in an async IIFE or just call it without await to prevent blocking
-    const sendResetEmail = async () => {
-        try {
-            const transporter = await createTransporter();
-            const mailOptions = {
-                from: `"Scarlett Marque" <${process.env.EMAIL_USER}>`,
-                to: user.email,
-                subject: "Password Reset Request",
-                html: `
-                  <h3>Password Reset Request</h3>
-                  <p>You requested a password reset. Please click the link below to verify your identity and set a new password:</p>
-                  <a href="${resetUrl}" clicktracking=off>${resetUrl}</a>
-                  <p>This link expires in 1 hour.</p>
-                  <p>If you did not request this, please ignore this email.</p>
-                `,
-            };
-            await transporter.sendMail(mailOptions);
-            console.log("Reset email sent");
-        } catch (err) {
-            console.log("Reset email failed:", err);
-        }
-    };
-
-    // Execute sending without 'await'
-    sendResetEmail();
-
-    return res
-      .status(200)
-      .json({ message: "Password reset link sent to email" });
-  } catch (error) {
-    console.log("Error in forgotPassword:", error);
-    return res.status(500).json({ message: "Error sending reset email" });
-  }
-};
-
-// --- 6. Reset Password ---
-exports.resetPassword = async (req, res) => {
-  try {
-    const { token, newPassword } = req.body;
-
-    const user = await User.findOne({
-      resetPasswordToken: token,
-      resetPasswordExpires: { $gt: Date.now() },
-    });
-
-    if (!user) {
-      return res
-        .status(400)
-        .json({ message: "Invalid or expired reset token" });
-    }
-
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(newPassword, salt);
-
-    user.password = hashedPassword;
-    user.resetPasswordToken = undefined;
-    user.resetPasswordExpires = undefined;
-
-    await user.save();
-
-    return res
-      .status(200)
-      .json({ message: "Password reset successfully. Please login." });
-  } catch (error) {
-    console.log("Error in resetPassword:", error);
-    return res.status(500).json({ message: "Error resetting password" });
-  }
-};
-
-// --- 7. Save Address ---
+// --- 5. Save Shipping Address ---
 exports.saveShippingAddress = async (req, res) => {
   try {
     const userId = req.user.userId;
@@ -276,7 +173,7 @@ exports.saveShippingAddress = async (req, res) => {
   }
 };
 
-// --- 8. Get Address ---
+// --- 6. Get Shipping Address ---
 exports.getShippingAddress = async (req, res) => {
   try {
     const userId = req.user.userId;
