@@ -18,6 +18,7 @@ import {
   Chip,
   Badge,
   alpha,
+  Button,
 } from "@mui/material";
 
 import SearchIcon from "@mui/icons-material/Search";
@@ -137,6 +138,21 @@ const Homepage = () => {
     window.location.href = "/signIn";
   };
 
+  const navButtonStyle = {
+    color: "white",
+    textTransform: "none",
+    minWidth: "auto",
+    paddingX: 1.5,
+    "&:hover": {
+      backgroundColor: "rgba(255, 255, 255, 0.1)",
+    },
+  };
+
+  const labelStyle = {
+    display: { xs: "none", md: "inline" },
+    marginLeft: "4px",
+  };
+
   return (
     <Box sx={{ bgcolor: "#f8f9fa", minHeight: "100vh" }}>
       <AppBar
@@ -222,60 +238,68 @@ const Homepage = () => {
             sx={{
               width: { xs: "100%", md: "auto" },
               justifyContent: { xs: "center", md: "flex-end" },
+              flexWrap: "wrap",
             }}
           >
             {!isAdmin && (
-              <Tooltip title="About Us">
-                <IconButton
-                  onClick={() => navigate("/about")}
-                  sx={{ color: "white" }}
-                >
-                  <InfoIcon />
-                </IconButton>
-              </Tooltip>
+              <Button
+                onClick={() => navigate("/about")}
+                sx={navButtonStyle}
+                startIcon={<InfoIcon />}
+              >
+                <Box component="span" sx={labelStyle}>
+                  About Us
+                </Box>
+              </Button>
             )}
 
             {isAdmin ? (
               <>
-                <Tooltip title="Orders">
-                  <IconButton
-                    onClick={() => navigate("/admin/orders")}
-                    sx={{ color: "white" }}
-                  >
-                    <ListAltIcon />
-                  </IconButton>
-                </Tooltip>
-                <Tooltip title="Add Product">
-                  <IconButton
-                    onClick={() => navigate("/addproducts")}
-                    sx={{ color: "white" }}
-                  >
-                    <AddIcon />
-                  </IconButton>
-                </Tooltip>
+                <Button
+                  onClick={() => navigate("/admin/orders")}
+                  sx={navButtonStyle}
+                  startIcon={<ListAltIcon />}
+                >
+                  <Box component="span" sx={labelStyle}>
+                    Orders
+                  </Box>
+                </Button>
+                <Button
+                  onClick={() => navigate("/addproducts")}
+                  sx={navButtonStyle}
+                  startIcon={<AddIcon />}
+                >
+                  <Box component="span" sx={labelStyle}>
+                    Add Product
+                  </Box>
+                </Button>
               </>
             ) : (
               <>
                 {token && (
-                  <Tooltip title="My Orders">
-                    <IconButton
-                      onClick={() => navigate("/account/orders")}
-                      sx={{ color: "white" }}
-                    >
-                      <LocalShippingIcon />
-                    </IconButton>
-                  </Tooltip>
-                )}
-                <Tooltip title="Cart">
-                  <IconButton
-                    onClick={() => navigate("/cart")}
-                    sx={{ color: "white" }}
+                  <Button
+                    onClick={() => navigate("/account/orders")}
+                    sx={navButtonStyle}
+                    startIcon={<LocalShippingIcon />}
                   >
+                    <Box component="span" sx={labelStyle}>
+                      My Orders
+                    </Box>
+                  </Button>
+                )}
+                <Button
+                  onClick={() => navigate("/cart")}
+                  sx={navButtonStyle}
+                  startIcon={
                     <Badge badgeContent={cartItems.length} color="warning">
                       <ShoppingCartIcon />
                     </Badge>
-                  </IconButton>
-                </Tooltip>
+                  }
+                >
+                  <Box component="span" sx={labelStyle}>
+                    Cart
+                  </Box>
+                </Button>
               </>
             )}
 
@@ -284,11 +308,19 @@ const Homepage = () => {
                 direction="row"
                 alignItems="center"
                 spacing={1}
-                sx={{ ml: 1 }}
+                sx={{
+                  ml: 1,
+                  pl: 1,
+                  borderLeft: { md: "1px solid rgba(255,255,255,0.2)" }, // Divider only on desktop
+                }}
               >
                 <Typography
                   variant="body2"
-                  sx={{ display: { xs: "none", md: "block" }, opacity: 0.9 }}
+                  sx={{
+                    display: { xs: "none", md: "block" },
+                    opacity: 0.9,
+                    color: "white",
+                  }}
                 >
                   {user?.username}
                 </Typography>
@@ -299,14 +331,15 @@ const Homepage = () => {
                 </Tooltip>
               </Stack>
             ) : (
-              <Tooltip title="Sign In">
-                <IconButton
-                  onClick={() => navigate("/signIn")}
-                  sx={{ color: "white" }}
-                >
-                  <AccountCircleIcon fontSize="large" />
-                </IconButton>
-              </Tooltip>
+              <Button
+                onClick={() => navigate("/signIn")}
+                sx={navButtonStyle}
+                startIcon={<AccountCircleIcon />}
+              >
+                <Box component="span" sx={labelStyle}>
+                  Sign In
+                </Box>
+              </Button>
             )}
           </Stack>
         </Toolbar>

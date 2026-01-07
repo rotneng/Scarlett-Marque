@@ -31,6 +31,7 @@ import LocalShippingIcon from "@mui/icons-material/LocalShippingOutlined";
 import BlockIcon from "@mui/icons-material/Block";
 import { getProducts } from "../../Actions/product.actions";
 import { addItemToCart } from "../../Actions/cartActions";
+import Header from "../header";
 
 const API_BASE_URL = "http://localhost:5000/public/";
 const PLACEHOLDER_IMG = "https://placehold.co/600x600?text=No+Image";
@@ -52,12 +53,7 @@ const ProductDetails = () => {
   const product = useSelector((state) =>
     state.product.products.find((p) => p._id === id)
   );
-
   const loading = useSelector((state) => state.product.loading);
-
-  const userString = localStorage.getItem("user");
-  const user = userString ? JSON.parse(userString) : null;
-  const isAdmin = user && user.role === "admin";
 
   const [qty, setQty] = useState(1);
   const [toast, setToast] = useState({
@@ -65,8 +61,11 @@ const ProductDetails = () => {
     message: "",
     severity: "success",
   });
-
   const [selectedImage, setSelectedImage] = useState("");
+
+  const userString = localStorage.getItem("user");
+  const user = userString ? JSON.parse(userString) : null;
+  const isAdmin = user && user.role === "admin";
 
   useEffect(() => {
     if (!product) {
@@ -90,14 +89,12 @@ const ProductDetails = () => {
 
   const getAllImages = () => {
     if (!product) return [];
-
     let rawImages = [];
     if (product.images && product.images.length > 0) {
       rawImages = product.images.map((img) => img.img || img);
     } else if (product.image) {
       rawImages = [product.image];
     }
-
     return rawImages.map((path) => getValidImageUrl(path));
   };
 
@@ -194,6 +191,8 @@ const ProductDetails = () => {
 
   return (
     <Box sx={{ bgcolor: "#fff", minHeight: "100vh", pb: 8 }}>
+      <Header />
+
       <Container maxWidth="lg" sx={{ pt: 4 }}>
         <Breadcrumbs
           separator={<NavigateNextIcon fontSize="small" />}
@@ -529,6 +528,7 @@ const ProductDetails = () => {
           </Grid>
         </Grid>
       </Container>
+
       <Snackbar
         open={toast.open}
         autoHideDuration={4000}
