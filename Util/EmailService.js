@@ -49,7 +49,7 @@ const sendEmail = async (email, otp) => {
     console.log(`[DEBUG] Attempting to send to ${email} using Port 465 (IPv4)...`);
 
     const info = await transporter.sendMail({
-      from: `"Scarlett Marque" <${process.env.EMAIL_USER}>`,
+      from: `"rotneng@gmail.com" <${process.env.EMAIL_USER}>`,
       to: email,
       subject: "Welcome to Scarlett Marque",
       text: `Your verification token is ${otp}`,
@@ -59,7 +59,7 @@ const sendEmail = async (email, otp) => {
     console.log("SUCCESS: Email sent. Message ID:", info.messageId);
   } catch (error) {
     console.error("EMAIL FAILED TO SEND. Error Details:");
-    console.error(error); // This will print the full object
+    console.error(error); 
   }
 };
 
