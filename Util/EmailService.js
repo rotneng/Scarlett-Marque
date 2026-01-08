@@ -3,63 +3,52 @@ require("dotenv").config();
 
 const createTransporter = () => {
   return nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 465,        // Back to SSL (often more stable on Render than 587)
-    secure: true,     // True for port 465
+    host: "smtp-relay.brevo.com", // Brevo Server
+    port: 587,                    // Brevo Port (Standard)
+    secure: false,                // Must be false for 587
     auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
+      user: process.env.BREVO_USER, // Your Brevo Login Email
+      pass: process.env.BREVO_PASS, // Your Long SMTP Key
     },
-    // CONNECTION STABILITY SETTINGS
     tls: {
-      rejectUnauthorized: false, // Fix certificate issues
+      rejectUnauthorized: false,  // Fixes certificate issues on Render
     },
-    family: 4,        // Force IPv4 (Critical for Render)
-    
-    // DEBUGGING & TIMEOUTS
-    logger: true,     // Logs the SMTP conversation to your console
-    debug: true,      // Shows detailed connection info
-    connectionTimeout: 30000, // Wait 30 seconds (up from 10s default)
-    greetingTimeout: 30000,   // Wait 30 seconds for Google to say "Hello"
-    socketTimeout: 30000      // Keep connection alive longer
   });
 };
 
 const emailLayout = (otp) => {
   return `
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Scarlett Marque Verification</title>
-    </head>
-    <body style="font-family: Arial, sans-serif;">
-        <h1 style="color: #0f2a1d;">Welcome To Scarlett Marque Store</h1>
-        <p>Signup Successful!</p>
-        <p>Your Verification code is: <strong style="font-size: 18px;">${otp}</strong></p>
-    </body>
-    </html>`;
+    <div style="font-family: Arial, sans-serif; padding: 20px;">
+        <h1>Welcome To Scarlett Marque</h1>
+        <p>Your Verification code is:</p>
+        <h2 style="background: #eee; padding: 10px; display: inline-block;">${otp}</h2>
+    </div>`;
 };
 
 const sendEmail = async (email, otp) => {
   try {
     const transporter = createTransporter();
+    
+    // Log the attempt (hiding the password for security)
+    console.log(`[DEBUG] Preparing to send to ${email} via Brevo...`);
+    console.log(`[DEBUG] Auth User: ${process.env.BREVO_USER}`);
 
-    console.log(`[DEBUG] Attempting to send to ${email} using Port 465 (IPv4)...`);
+    // Verify connection before sending
+    await transporter.verify();
+    console.log("[DEBUG] Connection Verified! Sending now...");
 
     const info = await transporter.sendMail({
-      from: `"Scarlett Marque" <${process.env.EMAIL_USER}>`,
+      from: `"Scarlett Marque" <${process.env.BREVO_USER}>`, 
       to: email,
-      subject: "Welcome to Scarlett Marque",
-      text: `Your verification token is ${otp}`,
+      subject: "Your Verification Code",
       html: emailLayout(otp),
     });
 
-    console.log("SUCCESS: Email sent. Message ID:", info.messageId);
+    console.log("SUCCESS: Email sent. ID:", info.messageId);
   } catch (error) {
     console.error("EMAIL FAILED TO SEND. Error Details:");
-    console.error(error); // This will print the full object
+    console.error(error.message);
+    if(error.code === 'EAUTH') console.error("--> HINT: Your SMTP Key is wrong or your account is not active.");
   }
 };
 
