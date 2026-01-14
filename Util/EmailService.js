@@ -1,17 +1,12 @@
 const nodemailer = require("nodemailer");
 
-// 👇 KEY FIX: We hardcode 'smtp.gmail.com' to stop it from going to 127.0.0.1
 const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 465,
-  secure: true, // Use SSL
+  host: "smtp-relay.brevo.com",
+  port: 587,
+  secure: false,
   auth: {
-    user: process.env.EMAIL_USER, // Your Gmail address
-    pass: process.env.EMAIL_PASS, // Your Gmail App Password
-  },
-  tls: {
-    // This helps prevent some SSL handshake errors on Render
-    rejectUnauthorized: false,
+    user: process.env.BREVO_USER,
+    pass: process.env.BREVO_PASS,
   },
 });
 
@@ -20,7 +15,7 @@ const sendEmail = async (email, otp) => {
     console.log(`[DEBUG] Sending OTP to: ${email}`);
 
     await transporter.sendMail({
-      from: `"Scarlett Marque" <${process.env.EMAIL_USER}>`,
+      from: `"Scarlett Marque" <${process.env.BREVO_USER}>`,
       to: email,
       subject: "Verification Code - Scarlett Marque",
       html: `
@@ -42,7 +37,7 @@ const sendResetEmail = async (email, resetUrl) => {
     console.log(`[DEBUG] Sending Reset Link to: ${email}`);
 
     await transporter.sendMail({
-      from: `"Scarlett Marque" <${process.env.EMAIL_USER}>`,
+      from: `"Scarlett Marque" <${process.env.BREVO_USER}>`,
       to: email,
       subject: "Password Reset Request",
       html: `
