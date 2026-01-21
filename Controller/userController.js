@@ -32,7 +32,7 @@ exports.registerUser = async (req, res) => {
         console.log("Background Email Failed:", err)
       );
 
-      console.log("OTP Email process started...");
+      console.log("OTP Email process started...", otp);
     } catch (emailError) {
       console.log("Error preparing OTP:", emailError);
     }

@@ -15,7 +15,7 @@ const transporter = nodemailer.createTransport({
 
 const sendEmail = async (email, otp) => {
   try {
-    console.log(`[DEBUG] Sending OTP to: ${email}`);
+    console.log(`[DEBUG] Sending OTP to: ${email, otp}`);
 
     await transporter.sendMail({
       from: `"Scarlett Marque" <${process.env.EMAIL_USER}>`,
