@@ -67,7 +67,9 @@ const Homepage = () => {
   const navigate = useNavigate();
 
   const productState = useSelector((state) => state.product);
-  const products = productState?.products || [];
+
+  // 👇 FIXED: Wrapped in useMemo to stabilize the dependency
+  const products = useMemo(() => productState?.products || [], [productState]);
   const loading = productState?.loading || false;
 
   const [searchTerm, setSearchTerm] = useState("");
@@ -115,7 +117,7 @@ const Homepage = () => {
     e.stopPropagation();
     if (
       window.confirm(
-        "Are you sure you want to permanently delete this product?"
+        "Are you sure you want to permanently delete this product?",
       )
     ) {
       dispatch(deleteProduct(id));

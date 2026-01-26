@@ -17,7 +17,6 @@ import {
   IconButton,
   Tooltip,
   Avatar,
-  useTheme,
 } from "@mui/material";
 
 import LocalShippingIcon from "@mui/icons-material/LocalShippingOutlined";

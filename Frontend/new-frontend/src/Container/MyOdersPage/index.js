@@ -14,7 +14,6 @@ import {
   IconButton,
   Divider,
 } from "@mui/material";
-import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ShoppingBagOutlinedIcon from "@mui/icons-material/ShoppingBagOutlined";

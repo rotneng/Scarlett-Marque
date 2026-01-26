@@ -18,8 +18,6 @@ import {
   Avatar,
   IconButton,
   alpha,
-  useTheme,
-  useMediaQuery,
 } from "@mui/material";
 
 import CreditCardIcon from "@mui/icons-material/CreditCard";
@@ -39,7 +37,6 @@ const PlaceOrderPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
-  const theme = useTheme();
 
   const stateData = location.state || {};
   const finalAddress = stateData.shippingAddress || stateData.selectedAddress;

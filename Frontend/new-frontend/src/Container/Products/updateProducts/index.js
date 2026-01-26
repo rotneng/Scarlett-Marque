@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -27,7 +27,9 @@ const UpdateProduct = () => {
   const dispatch = useDispatch();
 
   const productState = useSelector((state) => state.product);
-  const products = productState?.products || [];
+
+  // 👇 FIXED: Wrapped in useMemo to prevent dependency cycle errors
+  const products = useMemo(() => productState?.products || [], [productState]);
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -74,12 +76,12 @@ const UpdateProduct = () => {
         setSizes(
           Array.isArray(productToEdit.sizes)
             ? productToEdit.sizes.join(",")
-            : productToEdit.sizes || ""
+            : productToEdit.sizes || "",
         );
         setColors(
           Array.isArray(productToEdit.colors)
             ? productToEdit.colors.join(",")
-            : productToEdit.colors || ""
+            : productToEdit.colors || "",
         );
 
         let rawImages = [];
@@ -275,7 +277,12 @@ const UpdateProduct = () => {
                   </Typography>
 
                   <Box
-                    sx={{ display: "flex", flexWrap: "wrap", gap: 1, mb: 3 }}
+                    sx={{
+                      display: "flex",
+                      flexWrap: "wrap",
+                      gap: 1,
+                      mb: 3,
+                    }}
                   >
                     {existingImages.length > 0 ? (
                       existingImages.map((imgUrl, index) => (
@@ -308,7 +315,10 @@ const UpdateProduct = () => {
                               right: 0,
                               bgcolor: "rgba(255,255,255,0.8)",
                               p: "2px",
-                              "&:hover": { bgcolor: "white", color: "red" },
+                              "&:hover": {
+                                bgcolor: "white",
+                                color: "red",
+                              },
                             }}
                           >
                             <DeleteIcon fontSize="small" />
@@ -357,7 +367,13 @@ const UpdateProduct = () => {
                   </Button>
 
                   {newImages.length > 0 && (
-                    <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        flexWrap: "wrap",
+                        gap: 1,
+                      }}
+                    >
                       {newImages.map((file, index) => (
                         <Box
                           key={index}
@@ -388,7 +404,10 @@ const UpdateProduct = () => {
                               right: 0,
                               bgcolor: "rgba(255,255,255,0.8)",
                               p: "2px",
-                              "&:hover": { bgcolor: "white", color: "red" },
+                              "&:hover": {
+                                bgcolor: "white",
+                                color: "red",
+                              },
                             }}
                           >
                             <DeleteIcon fontSize="small" />
