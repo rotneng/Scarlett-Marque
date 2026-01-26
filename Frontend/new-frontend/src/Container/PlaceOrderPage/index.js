@@ -40,7 +40,6 @@ const PlaceOrderPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const stateData = location.state || {};
   const finalAddress = stateData.shippingAddress || stateData.selectedAddress;

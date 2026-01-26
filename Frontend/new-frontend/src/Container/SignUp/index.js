@@ -18,7 +18,6 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import { useState, useEffect } from "react";
 import { register } from "../../Actions/auth.actions";
-import { authConstants } from "../../Actions/constant";
 
 const SignUp = () => {
   const navigate = useNavigate();

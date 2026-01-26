@@ -18,7 +18,6 @@ import {
   Tooltip,
   Avatar,
   useTheme,
-  alpha,
 } from "@mui/material";
 
 import LocalShippingIcon from "@mui/icons-material/LocalShippingOutlined";
@@ -34,7 +33,6 @@ const OrderPage = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const theme = useTheme();
 
   const orderDetails = useSelector((state) => state.orderDetails);
   const { order, loading, error } = orderDetails;
