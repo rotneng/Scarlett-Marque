@@ -68,7 +68,6 @@ const Homepage = () => {
 
   const productState = useSelector((state) => state.product);
 
-  // 👇 FIXED: Wrapped in useMemo to stabilize the dependency
   const products = useMemo(() => productState?.products || [], [productState]);
   const loading = productState?.loading || false;
 

@@ -61,7 +61,7 @@ const MobileFooter = () => {
         left: 0,
         right: 0,
         zIndex: 1000,
-        borderTop: "1px solid #e0e0e0",
+        borderTop: "1px solid rgba(255,255,255,0.1)", // Light border for contrast
       }}
       elevation={3}
     >
@@ -72,8 +72,15 @@ const MobileFooter = () => {
           setValue(newValue);
         }}
         sx={{
+          bgcolor: "#0f2a1d", 
+          "& .MuiBottomNavigationAction-root": {
+            color: "rgba(255, 255, 255, 0.6)", 
+          },
           "& .Mui-selected": {
-            color: "#0f2a1d",
+            color: "#ffffff !important", 
+            "& .MuiSvgIcon-root": {
+              color: "#ffffff", 
+            }
           },
         }}
       >

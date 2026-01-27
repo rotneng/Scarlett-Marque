@@ -23,6 +23,7 @@ import ListAltIcon from "@mui/icons-material/ListAlt";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import Logo from "../../src/assets/Logo.png";
 
 const PRIMARY_COLOR = "#0f2a1d";
 
@@ -66,14 +67,12 @@ const Header = ({ showSearch = false, searchTerm = "", setSearchTerm }) => {
     >
       <Toolbar
         sx={{
-          // REVERTED TO ROW: Ensures Logo and Icon are side-by-side on mobile
-          flexDirection: "row", 
+          flexDirection: "row",
           alignItems: "center",
           justifyContent: "space-between",
-          py: 1, // Reduced padding for mobile
+          py: 1,
         }}
       >
-        {/* --- 1. LOGO SECTION (Always Visible) --- */}
         <Box
           onClick={() => navigate("/")}
           sx={{
@@ -83,6 +82,15 @@ const Header = ({ showSearch = false, searchTerm = "", setSearchTerm }) => {
             "&:hover": { opacity: 0.9 },
           }}
         >
+          <Box component="img"
+          src={Logo}
+          alt="Scarlett Marque Logo"
+          sx={{
+            height: { xs: 40, md: 50 },
+            width: "auto",
+            mr: 1,
+          }}>
+          </Box>
           <Typography
             variant="h5"
             noWrap
@@ -92,23 +100,22 @@ const Header = ({ showSearch = false, searchTerm = "", setSearchTerm }) => {
               letterSpacing: ".1rem",
               color: "white",
               userSelect: "none",
-              fontSize: { xs: "1.2rem", md: "1.5rem" } // Slightly smaller on mobile
+              fontSize: { xs: "1.2rem", md: "1.5rem" },
             }}
           >
+            
             Scarlett Marque
           </Typography>
         </Box>
 
-        {/* --- 2. SEARCH SECTION (Desktop Only) --- */}
         {showSearch ? (
           <Box
             sx={{
-              // HIDDEN ON MOBILE (xs: none), Visible on Desktop (md: flex)
-              display: { xs: "none", md: "flex" }, 
+              display: { xs: "none", md: "flex" },
               justifyContent: "center",
               flexGrow: 1,
               maxWidth: "600px",
-              mx: 2
+              mx: 2,
             }}
           >
             <TextField
@@ -136,11 +143,9 @@ const Header = ({ showSearch = false, searchTerm = "", setSearchTerm }) => {
             />
           </Box>
         ) : (
-          // Spacer for desktop alignment when search is hidden
           <Box sx={{ display: { xs: "none", md: "block" }, flexGrow: 1 }} />
         )}
 
-        {/* --- 3. ICONS & BUTTONS SECTION --- */}
         <Stack
           direction="row"
           spacing={1}
@@ -149,10 +154,9 @@ const Header = ({ showSearch = false, searchTerm = "", setSearchTerm }) => {
             justifyContent: "flex-end",
           }}
         >
-          {/* WRAPPER FOR NAVIGATION BUTTONS 
-             Hidden on Mobile, Visible on Desktop 
-          */}
-          <Box sx={{ display: { xs: "none", md: "flex" }, alignItems: "center" }}>
+          <Box
+            sx={{ display: { xs: "none", md: "flex" }, alignItems: "center" }}
+          >
             {!isAdmin && (
               <Button
                 onClick={() => navigate("/about")}
@@ -206,9 +210,6 @@ const Header = ({ showSearch = false, searchTerm = "", setSearchTerm }) => {
             )}
           </Box>
 
-          {/* LOGIN / LOGOUT SECTION 
-             Visible on BOTH Mobile and Desktop 
-          */}
           {token ? (
             <Stack
               direction="row"
@@ -216,15 +217,17 @@ const Header = ({ showSearch = false, searchTerm = "", setSearchTerm }) => {
               spacing={1}
               sx={{
                 ml: 1,
-                // Add border only on desktop to separate from nav links
-                borderLeft: { xs: "none", md: "1px solid rgba(255,255,255,0.2)" },
+                borderLeft: {
+                  xs: "none",
+                  md: "1px solid rgba(255,255,255,0.2)",
+                },
                 pl: { xs: 0, md: 1 },
               }}
             >
               <Typography
                 variant="body2"
                 sx={{
-                  display: { xs: "none", md: "block" }, // Hide username text on mobile, show icon only
+                  display: { xs: "none", md: "block" },
                   opacity: 0.9,
                   color: "white",
                   maxWidth: "100px",
