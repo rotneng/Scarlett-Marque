@@ -112,8 +112,8 @@ const CartPage = () => {
       productStock !== null
         ? productStock
         : itemStock !== null
-        ? itemStock
-        : 1000;
+          ? itemStock
+          : 1000;
 
     if (item.qty >= availableStock) {
       return;
@@ -286,7 +286,16 @@ const CartPage = () => {
             )}
           </Stack>
 
-          <Grid container spacing={4}>
+          <Grid
+            container
+            spacing={4}
+            sx={{
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
             <Grid item xs={12} md={8}>
               {cartItems.map((item) => {
                 const productId = item.product?._id || item.product || item._id;
@@ -298,8 +307,8 @@ const CartPage = () => {
                   productStock !== null
                     ? productStock
                     : itemStock !== null
-                    ? itemStock
-                    : 1000;
+                      ? itemStock
+                      : 1000;
                 const isMaxedOut = item.qty >= stockLimit;
 
                 const displayImage = getProductImage(realProduct || item);

@@ -128,12 +128,23 @@ const Homepage = () => {
     <Box sx={{ bgcolor: "#f8f9fa", minHeight: "100vh" }}>
       <Header />
 
-      <Container maxWidth="xl" sx={{ py: 5 }}>
+      <Container
+        maxWidth="xl"
+        sx={{
+          py: 4,
+          display: "flex",
+          flexDirection: "column",
+          minHeight: "90vh",
+          alignItems: "center",
+        }}
+      >
         <Box
           sx={{
             display: "flex",
-            justifyContent: "center",
             mb: 4,
+            backgroundColor: "transparent",
+            width: "100%",
+            justifyContent: "center",
           }}
         >
           <TextField
@@ -166,18 +177,15 @@ const Homepage = () => {
         </Box>
 
         {loading ? (
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              minHeight: "50vh",
-            }}
-          >
+          <Box>
             <CircularProgress sx={{ color: PRIMARY_COLOR }} />
           </Box>
         ) : (
-          <Grid container spacing={4}>
+          <Grid
+            container
+            spacing={4}
+            sx={{ width: "100%", justifyContent: "center" }}
+          >
             {filteredProducts.length > 0 ? (
               filteredProducts.map((item) => {
                 const currentStock = getStock(item);
@@ -186,7 +194,15 @@ const Homepage = () => {
                 const displayImage = getProductImage(item);
 
                 return (
-                  <Grid item key={item._id} xs={12} sm={6} md={4} lg={3}>
+                  <Grid
+                    item
+                    key={item._id}
+                    xs={6}
+                    sm={6}
+                    md={4}
+                    lg={3}
+                    sx={{ display: "flex", mb: 2 }}
+                  >
                     <Card
                       onClick={() => handleProductClick(item)}
                       elevation={0}

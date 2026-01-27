@@ -66,19 +66,26 @@ const Header = ({ showSearch = false, searchTerm = "", setSearchTerm }) => {
     >
       <Toolbar
         sx={{
-          py: { xs: 2, md: 1 },
-          flexDirection: { xs: "column", md: "row" },
+          // STACKING LOGIC:
+          // xs: "column" -> Stacks items vertically on mobile
+          // md: "row"    -> Aligns items horizontally on desktop
+          flexDirection: { xs: "column", md: "row" }, 
           alignItems: "center",
           justifyContent: "space-between",
-          gap: { xs: 2, md: 2 },
+          // Adds vertical spacing between stack items on mobile
+          gap: { xs: 2, md: 2 }, 
+          py: { xs: 2, md: 1 },
         }}
       >
+        {/* --- 1. LOGO SECTION --- */}
         <Box
           onClick={() => navigate("/")}
           sx={{
             display: "flex",
             alignItems: "center",
             cursor: "pointer",
+            // Mobile: Full width & Centered
+            // Desktop: Auto width & Left aligned
             width: { xs: "100%", md: "auto" },
             justifyContent: { xs: "center", md: "flex-start" },
             "&:hover": { opacity: 0.9 },
@@ -99,11 +106,13 @@ const Header = ({ showSearch = false, searchTerm = "", setSearchTerm }) => {
           </Typography>
         </Box>
 
+        {/* --- 2. SEARCH SECTION --- */}
         {showSearch ? (
           <Box
             sx={{
               display: "flex",
               justifyContent: "center",
+              // Mobile: Takes full width so search bar is big
               width: { xs: "100%", md: "auto" },
               flexGrow: { md: 1 },
               maxWidth: "600px",
@@ -137,11 +146,14 @@ const Header = ({ showSearch = false, searchTerm = "", setSearchTerm }) => {
           <Box sx={{ flexGrow: 1 }} />
         )}
 
+        {/* --- 3. ICONS & BUTTONS SECTION --- */}
         <Stack
           direction="row"
           spacing={1}
           alignItems="center"
           sx={{
+            // Mobile: Full width & Centered
+            // Desktop: Auto width & Right aligned
             width: { xs: "100%", md: "auto" },
             justifyContent: { xs: "center", md: "flex-end" },
             flexWrap: "wrap",
