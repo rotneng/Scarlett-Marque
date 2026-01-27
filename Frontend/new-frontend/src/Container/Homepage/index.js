@@ -161,7 +161,8 @@ const Homepage = () => {
       {!isAdmin && (
         <Box
           sx={{
-            width: "100%",
+            width: "full",
+            mx: "auto",
             height: { xs: "200px", md: "400px" },
             backgroundImage: `url(${BANNER_IMG})`,
             backgroundSize: "cover",
@@ -320,7 +321,12 @@ const Homepage = () => {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             size="small"
-            sx={{ bgcolor: "white", width: "100%", maxWidth: "600px", borderRadius: "40px" }}
+            sx={{
+              bgcolor: "white",
+              width: "100%",
+              maxWidth: "600px",
+              borderRadius: "40px",
+            }}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
