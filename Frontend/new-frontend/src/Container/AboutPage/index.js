@@ -9,6 +9,7 @@ import {
   Paper,
   Avatar,
   Stack,
+  Divider,
 } from "@mui/material";
 import LocalShippingIcon from "@mui/icons-material/LocalShippingOutlined";
 import SecurityIcon from "@mui/icons-material/SecurityOutlined";
@@ -17,6 +18,7 @@ import InstagramIcon from "@mui/icons-material/Instagram";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import FacebookIcon from "@mui/icons-material/Facebook";
 import EmailIcon from "@mui/icons-material/EmailOutlined";
+import LocationOnIcon from "@mui/icons-material/LocationOn";
 
 const AboutPage = () => {
   const navigate = useNavigate();
@@ -67,7 +69,7 @@ const AboutPage = () => {
   ];
 
   return (
-    <Box sx={{ minHeight: "100vh", bgcolor: "#fff", pb: 4 }}>
+    <Box sx={{ minHeight: "100vh", bgcolor: "#fff" }}>
       <Box
         sx={{
           bgcolor: themeColor,
@@ -277,39 +279,73 @@ const AboutPage = () => {
           </Stack>
         </Container>
       </Box>
-      <Box sx={{ textAlign: "center", py: 4, bgcolor: "#fafafa" }}>
-        <Typography variant="body2" color="text.secondary">
-          Ready to experience quality?
-        </Typography>
-        <Button
-          onClick={() => navigate("/")}
-          sx={{
-            mt: 1,
-            fontWeight: "bold",
-            color: themeColor,
-            textDecoration: "underline",
-            "&:hover": { textDecoration: "none" },
-          }}
-        >
-          Go to Shop
-        </Button>
-      </Box>
 
-      <Typography
-        variant="body2"
-        color="text.secondary"
-        align="center"
-        sx={{ mt: 4, mb: 2 }}
+      <Box
+        sx={{ bgcolor: "#fafafa", pt: 6, pb: 10, borderTop: "1px solid #eee" }}
       >
-        <h4
-          style={{ marginBottom: "10px", bgcolor: "#fafafa", padding: "10px" }}
-        >
-          Longwa Phase 3, before Solomon Lar Amusemnt Park, House 11, shop No 3,
-          Jos, Nigeria
-        </h4>
-        © {new Date().getFullYear()} Scarlett Marque. All rights reserved.{" "}
-        <br></br> @ {new Date().getFullYear()} Rotnen
-      </Typography>
+        <Container maxWidth="md" sx={{ textAlign: "center" }}>
+          <Typography variant="body2" color="text.secondary">
+            Ready to experience quality?
+          </Typography>
+          <Button
+            onClick={() => navigate("/")}
+            sx={{
+              mt: 1,
+              mb: 5,
+              fontWeight: "bold",
+              color: themeColor,
+              textDecoration: "underline",
+              "&:hover": { textDecoration: "none", bgcolor: "transparent" },
+            }}
+          >
+            Go to Shop
+          </Button>
+
+          <Divider sx={{ mb: 5, opacity: 0.5 }} />
+
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              mb: 4,
+            }}
+          >
+            <Stack
+              direction="row"
+              alignItems="center"
+              spacing={1}
+              sx={{ mb: 1, color: themeColor }}
+            >
+              <LocationOnIcon fontSize="small" />
+              <Typography variant="subtitle1" fontWeight="600">
+                Visit Our Store
+              </Typography>
+            </Stack>
+            <Typography
+              variant="body1"
+              color="text.secondary"
+              sx={{ maxWidth: "400px", lineHeight: 1.6 }}
+            >
+              Longwa Phase 3, before Solomon Lar Amusement Park,
+              <br />
+              House 11, Shop No 3, Jos, Nigeria
+            </Typography>
+          </Box>
+          <Typography variant="body2" color="text.secondary">
+            © {new Date().getFullYear()} Scarlett Marque. All rights reserved.
+          </Typography>
+
+          <Typography
+            variant="caption"
+            display="block"
+            sx={{ mt: 1, color: "#999", fontStyle: "italic" }}
+          >
+            Developed by Rotnen
+          </Typography>
+        </Container>
+      </Box>
     </Box>
   );
 };

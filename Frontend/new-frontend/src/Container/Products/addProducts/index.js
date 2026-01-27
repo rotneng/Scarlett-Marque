@@ -10,11 +10,23 @@ import {
   Paper,
   IconButton,
   Grid,
+  MenuItem,
 } from "@mui/material";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { addProduct } from "../../../Actions/product.actions";
 import Header from "../../header";
+
+const categories = [
+  { label: "Women", value: "women" },
+  { label: "Men", value: "men" },
+  { label: "Kids & Baby", value: "kids" },
+  { label: "Dresses", value: "dresses" },
+  { label: "Accessories", value: "accessories" },
+  { label: "Summer/Swim", value: "summer" },
+  { label: "New Arrivals", value: "new" },
+  { label: "Clearance/Sale", value: "sale" },
+];
 
 const AddProducts = () => {
   const dispatch = useDispatch();
@@ -163,13 +175,20 @@ const AddProducts = () => {
 
               <Grid item xs={12}>
                 <TextField
+                  select
                   label="Category"
                   name="category"
                   fullWidth
                   value={formData.category}
                   onChange={handleInputChange}
                   required
-                />
+                >
+                  {categories.map((option) => (
+                    <MenuItem key={option.value} value={option.value}>
+                      {option.label}
+                    </MenuItem>
+                  ))}
+                </TextField>
               </Grid>
 
               <Grid item xs={12} sm={6}>

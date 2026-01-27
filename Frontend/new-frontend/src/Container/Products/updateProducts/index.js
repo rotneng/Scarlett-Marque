@@ -10,6 +10,7 @@ import {
   Grid,
   IconButton,
   CircularProgress,
+  MenuItem,
 } from "@mui/material";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -21,14 +22,23 @@ const API_BASE_URL =
     ? "http://localhost:5000"
     : "https://scarlett-marque.onrender.com";
 
+const categories = [
+  { label: "Women", value: "women" },
+  { label: "Men", value: "men" },
+  { label: "Kids & Baby", value: "kids" },
+  { label: "Dresses", value: "dresses" },
+  { label: "Accessories", value: "accessories" },
+  { label: "Summer/Swim", value: "summer" },
+  { label: "New Arrivals", value: "new" },
+  { label: "Clearance/Sale", value: "sale" },
+];
+
 const UpdateProduct = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const productState = useSelector((state) => state.product);
-
-  // 👇 FIXED: Wrapped in useMemo to prevent dependency cycle errors
   const products = useMemo(() => productState?.products || [], [productState]);
 
   const [title, setTitle] = useState("");
@@ -45,18 +55,14 @@ const UpdateProduct = () => {
 
   const formatImageForDisplay = (imgData) => {
     if (!imgData) return null;
-
     let path = imgData;
     if (typeof imgData === "object") {
       path = imgData.img || imgData.url || imgData.filename;
     }
-
     if (!path) return null;
-
     if (path.startsWith("http") || path.startsWith("data:")) {
       return path;
     }
-
     const cleanPath = path.startsWith("/") ? path : `/${path}`;
     return `${API_BASE_URL}${cleanPath}`;
   };
@@ -72,7 +78,6 @@ const UpdateProduct = () => {
         setPrice(productToEdit.price || "");
         setCategory(productToEdit.category || "");
         setStock(productToEdit.stock || "");
-
         setSizes(
           Array.isArray(productToEdit.sizes)
             ? productToEdit.sizes.join(",")
@@ -125,7 +130,6 @@ const UpdateProduct = () => {
 
     try {
       const formData = new FormData();
-
       formData.append("title", title);
       formData.append("description", description);
       formData.append("price", price);
@@ -139,7 +143,6 @@ const UpdateProduct = () => {
         if (url.startsWith(API_BASE_URL)) {
           cleanPath = url.replace(API_BASE_URL, "");
         }
-
         formData.append("existingImages", cleanPath);
       });
 
@@ -160,7 +163,6 @@ const UpdateProduct = () => {
   return (
     <>
       <Header />
-
       <Box
         sx={{
           p: { xs: 2, md: 4 },
@@ -187,7 +189,7 @@ const UpdateProduct = () => {
 
           <form onSubmit={handleSubmit}>
             <Grid container spacing={3}>
-              <Grid item xs={12}>
+              <Grid item xs={12} sm={6}>
                 <TextField
                   label="Product Title"
                   fullWidth
@@ -196,7 +198,6 @@ const UpdateProduct = () => {
                   InputLabelProps={{ shrink: true }}
                 />
               </Grid>
-
               <Grid item xs={12} sm={6}>
                 <TextField
                   label="Price"
@@ -207,6 +208,7 @@ const UpdateProduct = () => {
                   InputLabelProps={{ shrink: true }}
                 />
               </Grid>
+
               <Grid item xs={12} sm={6}>
                 <TextField
                   label="Stock"
@@ -218,14 +220,21 @@ const UpdateProduct = () => {
                 />
               </Grid>
 
-              <Grid item xs={12}>
+              <Grid item xs={12} sm={6}>
                 <TextField
+                  select
                   label="Category"
                   fullWidth
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
                   InputLabelProps={{ shrink: true }}
-                />
+                >
+                  {categories.map((option) => (
+                    <MenuItem key={option.value} value={option.value}>
+                      {option.label}
+                    </MenuItem>
+                  ))}
+                </TextField>
               </Grid>
 
               <Grid item xs={12} sm={6}>
@@ -260,6 +269,7 @@ const UpdateProduct = () => {
                   InputLabelProps={{ shrink: true }}
                 />
               </Grid>
+
               <Grid item xs={12}>
                 <Box
                   sx={{
@@ -273,16 +283,11 @@ const UpdateProduct = () => {
                     variant="subtitle2"
                     sx={{ mb: 1, color: "text.secondary" }}
                   >
-                    Current Images (Click trash icon to delete)
+                    Current Images
                   </Typography>
 
                   <Box
-                    sx={{
-                      display: "flex",
-                      flexWrap: "wrap",
-                      gap: 1,
-                      mb: 3,
-                    }}
+                    sx={{ display: "flex", flexWrap: "wrap", gap: 1, mb: 3 }}
                   >
                     {existingImages.length > 0 ? (
                       existingImages.map((imgUrl, index) => (
@@ -315,10 +320,7 @@ const UpdateProduct = () => {
                               right: 0,
                               bgcolor: "rgba(255,255,255,0.8)",
                               p: "2px",
-                              "&:hover": {
-                                bgcolor: "white",
-                                color: "red",
-                              },
+                              "&:hover": { bgcolor: "white", color: "red" },
                             }}
                           >
                             <DeleteIcon fontSize="small" />
@@ -334,13 +336,13 @@ const UpdateProduct = () => {
                       </Typography>
                     )}
                   </Box>
+
                   <Typography
                     variant="subtitle2"
                     sx={{ mb: 1, color: "text.secondary" }}
                   >
                     Add New Images
                   </Typography>
-
                   <Button
                     component="label"
                     variant="outlined"
@@ -367,13 +369,7 @@ const UpdateProduct = () => {
                   </Button>
 
                   {newImages.length > 0 && (
-                    <Box
-                      sx={{
-                        display: "flex",
-                        flexWrap: "wrap",
-                        gap: 1,
-                      }}
-                    >
+                    <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
                       {newImages.map((file, index) => (
                         <Box
                           key={index}
@@ -404,10 +400,7 @@ const UpdateProduct = () => {
                               right: 0,
                               bgcolor: "rgba(255,255,255,0.8)",
                               p: "2px",
-                              "&:hover": {
-                                bgcolor: "white",
-                                color: "red",
-                              },
+                              "&:hover": { bgcolor: "white", color: "red" },
                             }}
                           >
                             <DeleteIcon fontSize="small" />
