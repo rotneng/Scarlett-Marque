@@ -294,6 +294,22 @@ const AboutPage = () => {
           Go to Shop
         </Button>
       </Box>
+
+      <Typography
+        variant="body2"
+        color="text.secondary"
+        align="center"
+        sx={{ mt: 4, mb: 2 }}
+      >
+        <h4
+          style={{ marginBottom: "10px", bgcolor: "#fafafa", padding: "10px" }}
+        >
+          Longwa Phase 3, before Solomon Lar Amusemnt Park, House 11, shop No 3,
+          Jos, Nigeria
+        </h4>
+        © {new Date().getFullYear()} Scarlett Marque. All rights reserved.{" "}
+        <br></br> @ {new Date().getFullYear()} Rotnen
+      </Typography>
     </Box>
   );
 };
