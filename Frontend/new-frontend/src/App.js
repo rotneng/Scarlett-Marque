@@ -23,7 +23,6 @@ import MyOrdersPage from "./Container/MyOdersPage";
 import OtpVerification from "./Container/OTPpage";
 import ForgotPassword from "./Passwords/ForgotPassword";
 import ResetPassword from "./Passwords/ResetPassword";
-
 import MobileFooter from "./Container/MobileFooter"; 
 
 function App() {

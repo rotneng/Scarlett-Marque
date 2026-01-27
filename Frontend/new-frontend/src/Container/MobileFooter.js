@@ -11,6 +11,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 import HomeIcon from "@mui/icons-material/Home";
+import InfoIcon from "@mui/icons-material/Info";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import ListAltIcon from "@mui/icons-material/ListAlt";
@@ -34,12 +35,20 @@ const MobileFooter = () => {
 
   useEffect(() => {
     const path = location.pathname;
-    if (path === "/") setValue(0);
-    else if (path === "/cart") setValue(1);
-    else if (path === "/account/orders" || path === "/admin/orders")
+
+    if (path === "/") {
+      setValue(0);
+    } else if (path === "/about") {
+      setValue(1);
+    } else if (path === "/cart" || path === "/addproducts") {
       setValue(2);
-    else if (path === "/addproducts") setValue(1);
-    else if (path === "/signIn") setValue(3);
+    } else if (
+      path === "/account/orders" ||
+      path === "/admin/orders" ||
+      path === "/signIn"
+    ) {
+      setValue(3);
+    }
   }, [location.pathname]);
 
   if (!isMobile) return null;
@@ -73,12 +82,17 @@ const MobileFooter = () => {
           icon={<HomeIcon />}
           onClick={() => navigate("/")}
         />
+        <BottomNavigationAction
+          label="About"
+          icon={<InfoIcon />}
+          onClick={() => navigate("/about")}
+        />
 
         {isAdmin
           ? [
               <BottomNavigationAction
                 key="add"
-                label="Add Product"
+                label="Add"
                 icon={<AddIcon />}
                 onClick={() => navigate("/addproducts")}
               />,
@@ -104,7 +118,7 @@ const MobileFooter = () => {
               token ? (
                 <BottomNavigationAction
                   key="orders"
-                  label="My Orders"
+                  label="Orders"
                   icon={<LocalShippingIcon />}
                   onClick={() => navigate("/account/orders")}
                 />

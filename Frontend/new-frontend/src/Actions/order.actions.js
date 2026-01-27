@@ -1,5 +1,5 @@
 import axios from "axios";
-import { orderConstants, cartConstants } from "../Actions/constant";
+import { orderConstants, cartConstants } from "./constant";
 
 const BASE_URL =
   window.location.hostname === "localhost"

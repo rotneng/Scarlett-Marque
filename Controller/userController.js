@@ -23,19 +23,19 @@ exports.registerUser = async (req, res) => {
       role,
     });
 
-    try {
-      const otp = Math.floor(100000 + Math.random() * 900000);
-      const token = new Token({ email, token: otp });
-      await token.save();
+    // try {
+    //   const otp = Math.floor(100000 + Math.random() * 900000);
+    //   const token = new Token({ email, token: otp });
+    //   await token.save();
 
-      sendEmail(email, otp).catch((err) =>
-        console.log("Background Email Failed:", err)
-      );
+    //   sendEmail(email, otp).catch((err) =>
+    //     console.log("Background Email Failed:", err)
+    //   );
 
-      console.log("OTP Email process started...", otp);
-    } catch (emailError) {
-      console.log("Error preparing OTP:", emailError);
-    }
+    //   console.log("OTP Email process started...", otp);
+    // } catch (emailError) {
+    //   console.log("Error preparing OTP:", emailError);
+    // }
 
     await user.save();
     return res.status(200).json({

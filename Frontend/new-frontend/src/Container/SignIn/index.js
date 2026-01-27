@@ -165,7 +165,7 @@ const SignIn = () => {
               }}
             />
 
-            <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 1 }}>
+            {/* <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 1 }}>
               <Typography
                 variant="body2"
                 onClick={() => navigate("/forgot-password")}
@@ -179,7 +179,7 @@ const SignIn = () => {
               >
                 Forgot Password?
               </Typography>
-            </Box>
+            </Box> */}
           </Box>
 
           <Button

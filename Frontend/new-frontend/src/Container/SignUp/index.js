@@ -38,7 +38,7 @@ const SignUp = () => {
 
   useEffect(() => {
     if (!auth.loading && auth.message && !auth.error) {
-      navigate("/otp-verify", {
+      navigate("/signIn", {
         state: { email: email },
         replace: true,
       });
