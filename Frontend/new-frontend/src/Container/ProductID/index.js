@@ -218,7 +218,7 @@ const ProductDetails = () => {
           </Typography>
         </Breadcrumbs>
 
-        <Grid container spacing={6}>
+        <Grid container spacing={6} sx={{justifyContent: "center" }}>
           <Grid item xs={12} md={6}>
             <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
               <Paper

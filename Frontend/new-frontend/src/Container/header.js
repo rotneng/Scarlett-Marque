@@ -66,28 +66,20 @@ const Header = ({ showSearch = false, searchTerm = "", setSearchTerm }) => {
     >
       <Toolbar
         sx={{
-          // STACKING LOGIC:
-          // xs: "column" -> Stacks items vertically on mobile
-          // md: "row"    -> Aligns items horizontally on desktop
-          flexDirection: { xs: "column", md: "row" }, 
+          // REVERTED TO ROW: Ensures Logo and Icon are side-by-side on mobile
+          flexDirection: "row", 
           alignItems: "center",
           justifyContent: "space-between",
-          // Adds vertical spacing between stack items on mobile
-          gap: { xs: 2, md: 2 }, 
-          py: { xs: 2, md: 1 },
+          py: 1, // Reduced padding for mobile
         }}
       >
-        {/* --- 1. LOGO SECTION --- */}
+        {/* --- 1. LOGO SECTION (Always Visible) --- */}
         <Box
           onClick={() => navigate("/")}
           sx={{
             display: "flex",
             alignItems: "center",
             cursor: "pointer",
-            // Mobile: Full width & Centered
-            // Desktop: Auto width & Left aligned
-            width: { xs: "100%", md: "auto" },
-            justifyContent: { xs: "center", md: "flex-start" },
             "&:hover": { opacity: 0.9 },
           }}
         >
@@ -100,22 +92,23 @@ const Header = ({ showSearch = false, searchTerm = "", setSearchTerm }) => {
               letterSpacing: ".1rem",
               color: "white",
               userSelect: "none",
+              fontSize: { xs: "1.2rem", md: "1.5rem" } // Slightly smaller on mobile
             }}
           >
             Scarlett Marque
           </Typography>
         </Box>
 
-        {/* --- 2. SEARCH SECTION --- */}
+        {/* --- 2. SEARCH SECTION (Desktop Only) --- */}
         {showSearch ? (
           <Box
             sx={{
-              display: "flex",
+              // HIDDEN ON MOBILE (xs: none), Visible on Desktop (md: flex)
+              display: { xs: "none", md: "flex" }, 
               justifyContent: "center",
-              // Mobile: Takes full width so search bar is big
-              width: { xs: "100%", md: "auto" },
-              flexGrow: { md: 1 },
+              flexGrow: 1,
               maxWidth: "600px",
+              mx: 2
             }}
           >
             <TextField
@@ -143,7 +136,8 @@ const Header = ({ showSearch = false, searchTerm = "", setSearchTerm }) => {
             />
           </Box>
         ) : (
-          <Box sx={{ flexGrow: 1 }} />
+          // Spacer for desktop alignment when search is hidden
+          <Box sx={{ display: { xs: "none", md: "block" }, flexGrow: 1 }} />
         )}
 
         {/* --- 3. ICONS & BUTTONS SECTION --- */}
@@ -152,65 +146,69 @@ const Header = ({ showSearch = false, searchTerm = "", setSearchTerm }) => {
           spacing={1}
           alignItems="center"
           sx={{
-            // Mobile: Full width & Centered
-            // Desktop: Auto width & Right aligned
-            width: { xs: "100%", md: "auto" },
-            justifyContent: { xs: "center", md: "flex-end" },
-            flexWrap: "wrap",
+            justifyContent: "flex-end",
           }}
         >
-          {!isAdmin && (
-            <Button
-              onClick={() => navigate("/about")}
-              startIcon={<InfoIcon />}
-              sx={navButtonStyle}
-            >
-              <span style={labelStyle}>About Us</span>
-            </Button>
-          )}
+          {/* WRAPPER FOR NAVIGATION BUTTONS 
+             Hidden on Mobile, Visible on Desktop 
+          */}
+          <Box sx={{ display: { xs: "none", md: "flex" }, alignItems: "center" }}>
+            {!isAdmin && (
+              <Button
+                onClick={() => navigate("/about")}
+                startIcon={<InfoIcon />}
+                sx={navButtonStyle}
+              >
+                <span style={labelStyle}>About Us</span>
+              </Button>
+            )}
 
-          {isAdmin ? (
-            <>
-              <Button
-                onClick={() => navigate("/admin/orders")}
-                startIcon={<ListAltIcon />}
-                sx={navButtonStyle}
-              >
-                <span style={labelStyle}>Orders</span>
-              </Button>
-              <Button
-                onClick={() => navigate("/addproducts")}
-                startIcon={<AddIcon />}
-                sx={navButtonStyle}
-              >
-                <span style={labelStyle}>Add Product</span>
-              </Button>
-            </>
-          ) : (
-            <>
-              {token && (
+            {isAdmin ? (
+              <>
                 <Button
-                  onClick={() => navigate("/account/orders")}
-                  startIcon={<LocalShippingIcon />}
+                  onClick={() => navigate("/admin/orders")}
+                  startIcon={<ListAltIcon />}
                   sx={navButtonStyle}
                 >
-                  <span style={labelStyle}>My Orders</span>
+                  <span style={labelStyle}>Orders</span>
                 </Button>
-              )}
-              <Button
-                onClick={() => navigate("/cart")}
-                sx={navButtonStyle}
-                startIcon={
-                  <Badge badgeContent={cartItems.length} color="warning">
-                    <ShoppingCartIcon />
-                  </Badge>
-                }
-              >
-                <span style={labelStyle}>Cart</span>
-              </Button>
-            </>
-          )}
+                <Button
+                  onClick={() => navigate("/addproducts")}
+                  startIcon={<AddIcon />}
+                  sx={navButtonStyle}
+                >
+                  <span style={labelStyle}>Add Product</span>
+                </Button>
+              </>
+            ) : (
+              <>
+                {token && (
+                  <Button
+                    onClick={() => navigate("/account/orders")}
+                    startIcon={<LocalShippingIcon />}
+                    sx={navButtonStyle}
+                  >
+                    <span style={labelStyle}>My Orders</span>
+                  </Button>
+                )}
+                <Button
+                  onClick={() => navigate("/cart")}
+                  sx={navButtonStyle}
+                  startIcon={
+                    <Badge badgeContent={cartItems.length} color="warning">
+                      <ShoppingCartIcon />
+                    </Badge>
+                  }
+                >
+                  <span style={labelStyle}>Cart</span>
+                </Button>
+              </>
+            )}
+          </Box>
 
+          {/* LOGIN / LOGOUT SECTION 
+             Visible on BOTH Mobile and Desktop 
+          */}
           {token ? (
             <Stack
               direction="row"
@@ -218,14 +216,15 @@ const Header = ({ showSearch = false, searchTerm = "", setSearchTerm }) => {
               spacing={1}
               sx={{
                 ml: 1,
-                borderLeft: "1px solid rgba(255,255,255,0.2)",
-                pl: 1,
+                // Add border only on desktop to separate from nav links
+                borderLeft: { xs: "none", md: "1px solid rgba(255,255,255,0.2)" },
+                pl: { xs: 0, md: 1 },
               }}
             >
               <Typography
                 variant="body2"
                 sx={{
-                  display: { xs: "none", md: "block" },
+                  display: { xs: "none", md: "block" }, // Hide username text on mobile, show icon only
                   opacity: 0.9,
                   color: "white",
                   maxWidth: "100px",
