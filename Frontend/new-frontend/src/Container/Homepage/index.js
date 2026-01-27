@@ -105,18 +105,25 @@ const Homepage = () => {
     dispatch(getProducts());
   }, [dispatch]);
 
-  const filteredProducts = useMemo(() => {
+const filteredProducts = useMemo(() => {
     if (!searchTerm) return products;
 
     const lowerCaseSearch = searchTerm.toLowerCase().trim();
-
     const cleanSearch = lowerCaseSearch.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-
     const regex = new RegExp(`\\b${cleanSearch}`, "i");
 
     return products.filter((product) => {
       const title = product.title ? product.title.toLowerCase() : "";
       const category = product.category ? product.category.toLowerCase() : "";
+
+      if (lowerCaseSearch === "kids") {
+        return (
+          title.includes("kids") || 
+          title.includes("baby") || 
+          category.includes("kids") || 
+          category.includes("baby")
+        );
+      }
 
       return regex.test(title) || regex.test(category);
     });
@@ -159,33 +166,36 @@ const Homepage = () => {
       <Header />
 
       {!isAdmin && (
-        <Box
-          sx={{
-            width: "full",
-            mx: "auto",
-            height: { xs: "200px", md: "400px" },
-            backgroundImage: `url(${BANNER_IMG})`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            position: "relative",
-          }}
-        >
+        <Container maxWidth="lg" sx={{ mt: 2 }}>
           <Box
             sx={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              bgcolor: "rgba(0,0,0,0.2)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
+              width: "100%", 
+              mx: "auto",
+              height: { xs: "200px", md: "400px" },
+              backgroundImage: `url(${BANNER_IMG})`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+              position: "relative",
+              borderRadius: 2, 
+              overflow: "hidden", 
             }}
-          ></Box>
-        </Box>
+          >
+            <Box
+              sx={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                bgcolor: "rgba(0,0,0,0.2)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            ></Box>
+          </Box>
+        </Container>
       )}
-
       {!isAdmin && (
         <Paper elevation={0} sx={{ py: 3, mb: 2, borderRadius: 0 }}>
           <Container maxWidth="lg">
@@ -199,19 +209,20 @@ const Homepage = () => {
                 <Box
                   sx={{
                     display: "flex",
+                    flexDirection: "column",
                     alignItems: "center",
                     justifyContent: { xs: "center", md: "flex-start" },
                   }}
                 >
                   <LocalShippingIcon
-                    sx={{ fontSize: 40, color: "#0f2a1d", mr: 2 }}
+                    sx={{ fontSize: 35, color: "#0f2a1d", mr: 2 }}
                   />
                   <Box>
                     <Typography variant="subtitle1" fontWeight="bold">
                       Free Shipping
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
-                      On orders over ₦100,000
+                      On orders over ₦50,000
                     </Typography>
                   </Box>
                 </Box>
@@ -220,12 +231,13 @@ const Homepage = () => {
                 <Box
                   sx={{
                     display: "flex",
+                    flexDirection: "column",
                     alignItems: "center",
                     justifyContent: { xs: "center", md: "flex-start" },
                   }}
                 >
                   <SecurityIcon
-                    sx={{ fontSize: 40, color: "#0f2a1d", mr: 2 }}
+                    sx={{ fontSize: 25, color: "#0f2a1d", mr: 2 }}
                   />
                   <Box>
                     <Typography variant="subtitle1" fontWeight="bold">
@@ -271,7 +283,7 @@ const Homepage = () => {
               {categories.map((cat, index) => (
                 <Grid item xs={4} sm={3} md={2} lg={1.5} key={index}>
                   <Box
-                    onClick={() => handleCategoryClick(cat.label)}
+                    onClick={() => handleCategoryClick(cat.value)}
                     sx={{
                       display: "flex",
                       flexDirection: "column",
@@ -320,7 +332,7 @@ const Homepage = () => {
             placeholder="Search products..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            size="small"
+            size="medium"
             sx={{
               bgcolor: "white",
               width: "100%",

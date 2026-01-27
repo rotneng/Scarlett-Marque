@@ -20,6 +20,8 @@ import FacebookIcon from "@mui/icons-material/Facebook";
 import EmailIcon from "@mui/icons-material/EmailOutlined";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 
+import Header from "../header";
+
 const AboutPage = () => {
   const navigate = useNavigate();
 
@@ -70,6 +72,8 @@ const AboutPage = () => {
 
   return (
     <Box sx={{ minHeight: "100vh", bgcolor: "#fff" }}>
+      <Header />
+
       <Box
         sx={{
           bgcolor: themeColor,
@@ -136,6 +140,7 @@ const AboutPage = () => {
           </Button>
         </Container>
       </Box>
+
       <Container
         maxWidth="lg"
         sx={{ mt: { xs: -8, md: -14 }, mb: 8, position: "relative", zIndex: 2 }}
@@ -229,24 +234,30 @@ const AboutPage = () => {
         </Grid>
       </Container>
 
-      <Box sx={{ bgcolor: "#fff", py: 8, textAlign: "center" }}>
-        <Container maxWidth="md">
+      <Box
+        component="footer"
+        sx={{
+          bgcolor: "#fafafa",
+          pt: 8,
+          pb: 6,
+          borderTop: "1px solid #eee",
+          mt: 4,
+        }}
+      >
+        <Container maxWidth="md" sx={{ textAlign: "center" }}>
           <Typography
-            variant="h5"
+            variant="h6"
             fontWeight="bold"
-            sx={{ color: themeColor, mb: 1 }}
+            sx={{ color: themeColor, mb: 2 }}
           >
-            Stay Connected
+            Connect With Us
           </Typography>
-          <Typography color="text.secondary" sx={{ mb: 4 }}>
-            Follow us on social media for updates and exclusive offers.
-          </Typography>
-
           <Stack
             direction="row"
-            spacing={{ xs: 2, md: 4 }}
+            spacing={{ xs: 2, md: 3 }}
             justifyContent="center"
             alignItems="center"
+            sx={{ mb: 5 }}
           >
             {socialLinks.map((social, index) => (
               <a
@@ -258,17 +269,17 @@ const AboutPage = () => {
               >
                 <Box
                   sx={{
-                    p: 2,
+                    p: 1.5,
                     borderRadius: "50%",
-                    bgcolor: "#f5f5f5",
+                    bgcolor: "white",
                     color: "#555",
+                    boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
                     transition: "all 0.3s ease",
                     display: "flex",
                     "&:hover": {
                       bgcolor: social.color,
                       color: "white",
-                      transform: "scale(1.15)",
-                      boxShadow: "0 8px 16px rgba(0,0,0,0.15)",
+                      transform: "translateY(-3px)",
                     },
                   }}
                 >
@@ -277,73 +288,72 @@ const AboutPage = () => {
               </a>
             ))}
           </Stack>
-        </Container>
-      </Box>
 
-      <Box
-        sx={{ bgcolor: "#fafafa", pt: 6, pb: 10, borderTop: "1px solid #eee" }}
-      >
-        <Container maxWidth="md" sx={{ textAlign: "center" }}>
-          <Typography variant="body2" color="text.secondary">
-            Ready to experience quality?
-          </Typography>
-          <Button
-            onClick={() => navigate("/")}
-            sx={{
-              mt: 1,
-              mb: 5,
-              fontWeight: "bold",
-              color: themeColor,
-              textDecoration: "underline",
-              "&:hover": { textDecoration: "none", bgcolor: "transparent" },
-            }}
+          <Divider sx={{ mb: 5, opacity: 0.6 }} />
+
+          <Grid
+            container
+            spacing={4}
+            justifyContent="center"
+            alignItems="center"
           >
-            Go to Shop
-          </Button>
+            <Grid item xs={12} md={6}>
+              <Stack
+                direction="column"
+                alignItems="center"
+                spacing={1}
+                sx={{ color: themeColor }}
+              >
+                <LocationOnIcon fontSize="large" sx={{ mb: 1 }} />
+                <Typography variant="h6" fontWeight="bold">
+                  Visit Our Store
+                </Typography>
+                <Typography
+                  variant="body1"
+                  color="text.secondary"
+                  sx={{ lineHeight: 1.6, maxWidth: "300px" }}
+                >
+                  Longwa Phase 3, before Solomon Lar Amusement Park,
+                  <br />
+                  House 11, Shop No 3, Jos, Nigeria
+                </Typography>
+              </Stack>
+            </Grid>
 
-          <Divider sx={{ mb: 5, opacity: 0.5 }} />
+            <Grid item xs={12} md={6}>
+              <Stack direction="column" alignItems="center" spacing={1}>
+                <Typography variant="body1" color="text.secondary">
+                  Ready to experience quality?
+                </Typography>
+                <Button
+                  variant="contained"
+                  onClick={() => navigate("/")}
+                  sx={{
+                    bgcolor: themeColor,
+                    px: 4,
+                    borderRadius: "20px",
+                    textTransform: "none",
+                    "&:hover": { bgcolor: "#0a1f15" },
+                  }}
+                >
+                  Go to Shop
+                </Button>
+              </Stack>
+            </Grid>
+          </Grid>
 
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-              mb: 4,
-            }}
-          >
-            <Stack
-              direction="row"
-              alignItems="center"
-              spacing={1}
-              sx={{ mb: 1, color: themeColor }}
-            >
-              <LocationOnIcon fontSize="small" />
-              <Typography variant="subtitle1" fontWeight="600">
-                Visit Our Store
-              </Typography>
-            </Stack>
+          <Box sx={{ mt: 8 }}>
+            <Typography variant="body2" color="text.secondary">
+              © {new Date().getFullYear()} Scarlett Marque. All rights reserved.
+            </Typography>
             <Typography
-              variant="body1"
-              color="text.secondary"
-              sx={{ maxWidth: "400px", lineHeight: 1.6 }}
+              variant="caption"
+              display="block"
+              sx={{ mt: 1, color: "#aaa", fontStyle: "italic" }}
             >
-              Longwa Phase 3, before Solomon Lar Amusement Park,
-              <br />
-              House 11, Shop No 3, Jos, Nigeria
+              Developed by Rotnen
             </Typography>
           </Box>
-          <Typography variant="body2" color="text.secondary">
-            © {new Date().getFullYear()} Scarlett Marque. All rights reserved.
-          </Typography>
-
-          <Typography
-            variant="caption"
-            display="block"
-            sx={{ mt: 1, color: "#999", fontStyle: "italic" }}
-          >
-            Developed by Rotnen
-          </Typography>
         </Container>
       </Box>
     </Box>
