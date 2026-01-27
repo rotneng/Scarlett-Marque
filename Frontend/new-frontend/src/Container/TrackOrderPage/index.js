@@ -73,7 +73,7 @@ const TrackOrderPage = () => {
   const onConfirmDelivery = () => {
     if (
       window.confirm(
-        "Are you sure you have received this order? This cannot be undone."
+        "Are you sure you have received this order? This cannot be undone.",
       )
     ) {
       dispatch(confirmDelivery(order._id));
@@ -83,7 +83,7 @@ const TrackOrderPage = () => {
   const onReportIssue = () => {
     if (
       window.confirm(
-        "Has the order NOT arrived? We will notify the admin immediately."
+        "Has the order NOT arrived? We will notify the admin immediately.",
       )
     ) {
       dispatch(reportOrderIssue(order._id));
@@ -168,8 +168,8 @@ const TrackOrderPage = () => {
                 isIssueReported
                   ? "error"
                   : pendingConfirmation
-                  ? "warning"
-                  : "success"
+                    ? "warning"
+                    : "success"
               }
               variant="outlined"
               sx={{ fontWeight: "bold", textTransform: "capitalize" }}
@@ -268,10 +268,10 @@ const TrackOrderPage = () => {
                 {isIssueReported
                   ? "ISSUE IN DELIVERY"
                   : pendingConfirmation
-                  ? "ARRIVED (Action Required)"
-                  : order.orderStatus
-                  ? order.orderStatus.toUpperCase()
-                  : "PROCESSING"}
+                    ? "ARRIVED (Action Required)"
+                    : order.orderStatus
+                      ? order.orderStatus.toUpperCase()
+                      : "PROCESSING"}
               </Box>
             </Typography>
           </Box>
@@ -344,7 +344,7 @@ const TrackOrderPage = () => {
         </Alert>
       )}
 
-      <Grid container spacing={4}>
+      <Grid container spacing={4} sx={{ justifyContent: "center" }}>
         <Grid item xs={12} md={8}>
           <Card
             sx={{

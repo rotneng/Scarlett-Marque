@@ -44,7 +44,7 @@ function App() {
             <Route path="/checkout" element={<CheckoutPage />} />
             <Route path="/address" element={<AddressPage />} />
             <Route path="/manageAddress" element={<ManageAddressPage />} />
-            <Route path="/payment" element={<PaymentPage />} />
+            {/* <Route path="/payment" element={<PaymentPage />} /> */}
             <Route path="/place-order" element={<PlaceOrderPage />} />
             <Route path="/order/:id" element={<OrderPage />} />
             <Route

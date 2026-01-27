@@ -18,6 +18,7 @@ import {
   StepLabel,
   Paper,
   Chip,
+  IconButton,
 } from "@mui/material";
 
 import LocationOnIcon from "@mui/icons-material/LocationOn";
@@ -71,7 +72,7 @@ const CheckoutPage = () => {
 
   const handleProceedToPayment = () => {
     if (selectedAddress) {
-      navigate("/payment", {
+      navigate("/place-order", {
         state: {
           shippingAddress: selectedAddress,
           cartItems: cartItems,
@@ -128,26 +129,19 @@ const CheckoutPage = () => {
   return (
     <Box sx={{ bgcolor: "#f4f6f8", minHeight: "100vh", pb: 8 }}>
       <Container maxWidth="lg">
-        <Box sx={{ py: 4, mb: 2 }}>
-          <Stepper activeStep={1} alternativeLabel>
-            {steps.map((label) => (
-              <Step key={label}>
-                <StepLabel
-                  StepIconProps={{
-                    sx: {
-                      "&.Mui-active": { color: "#0f2a1d" },
-                      "&.Mui-completed": { color: "#0f2a1d" },
-                    },
-                  }}
-                >
-                  {label}
-                </StepLabel>
-              </Step>
-            ))}
-          </Stepper>
+        <Box sx={{ py: 4, mb: 1, display: "flex", alignItems: "center", gap: 2 }}>
+           <IconButton
+              onClick={() => navigate("/cart")}
+              sx={{ bgcolor: "white", boxShadow: 1 }}
+            >
+              <ArrowBackIcon />
+            </IconButton>
+            <Typography variant="h4" fontWeight="800" color="#0f2a1d">
+              Checkout
+            </Typography>
         </Box>
 
-        <Grid container spacing={4}>
+        <Grid container spacing={4} sx={{justifyContent:"center"}}> 
           <Grid item xs={12} md={8}>
             <Card
               elevation={0}

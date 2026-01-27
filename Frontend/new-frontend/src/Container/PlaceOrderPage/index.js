@@ -299,7 +299,7 @@ const PlaceOrderPage = () => {
         py: { xs: 2, md: 4 },
       }}
     >
-      <Container maxWidth="lg" sx={{ px: { xs: 2, md: 3 } }}>
+      <Container maxWidth="lg" sx={{ px: { xs: 2, md: 3 }, }}>
         <Button
           startIcon={<ArrowBackIcon />}
           onClick={() => navigate(-1)}
@@ -319,7 +319,7 @@ const PlaceOrderPage = () => {
           Review & Place Order
         </Typography>
 
-        <Grid container spacing={{ xs: 2, md: 4 }}>
+        <Grid container spacing={{ xs: 2, md: 4 }} sx={{justifyContent: "center"}}>
           <Grid item xs={12} md={8}>
             <Paper
               elevation={0}
