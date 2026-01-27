@@ -24,7 +24,6 @@ import OtpVerification from "./Container/OTPpage";
 import ForgotPassword from "./Passwords/ForgotPassword";
 import ResetPassword from "./Passwords/ResetPassword";
 
-import Header from "./Container/header"; 
 import MobileFooter from "./Container/MobileFooter"; 
 
 function App() {

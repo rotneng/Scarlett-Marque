@@ -28,7 +28,6 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { getAddresses } from "../../Actions/address.actions";
 import { getProducts } from "../../Actions/product.actions";
 
-const steps = ["Cart", "Shipping Address", "Payment"];
 
 const CheckoutPage = () => {
   const navigate = useNavigate();
