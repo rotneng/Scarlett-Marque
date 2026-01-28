@@ -22,19 +22,22 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import ListAltIcon from "@mui/icons-material/ListAlt";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import Logo from "../../src/assets/Logo.png";
 
 const PRIMARY_COLOR = "#0f2a1d";
 
-const Header = ({ showSearch = false, searchTerm = "", setSearchTerm }) => {
+const Header = ({ searchTerm = "", setSearchTerm }) => {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const cartItems = useSelector((state) => state.cart?.cartItems || []);
   const token = localStorage.getItem("token");
   const userString = localStorage.getItem("user");
   const user = userString ? JSON.parse(userString) : null;
   const isAdmin = token && user && user.role === "admin";
+
+  const showSearch = location.pathname === "/";
 
   const handleLogout = () => {
     localStorage.clear();
@@ -71,6 +74,7 @@ const Header = ({ showSearch = false, searchTerm = "", setSearchTerm }) => {
           alignItems: "center",
           justifyContent: "space-between",
           py: 1,
+          gap: 2,
         }}
       >
         <Box
@@ -79,18 +83,20 @@ const Header = ({ showSearch = false, searchTerm = "", setSearchTerm }) => {
             display: "flex",
             alignItems: "center",
             cursor: "pointer",
+            flexShrink: 0,
             "&:hover": { opacity: 0.9 },
           }}
         >
-          <Box component="img"
-          src={Logo}
-          alt="Scarlett Marque Logo"
-          sx={{
-            height: { xs: 40, md: 50 },
-            width: "auto",
-            mr: 1,
-          }}>
-          </Box>
+          <Box
+            component="img"
+            src={Logo}
+            alt="Scarlett Marque Logo"
+            sx={{
+              height: { xs: 40, md: 50 },
+              width: "auto",
+              mr: 1,
+            }}
+          ></Box>
           <Typography
             variant="h5"
             noWrap
@@ -101,9 +107,9 @@ const Header = ({ showSearch = false, searchTerm = "", setSearchTerm }) => {
               color: "white",
               userSelect: "none",
               fontSize: { xs: "1.2rem", md: "1.5rem" },
+              display: { xs: "none", sm: "block" },
             }}
           >
-            
             Scarlett Marque
           </Typography>
         </Box>
@@ -111,39 +117,41 @@ const Header = ({ showSearch = false, searchTerm = "", setSearchTerm }) => {
         {showSearch ? (
           <Box
             sx={{
-              display: { xs: "none", md: "flex" },
+              display: "flex",
               justifyContent: "center",
               flexGrow: 1,
-              maxWidth: "600px",
-              mx: 2,
+              flexShrink: 1,
+              maxWidth: "700px",
+              minWidth: "150px",
+              transition: "all 0.3s ease-in-out",
             }}
           >
             <TextField
-              fullWidth
               variant="outlined"
-              placeholder="Search collections..."
+              placeholder="Search products..."
               value={searchTerm}
               onChange={(e) => setSearchTerm && setSearchTerm(e.target.value)}
               size="small"
               sx={{
                 bgcolor: "white",
-                borderRadius: "50px",
+                width: "100%",
+                borderRadius: "40px",
                 "& .MuiOutlinedInput-root": {
-                  borderRadius: "50px",
+                  borderRadius: "40px",
                   "& fieldset": { border: "none" },
                 },
               }}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                    <SearchIcon sx={{ color: PRIMARY_COLOR }} />
+                    <SearchIcon color="action" />
                   </InputAdornment>
                 ),
               }}
             />
           </Box>
         ) : (
-          <Box sx={{ display: { xs: "none", md: "block" }, flexGrow: 1 }} />
+          <Box sx={{ flexGrow: 1 }} />
         )}
 
         <Stack
@@ -152,6 +160,7 @@ const Header = ({ showSearch = false, searchTerm = "", setSearchTerm }) => {
           alignItems="center"
           sx={{
             justifyContent: "flex-end",
+            flexShrink: 0,
           }}
         >
           <Box

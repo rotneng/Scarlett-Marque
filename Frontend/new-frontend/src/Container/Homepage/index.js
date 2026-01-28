@@ -1,9 +1,6 @@
 import React, { useEffect, useState, useMemo } from "react";
 import {
   Box,
-  TextField,
-  InputAdornment,
-  Card,
   Typography,
   Grid,
   CardMedia,
@@ -14,12 +11,12 @@ import {
   Chip,
   Avatar,
   Paper,
+  Card,
 } from "@mui/material";
 
-import SearchIcon from "@mui/icons-material/Search";
+import SearchOffIcon from "@mui/icons-material/SearchOff";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import SearchOffIcon from "@mui/icons-material/SearchOff";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import SecurityIcon from "@mui/icons-material/Security";
 
@@ -105,7 +102,7 @@ const Homepage = () => {
     dispatch(getProducts());
   }, [dispatch]);
 
-const filteredProducts = useMemo(() => {
+  const filteredProducts = useMemo(() => {
     if (!searchTerm) return products;
 
     const lowerCaseSearch = searchTerm.toLowerCase().trim();
@@ -118,9 +115,9 @@ const filteredProducts = useMemo(() => {
 
       if (lowerCaseSearch === "kids") {
         return (
-          title.includes("kids") || 
-          title.includes("baby") || 
-          category.includes("kids") || 
+          title.includes("kids") ||
+          title.includes("baby") ||
+          category.includes("kids") ||
           category.includes("baby")
         );
       }
@@ -163,21 +160,21 @@ const filteredProducts = useMemo(() => {
 
   return (
     <Box sx={{ bgcolor: "#f1f1f1", minHeight: "100vh" }}>
-      <Header />
+      <Header searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
 
       {!isAdmin && (
         <Container maxWidth="lg" sx={{ mt: 2 }}>
           <Box
             sx={{
-              width: "100%", 
+              width: "100%",
               mx: "auto",
               height: { xs: "200px", md: "400px" },
               backgroundImage: `url(${BANNER_IMG})`,
               backgroundSize: "cover",
               backgroundPosition: "center",
               position: "relative",
-              borderRadius: 2, 
-              overflow: "hidden", 
+              borderRadius: 2,
+              overflow: "hidden",
             }}
           >
             <Box
@@ -325,29 +322,6 @@ const filteredProducts = useMemo(() => {
             </Grid>
           </Paper>
         )}
-
-        <Box sx={{ mb: 4, display: "flex", justifyContent: "center" }}>
-          <TextField
-            variant="outlined"
-            placeholder="Search products..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            size="medium"
-            sx={{
-              bgcolor: "white",
-              width: "100%",
-              maxWidth: "600px",
-              borderRadius: "40px",
-            }}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon color="action" />
-                </InputAdornment>
-              ),
-            }}
-          />
-        </Box>
 
         {!isAdmin && (
           <Box
