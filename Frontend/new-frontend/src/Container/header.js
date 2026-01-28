@@ -172,7 +172,7 @@ const Header = ({ searchTerm = "", setSearchTerm }) => {
                 startIcon={<InfoIcon />}
                 sx={navButtonStyle}
               >
-                <span style={labelStyle}>About Us</span>
+                <span style={labelStyle}>About</span>
               </Button>
             )}
 
@@ -201,7 +201,7 @@ const Header = ({ searchTerm = "", setSearchTerm }) => {
                     startIcon={<LocalShippingIcon />}
                     sx={navButtonStyle}
                   >
-                    <span style={labelStyle}>My Orders</span>
+                    <span style={labelStyle}>Orders</span>
                   </Button>
                 )}
                 <Button
