@@ -160,7 +160,7 @@ export const logout = () => {
       localStorage.removeItem("cart");
       dispatch({ type: authConstants.LOGOUT_SUCCESS });
 
-      window.location.href = "/signinz";
+      window.location.href = "/signin";
     } catch (error) {
       console.log("error in logout action", error);
     }

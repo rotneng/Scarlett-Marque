@@ -29,13 +29,10 @@ import LoginIcon from "@mui/icons-material/Login";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import LogoutIcon from "@mui/icons-material/Logout";
 
-// 1. Import useDispatch
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate, useLocation } from "react-router-dom";
 import Logo from "../../src/assets/Logo.png";
 
-// 2. Import your signout/logout action here
-// (Check your auth.actions.js file if it is named 'signout' or 'logout')
 import { logout } from "../Actions/auth.actions";
 
 const PRIMARY_COLOR = "#0f2a1d";
@@ -43,7 +40,7 @@ const PRIMARY_COLOR = "#0f2a1d";
 const Header = ({ searchTerm = "", setSearchTerm }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const dispatch = useDispatch(); // 3. Initialize dispatch
+  const dispatch = useDispatch();
 
   const cartItems = useSelector((state) => state.cart?.cartItems || []);
   const token = localStorage.getItem("token");
@@ -69,14 +66,11 @@ const Header = ({ searchTerm = "", setSearchTerm }) => {
     navigate(path);
   };
 
-  // 4. Update the Logout function to use Redux
   const handleLogout = () => {
     handleMenuClose();
 
-    // Dispatch the action so Redux knows we are logged out
     dispatch(logout());
 
-    // Optional: If your signout action doesn't clear storage automatically, keep this:
     localStorage.clear();
     navigate("/");
   };
