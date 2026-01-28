@@ -38,18 +38,25 @@ const MobileFooter = () => {
 
     if (path === "/") {
       setValue(0);
-    } else if (path === "/about") {
-      setValue(1);
-    } else if (path === "/cart" || path === "/addproducts") {
-      setValue(2);
-    } else if (
-      path === "/account/orders" ||
-      path === "/admin/orders" ||
-      path === "/signIn"
-    ) {
-      setValue(3);
+      return;
     }
-  }, [location.pathname]);
+
+    if (isAdmin) {
+      if (path === "/addproducts") {
+        setValue(1);
+      } else if (path === "/admin/orders") {
+        setValue(2);
+      }
+    } else {
+      if (path === "/about") {
+        setValue(1);
+      } else if (path === "/cart") {
+        setValue(2);
+      } else if (path === "/account/orders" || path === "/signIn") {
+        setValue(3);
+      }
+    }
+  }, [location.pathname, isAdmin]);
 
   if (!isMobile) return null;
 
@@ -61,7 +68,7 @@ const MobileFooter = () => {
         left: 0,
         right: 0,
         zIndex: 1000,
-        borderTop: "1px solid rgba(255,255,255,0.1)",
+        borderTop: "1px solid rgba(0,0,0,0.1)",
       }}
       elevation={3}
     >
@@ -73,14 +80,11 @@ const MobileFooter = () => {
         }}
         sx={{
           bgcolor: "white",
-          "& .MuiBottomNavigationAction-root": {
-            color: "gray",
-          },
+          height: 65,
+          "& .MuiBottomNavigationAction-root": { color: "gray" },
           "& .Mui-selected": {
-            color: "#121212",
-            "& .MuiSvgIcon-root": {
-              color: "#121212",
-            },
+            color: "#0f2a1d",
+            "& .MuiSvgIcon-root": { color: "#0f2a1d" },
           },
         }}
       >
@@ -89,11 +93,14 @@ const MobileFooter = () => {
           icon={<HomeIcon />}
           onClick={() => navigate("/")}
         />
-        <BottomNavigationAction
-          label="About"
-          icon={<InfoIcon />}
-          onClick={() => navigate("/about")}
-        />
+
+        {!isAdmin && (
+          <BottomNavigationAction
+            label="About"
+            icon={<InfoIcon />}
+            onClick={() => navigate("/about")}
+          />
+        )}
 
         {isAdmin
           ? [
@@ -115,13 +122,23 @@ const MobileFooter = () => {
                 key="cart"
                 label="Cart"
                 icon={
-                  <Badge badgeContent={cartItems.length} color="error">
+                  <Badge
+                    badgeContent={cartItems.length}
+                    color="error"
+                    max={99}
+                    sx={{
+                      "& .MuiBadge-badge": {
+                        fontSize: "0.7rem",
+                        height: "18px",
+                        minWidth: "18px",
+                      },
+                    }}
+                  >
                     <ShoppingCartIcon />
                   </Badge>
                 }
                 onClick={() => navigate("/cart")}
               />,
-
               token ? (
                 <BottomNavigationAction
                   key="orders"

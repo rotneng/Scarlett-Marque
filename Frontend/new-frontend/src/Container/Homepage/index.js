@@ -175,6 +175,7 @@ const Homepage = () => {
               position: "relative",
               borderRadius: 2,
               overflow: "hidden",
+              mb: 4,
             }}
           >
             <Box

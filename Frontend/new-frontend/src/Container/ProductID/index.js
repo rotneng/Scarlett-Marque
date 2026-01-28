@@ -18,18 +18,25 @@ import {
   Alert,
   Divider,
   Container,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
 } from "@mui/material";
 
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCartOutlined";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import EditIcon from "@mui/icons-material/EditOutlined";
+import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import HomeIcon from "@mui/icons-material/HomeOutlined";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import VerifiedUserIcon from "@mui/icons-material/VerifiedUserOutlined";
 import LocalShippingIcon from "@mui/icons-material/LocalShippingOutlined";
 import BlockIcon from "@mui/icons-material/Block";
-import { getProducts } from "../../Actions/product.actions";
+
+import { getProducts, deleteProduct } from "../../Actions/product.actions";
 import { addItemToCart } from "../../Actions/cartActions";
 import Header from "../header";
 
@@ -51,7 +58,7 @@ const ProductDetails = () => {
   const dispatch = useDispatch();
 
   const product = useSelector((state) =>
-    state.product.products.find((p) => p._id === id)
+    state.product.products.find((p) => p._id === id),
   );
   const loading = useSelector((state) => state.product.loading);
 
@@ -62,6 +69,8 @@ const ProductDetails = () => {
     severity: "success",
   });
   const [selectedImage, setSelectedImage] = useState("");
+
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 
   const userString = localStorage.getItem("user");
   const user = userString ? JSON.parse(userString) : null;
@@ -77,7 +86,7 @@ const ProductDetails = () => {
     if (product) {
       if (product.images && product.images.length > 0) {
         setSelectedImage(
-          getValidImageUrl(product.images[0].img || product.images[0])
+          getValidImageUrl(product.images[0].img || product.images[0]),
         );
       } else if (product.image) {
         setSelectedImage(getValidImageUrl(product.image));
@@ -110,8 +119,8 @@ const ProductDetails = () => {
     stockCount > 10
       ? "In Stock"
       : stockCount > 0
-      ? `Low Stock: Only ${stockCount} left`
-      : "Out of Stock";
+        ? `Low Stock: Only ${stockCount} left`
+        : "Out of Stock";
 
   const stockColor =
     stockCount > 10 ? "success" : stockCount > 0 ? "warning" : "error";
@@ -170,6 +179,22 @@ const ProductDetails = () => {
     });
   };
 
+  const handleDeleteClick = () => {
+    setOpenDeleteDialog(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (product) {
+      await dispatch(deleteProduct(product._id));
+      setOpenDeleteDialog(false);
+      navigate("/");
+    }
+  };
+
+  const handleCloseDeleteDialog = () => {
+    setOpenDeleteDialog(false);
+  };
+
   const handleCloseToast = () => {
     setToast({ ...toast, open: false });
   };
@@ -218,7 +243,7 @@ const ProductDetails = () => {
           </Typography>
         </Breadcrumbs>
 
-        <Grid container spacing={6} sx={{justifyContent: "center" }}>
+        <Grid container spacing={6} sx={{ justifyContent: "center" }}>
           <Grid item xs={12} md={6}>
             <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
               <Paper
@@ -506,23 +531,41 @@ const ProductDetails = () => {
                   </Stack>
                 </Box>
               ) : (
-                <Button
-                  variant="outlined"
-                  size="large"
-                  startIcon={<EditIcon />}
-                  onClick={() => navigate(`/product/edit/${product._id}`)}
-                  fullWidth
-                  sx={{
-                    py: 1.5,
-                    borderRadius: "50px",
-                    borderColor: "#1976d2",
-                    color: "#1976d2",
-                    borderWidth: 2,
-                    "&:hover": { borderWidth: 2, bgcolor: "#f0f7ff" },
-                  }}
-                >
-                  Edit Product (Admin)
-                </Button>
+                <Stack direction="row" spacing={2} sx={{ width: "100%" }}>
+                  <Button
+                    variant="outlined"
+                    size="large"
+                    startIcon={<EditIcon />}
+                    onClick={() => navigate(`/product/edit/${product._id}`)}
+                    fullWidth
+                    sx={{
+                      py: 1.5,
+                      borderRadius: "50px",
+                      borderColor: "#1976d2",
+                      color: "#1976d2",
+                      borderWidth: 2,
+                      "&:hover": { borderWidth: 2, bgcolor: "#f0f7ff" },
+                    }}
+                  >
+                    Edit
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    size="large"
+                    color="error"
+                    startIcon={<DeleteIcon />}
+                    onClick={handleDeleteClick}
+                    fullWidth
+                    sx={{
+                      py: 1.5,
+                      borderRadius: "50px",
+                      borderWidth: 2,
+                      "&:hover": { borderWidth: 2, bgcolor: "#ffebee" },
+                    }}
+                  >
+                    Delete
+                  </Button>
+                </Stack>
               )}
             </Box>
           </Grid>
@@ -544,6 +587,31 @@ const ProductDetails = () => {
           {toast.message}
         </Alert>
       </Snackbar>
+
+      <Dialog
+        open={openDeleteDialog}
+        onClose={handleCloseDeleteDialog}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          {"Delete this product?"}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Are you sure you want to delete <strong>{product.title}</strong>?
+            This action cannot be undone.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDeleteDialog} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleConfirmDelete} color="error" autoFocus>
+            Confirm Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };
