@@ -36,6 +36,7 @@ const SignIn = () => {
 
   const [localError, setLocalError] = useState("");
 
+  // Clear errors on mount
   useEffect(() => {
     dispatch({
       type: authConstants.LOGIN_FAILURE,
@@ -58,7 +59,6 @@ const SignIn = () => {
     }
 
     const user = { username, password };
-
     dispatch(login(user, navigate));
   };
 
@@ -67,9 +67,16 @@ const SignIn = () => {
     if (localError) setLocalError("");
   };
 
+  // This is the part causing the redirect.
+  // Ideally, if a user is ALREADY logged in, they shouldn't see this page.
+  // If you are experiencing a loop, verify that you are actually logged out
+  // (i.e., localStorage has no token) before visiting this page.
   useEffect(() => {
     if (auth.authenticate) {
-      navigate("/");
+      const timer = setTimeout(() => {
+         navigate("/");
+      }, 100); // Small timeout to prevent instant flash if state updates fast
+      return () => clearTimeout(timer);
     }
   }, [auth.authenticate, navigate]);
 

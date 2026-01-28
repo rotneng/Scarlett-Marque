@@ -29,15 +29,21 @@ import LoginIcon from "@mui/icons-material/Login";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import LogoutIcon from "@mui/icons-material/Logout";
 
-import { useSelector } from "react-redux";
+// 1. Import useDispatch
+import { useSelector, useDispatch } from "react-redux";
 import { useNavigate, useLocation } from "react-router-dom";
 import Logo from "../../src/assets/Logo.png";
+
+// 2. Import your signout/logout action here
+// (Check your auth.actions.js file if it is named 'signout' or 'logout')
+import { logout } from "../Actions/auth.actions";
 
 const PRIMARY_COLOR = "#0f2a1d";
 
 const Header = ({ searchTerm = "", setSearchTerm }) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const dispatch = useDispatch(); // 3. Initialize dispatch
 
   const cartItems = useSelector((state) => state.cart?.cartItems || []);
   const token = localStorage.getItem("token");
@@ -63,10 +69,16 @@ const Header = ({ searchTerm = "", setSearchTerm }) => {
     navigate(path);
   };
 
+  // 4. Update the Logout function to use Redux
   const handleLogout = () => {
     handleMenuClose();
+
+    // Dispatch the action so Redux knows we are logged out
+    dispatch(logout());
+
+    // Optional: If your signout action doesn't clear storage automatically, keep this:
     localStorage.clear();
-    navigate("/signIn");
+    navigate("/");
   };
 
   const navButtonStyle = {
@@ -304,69 +316,52 @@ const Header = ({ searchTerm = "", setSearchTerm }) => {
               anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
             >
               {!token && (
-                <Box>
-                  <MenuItem onClick={() => handleNavigateAndClose("/signIn")}>
-                    <ListItemIcon>
-                      <LoginIcon fontSize="small" />
-                    </ListItemIcon>
-                    <Typography variant="body2">Sign In</Typography>
-                  </MenuItem>
-                  <MenuItem onClick={() => handleNavigateAndClose("/signUp")}>
-                    <ListItemIcon>
-                      <PersonAddIcon fontSize="small" />
-                    </ListItemIcon>
-                    <Typography variant="body2">Sign Up</Typography>
-                  </MenuItem>
-                </Box>
+                <MenuItem onClick={() => handleNavigateAndClose("/signIn")}>
+                  <ListItemIcon>
+                    <LoginIcon fontSize="small" />
+                  </ListItemIcon>
+                  <Typography variant="body2">Sign In</Typography>
+                </MenuItem>
               )}
 
+              {!token && (
+                <MenuItem onClick={() => handleNavigateAndClose("/signUp")}>
+                  <ListItemIcon>
+                    <PersonAddIcon fontSize="small" />
+                  </ListItemIcon>
+                  <Typography variant="body2">Sign Up</Typography>
+                </MenuItem>
+              )}
+
+              {token && !isAdmin && (
+                <MenuItem onClick={() => handleNavigateAndClose("/profile")}>
+                  <ListItemIcon>
+                    <PersonIcon fontSize="small" />
+                  </ListItemIcon>
+                  <Typography variant="body2">My Profile</Typography>
+                </MenuItem>
+              )}
+
+              {token && !isAdmin && (
+                <MenuItem
+                  onClick={() => handleNavigateAndClose("/account/orders")}
+                >
+                  <ListItemIcon>
+                    <LocalShippingIcon fontSize="small" />
+                  </ListItemIcon>
+                  <Typography variant="body2">My Orders</Typography>
+                </MenuItem>
+              )}
+
+              {token && !isAdmin && <Divider />}
+
               {token && (
-                <Box>
-                  {isAdmin ? (
-                    <Box>
-                      <MenuItem
-                        onClick={handleLogout}
-                        sx={{ color: "error.main" }}
-                      >
-                        <ListItemIcon>
-                          <LogoutIcon fontSize="small" color="error" />
-                        </ListItemIcon>
-                        <Typography variant="body2">Logout</Typography>
-                      </MenuItem>
-                    </Box>
-                  ) : (
-                    <Box>
-                      <MenuItem
-                        onClick={() => handleNavigateAndClose("/profile")}
-                      >
-                        <ListItemIcon>
-                          <PersonIcon fontSize="small" />
-                        </ListItemIcon>
-                        <Typography variant="body2">My Profile</Typography>
-                      </MenuItem>
-                      <MenuItem
-                        onClick={() =>
-                          handleNavigateAndClose("/account/orders")
-                        }
-                      >
-                        <ListItemIcon>
-                          <LocalShippingIcon fontSize="small" />
-                        </ListItemIcon>
-                        <Typography variant="body2">My Orders</Typography>
-                      </MenuItem>
-                      <Divider />
-                      <MenuItem
-                        onClick={handleLogout}
-                        sx={{ color: "error.main" }}
-                      >
-                        <ListItemIcon>
-                          <LogoutIcon fontSize="small" color="error" />
-                        </ListItemIcon>
-                        <Typography variant="body2">Logout</Typography>
-                      </MenuItem>
-                    </Box>
-                  )}
-                </Box>
+                <MenuItem onClick={handleLogout} sx={{ color: "error.main" }}>
+                  <ListItemIcon>
+                    <LogoutIcon fontSize="small" color="error" />
+                  </ListItemIcon>
+                  <Typography variant="body2">Logout</Typography>
+                </MenuItem>
               )}
             </Menu>
           </Stack>
