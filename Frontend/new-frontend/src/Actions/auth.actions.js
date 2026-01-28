@@ -1,7 +1,6 @@
 import axios from "axios";
 import { authConstants } from "./constant";
 
-// Define Base URL logic once
 const BASE_URL =
   window.location.hostname === "localhost"
     ? "http://localhost:5000"
@@ -161,7 +160,7 @@ export const logout = () => {
       localStorage.removeItem("cart");
       dispatch({ type: authConstants.LOGOUT_SUCCESS });
 
-      window.location.href = "/";
+      window.location.href = "/signinz";
     } catch (error) {
       console.log("error in logout action", error);
     }

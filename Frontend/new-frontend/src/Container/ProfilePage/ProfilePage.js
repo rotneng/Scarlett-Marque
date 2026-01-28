@@ -134,61 +134,6 @@ const ProfilePage = () => {
 
           <Grid item xs={12} md={8} lg={9}>
             <Stack spacing={3}>
-              <Paper
-                elevation={0}
-                sx={{ p: 3, borderRadius: "24px", border: "1px solid #eee" }}
-              >
-                <Typography variant="h6" fontWeight="bold" sx={{ mb: 2 }}>
-                  Profile Details
-                </Typography>
-                <Grid container spacing={2}>
-                  <Grid item xs={12} sm={6}>
-                    <Box
-                      sx={{
-                        p: 2,
-                        bgcolor: "#f9fafb",
-                        borderRadius: "12px",
-                        border: "1px solid #eee",
-                      }}
-                    >
-                      <Stack direction="row" spacing={2} alignItems="center">
-                        <PersonIcon sx={{ color: PRIMARY_COLOR }} />
-                        <Box>
-                          <Typography variant="caption" color="text.secondary">
-                            Full Name
-                          </Typography>
-                          <Typography variant="body1" fontWeight="500">
-                            {user.username}
-                          </Typography>
-                        </Box>
-                      </Stack>
-                    </Box>
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <Box
-                      sx={{
-                        p: 2,
-                        bgcolor: "#f9fafb",
-                        borderRadius: "12px",
-                        border: "1px solid #eee",
-                      }}
-                    >
-                      <Stack direction="row" spacing={2} alignItems="center">
-                        <EmailIcon sx={{ color: PRIMARY_COLOR }} />
-                        <Box>
-                          <Typography variant="caption" color="text.secondary">
-                            Email Address
-                          </Typography>
-                          <Typography variant="body1" fontWeight="500">
-                            {user.email}
-                          </Typography>
-                        </Box>
-                      </Stack>
-                    </Box>
-                  </Grid>
-                </Grid>
-              </Paper>
-
               <Grid container spacing={3}>
                 <Grid item xs={12} sm={6}>
                   <Paper
