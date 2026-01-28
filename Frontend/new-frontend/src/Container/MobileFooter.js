@@ -13,10 +13,8 @@ import { useSelector } from "react-redux";
 import HomeIcon from "@mui/icons-material/Home";
 import InfoIcon from "@mui/icons-material/Info";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
-import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import ListAltIcon from "@mui/icons-material/ListAlt";
 import AddIcon from "@mui/icons-material/Add";
-import LoginIcon from "@mui/icons-material/Login";
 
 const MobileFooter = () => {
   const navigate = useNavigate();
@@ -52,8 +50,6 @@ const MobileFooter = () => {
         setValue(1);
       } else if (path === "/cart") {
         setValue(2);
-      } else if (path === "/account/orders" || path === "/signIn") {
-        setValue(3);
       }
     }
   }, [location.pathname, isAdmin]);
@@ -102,59 +98,44 @@ const MobileFooter = () => {
           />
         )}
 
-        {isAdmin
-          ? [
-              <BottomNavigationAction
-                key="add"
-                label="Add"
-                icon={<AddIcon />}
-                onClick={() => navigate("/addproducts")}
-              />,
-              <BottomNavigationAction
-                key="orders"
-                label="Orders"
-                icon={<ListAltIcon />}
-                onClick={() => navigate("/admin/orders")}
-              />,
-            ]
-          : [
-              <BottomNavigationAction
-                key="cart"
-                label="Cart"
-                icon={
-                  <Badge
-                    badgeContent={cartItems.length}
-                    color="error"
-                    max={99}
-                    sx={{
-                      "& .MuiBadge-badge": {
-                        fontSize: "0.7rem",
-                        height: "18px",
-                        minWidth: "18px",
-                      },
-                    }}
-                  >
-                    <ShoppingCartIcon />
-                  </Badge>
-                }
-                onClick={() => navigate("/cart")}
-              />,
-              token ? (
-                <BottomNavigationAction
-                  key="orders"
-                  label="Orders"
-                  icon={<LocalShippingIcon />}
-                  onClick={() => navigate("/account/orders")}
-                />
-              ) : (
-                <BottomNavigationAction
-                  key="login"
-                  label="Login"
-                  icon={<LoginIcon />}
-                  onClick={() => navigate("/signIn")}
-                />
-              ),
-            ]}
+        {isAdmin ? (
+          [
+            <BottomNavigationAction
+              key="add"
+              label="Add"
+              icon={<AddIcon />}
+              onClick={() => navigate("/addproducts")}
+            />,
+            <BottomNavigationAction
+              key="orders"
+              label="Orders"
+              icon={<ListAltIcon />}
+              onClick={() => navigate("/admin/orders")}
+            />,
+          ]
+        ) : (
+          <BottomNavigationAction
+            key="cart"
+            label="Cart"
+            icon={
+              <Badge
+                badgeContent={cartItems.length}
+                color="error"
+                max={99}
+                sx={{
+                  "& .MuiBadge-badge": {
+                    fontSize: "0.7rem",
+                    height: "18px",
+                    minWidth: "18px",
+                  },
+                }}
+              >
+                <ShoppingCartIcon />
+              </Badge>
+            }
+            onClick={() => navigate("/cart")}
+          />
+        )}
       </BottomNavigation>
     </Paper>
   );

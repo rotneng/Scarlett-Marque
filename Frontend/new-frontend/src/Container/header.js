@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Box,
   TextField,
@@ -11,16 +11,24 @@ import {
   Stack,
   Badge,
   Button,
+  Menu,
+  MenuItem,
+  Divider,
+  ListItemIcon,
 } from "@mui/material";
 
 import SearchIcon from "@mui/icons-material/Search";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
-import LogoutIcon from "@mui/icons-material/Logout";
 import AddIcon from "@mui/icons-material/Add";
 import InfoIcon from "@mui/icons-material/Info";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import ListAltIcon from "@mui/icons-material/ListAlt";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
+import PersonIcon from "@mui/icons-material/Person";
+import LoginIcon from "@mui/icons-material/Login";
+import PersonAddIcon from "@mui/icons-material/PersonAdd";
+import LogoutIcon from "@mui/icons-material/Logout";
+
 import { useSelector } from "react-redux";
 import { useNavigate, useLocation } from "react-router-dom";
 import Logo from "../../src/assets/Logo.png";
@@ -39,9 +47,26 @@ const Header = ({ searchTerm = "", setSearchTerm }) => {
 
   const showSearch = location.pathname === "/";
 
+  const [anchorEl, setAnchorEl] = useState(null);
+  const openMenu = Boolean(anchorEl);
+
+  const handleProfileClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleNavigateAndClose = (path) => {
+    handleMenuClose();
+    navigate(path);
+  };
+
   const handleLogout = () => {
+    handleMenuClose();
     localStorage.clear();
-    window.location.href = "/signIn";
+    navigate("/signIn");
   };
 
   const navButtonStyle = {
@@ -190,7 +215,7 @@ const Header = ({ searchTerm = "", setSearchTerm }) => {
                   startIcon={<AddIcon />}
                   sx={navButtonStyle}
                 >
-                  <span style={labelStyle}>Add Product</span>
+                  <span style={labelStyle}>Add Products</span>
                 </Button>
               </>
             ) : (
@@ -219,20 +244,20 @@ const Header = ({ searchTerm = "", setSearchTerm }) => {
             )}
           </Box>
 
-          {token ? (
-            <Stack
-              direction="row"
-              alignItems="center"
-              spacing={1}
-              sx={{
-                ml: 1,
-                borderLeft: {
-                  xs: "none",
-                  md: "1px solid rgba(255,255,255,0.2)",
-                },
-                pl: { xs: 0, md: 1 },
-              }}
-            >
+          <Stack
+            direction="row"
+            alignItems="center"
+            spacing={1}
+            sx={{
+              ml: 1,
+              borderLeft: {
+                xs: "none",
+                md: "1px solid rgba(255,255,255,0.2)",
+              },
+              pl: { xs: 0, md: 1 },
+            }}
+          >
+            {token && (
               <Typography
                 variant="body2"
                 sx={{
@@ -247,22 +272,104 @@ const Header = ({ searchTerm = "", setSearchTerm }) => {
               >
                 {user?.username}
               </Typography>
-              <Tooltip title="Logout">
-                <IconButton onClick={handleLogout} sx={{ color: "white" }}>
-                  <LogoutIcon />
-                </IconButton>
-              </Tooltip>
-            </Stack>
-          ) : (
-            <Tooltip title="Sign In">
+            )}
+
+            <Tooltip title={token ? "Account Settings" : "Sign In / Sign Up"}>
               <IconButton
-                onClick={() => navigate("/signIn")}
+                onClick={handleProfileClick}
                 sx={{ color: "white", ml: 1 }}
               >
                 <AccountCircleIcon fontSize="large" />
               </IconButton>
             </Tooltip>
-          )}
+
+            <Menu
+              anchorEl={anchorEl}
+              open={openMenu}
+              onClose={handleMenuClose}
+              PaperProps={{
+                elevation: 3,
+                sx: {
+                  mt: 1.5,
+                  minWidth: 180,
+                  borderRadius: 2,
+                  "& .MuiMenuItem-root": {
+                    px: 2,
+                    py: 1.5,
+                    gap: 1.5,
+                  },
+                },
+              }}
+              transformOrigin={{ horizontal: "right", vertical: "top" }}
+              anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+            >
+              {!token && (
+                <Box>
+                  <MenuItem onClick={() => handleNavigateAndClose("/signIn")}>
+                    <ListItemIcon>
+                      <LoginIcon fontSize="small" />
+                    </ListItemIcon>
+                    <Typography variant="body2">Sign In</Typography>
+                  </MenuItem>
+                  <MenuItem onClick={() => handleNavigateAndClose("/signUp")}>
+                    <ListItemIcon>
+                      <PersonAddIcon fontSize="small" />
+                    </ListItemIcon>
+                    <Typography variant="body2">Sign Up</Typography>
+                  </MenuItem>
+                </Box>
+              )}
+
+              {token && (
+                <Box>
+                  {isAdmin ? (
+                    <Box>
+                      <MenuItem
+                        onClick={handleLogout}
+                        sx={{ color: "error.main" }}
+                      >
+                        <ListItemIcon>
+                          <LogoutIcon fontSize="small" color="error" />
+                        </ListItemIcon>
+                        <Typography variant="body2">Logout</Typography>
+                      </MenuItem>
+                    </Box>
+                  ) : (
+                    <Box>
+                      <MenuItem
+                        onClick={() => handleNavigateAndClose("/profile")}
+                      >
+                        <ListItemIcon>
+                          <PersonIcon fontSize="small" />
+                        </ListItemIcon>
+                        <Typography variant="body2">My Profile</Typography>
+                      </MenuItem>
+                      <MenuItem
+                        onClick={() =>
+                          handleNavigateAndClose("/account/orders")
+                        }
+                      >
+                        <ListItemIcon>
+                          <LocalShippingIcon fontSize="small" />
+                        </ListItemIcon>
+                        <Typography variant="body2">My Orders</Typography>
+                      </MenuItem>
+                      <Divider />
+                      <MenuItem
+                        onClick={handleLogout}
+                        sx={{ color: "error.main" }}
+                      >
+                        <ListItemIcon>
+                          <LogoutIcon fontSize="small" color="error" />
+                        </ListItemIcon>
+                        <Typography variant="body2">Logout</Typography>
+                      </MenuItem>
+                    </Box>
+                  )}
+                </Box>
+              )}
+            </Menu>
+          </Stack>
         </Stack>
       </Toolbar>
     </AppBar>

@@ -14,6 +14,9 @@ import {
   DialogContentText,
   DialogActions,
   Slide,
+  Avatar,
+  Container,
+  Grid,
 } from "@mui/material";
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -23,7 +26,9 @@ import EmailIcon from "@mui/icons-material/Email";
 import LockIcon from "@mui/icons-material/Lock";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
+import AppRegistrationIcon from "@mui/icons-material/AppRegistration";
 import { register } from "../../Actions/auth.actions";
+import { authConstants } from "../../Actions/constant";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -42,6 +47,13 @@ const SignUp = () => {
   const [localError, setLocalError] = useState("");
 
   const [openDialog, setOpenDialog] = useState(false);
+
+  useEffect(() => {
+    dispatch({
+      type: authConstants.LOGIN_FAILURE,
+      payload: { error: null },
+    });
+  }, [dispatch]);
 
   const handleInput = (setter) => (e) => {
     setter(e.target.value);
@@ -82,149 +94,215 @@ const SignUp = () => {
   return (
     <Box
       sx={{
-        pb: 5,
         minHeight: "100vh",
         display: "flex",
-        flexDirection: "column",
         alignItems: "center",
-        justifyContent: { xs: "flex-start" },
-        backgroundColor: "#f4f4f4",
+        justifyContent: "center",
+        background: "linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)",
+        py: 4,
       }}
     >
-      <Box
-        sx={{
-          fontSize: { xs: "24px", md: "30px" },
-          fontWeight: "600",
-          textAlign: "center",
-          backgroundColor: "#0f2a1d",
-          color: "white",
-          padding: { xs: "15px", md: "20px" },
-          mb: { xs: 2, md: 4 },
-          width: "100%",
-          boxShadow: 2,
-        }}
-      >
-        Sign Up Page
-      </Box>
-
-      <Paper
-        elevation={3}
-        sx={{
-          width: { xs: "90%", sm: "500px" },
-          p: { xs: 2, md: 4 },
-          borderRadius: "12px",
-          backgroundColor: "white",
-        }}
-      >
-        <Box
-          component="form"
-          onSubmit={handleRegistration}
+      <Container component="main" maxWidth="sm">
+        <Paper
+          elevation={6}
           sx={{
+            p: { xs: 3, md: 6 },
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            justifyContent: "center",
-            gap: 3,
+            borderRadius: "20px",
+            background: "rgba(255, 255, 255, 0.95)",
+            backdropFilter: "blur(10px)",
+            transition: "transform 0.3s ease-in-out",
+            "&:hover": {
+              boxShadow: "0 12px 40px rgba(0,0,0,0.12)",
+            },
           }}
         >
-          {(localError || (auth.error && !auth.loading)) && (
-            <Alert sx={{ width: "100%" }} severity="error">
-              {localError || auth.error}
-            </Alert>
-          )}
-
-          <TextField
-            label="Username"
-            fullWidth
-            value={username}
-            onChange={handleInput(setUsername)}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <PersonIcon color="action" />
-                </InputAdornment>
-              ),
-            }}
-          />
-
-          <TextField
-            label="Email"
-            type="email"
-            fullWidth
-            value={email}
-            onChange={handleInput(setEmail)}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <EmailIcon color="action" />
-                </InputAdornment>
-              ),
-            }}
-          />
-
-          <TextField
-            type={showPassword ? "text" : "password"}
-            label="Password"
-            fullWidth
-            value={password}
-            onChange={handleInput(setPassword)}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <LockIcon color="action" />
-                </InputAdornment>
-              ),
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton
-                    onClick={() => setShowPassword(!showPassword)}
-                    edge="end"
-                  >
-                    {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
-                  </IconButton>
-                </InputAdornment>
-              ),
-            }}
-          />
-
-          <Button
-            type="submit"
-            variant="contained"
-            disabled={auth.loading}
+          <Avatar
             sx={{
-              fontSize: 15,
-              backgroundColor: "#0f2a1d",
-              color: "white",
-              padding: "12px 40px",
-              marginTop: 2,
-              borderRadius: "30px",
-              width: { xs: "100%", sm: "50%" },
-              "&:hover": { backgroundColor: "#1a4d33" },
+              m: 1,
+              bgcolor: "#0f2a1d",
+              width: 56,
+              height: 56,
+              boxShadow: "0 4px 10px rgba(15, 42, 29, 0.3)",
             }}
           >
-            {auth.loading ? (
-              <CircularProgress size={24} color="inherit" />
-            ) : (
-              "Sign Up"
-            )}
-          </Button>
+            <AppRegistrationIcon fontSize="large" />
+          </Avatar>
 
-          <Typography variant="body2" sx={{ mt: 2, textAlign: "center" }}>
-            Already have an account?
-            <span
-              style={{
-                color: "#0f2a1d",
-                fontWeight: "bold",
-                cursor: "pointer",
-                marginLeft: "5px",
-              }}
-              onClick={() => navigate("/signin")}
-            >
-              Sign In
-            </span>
+          <Typography
+            component="h1"
+            variant="h4"
+            sx={{
+              fontFamily: '"Playfair Display", serif',
+              fontWeight: 700,
+              color: "#0f2a1d",
+              mb: 1,
+              textAlign: "center",
+            }}
+          >
+            Create Account
           </Typography>
-        </Box>
-      </Paper>
+
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 4 }}>
+            Join Scarlett Marque for exclusive collections
+          </Typography>
+
+          <Box
+            component="form"
+            onSubmit={handleRegistration}
+            sx={{
+              width: "100%",
+              mt: 1,
+              display: "flex",
+              flexDirection: "column",
+              gap: 2.5,
+            }}
+          >
+            {(localError || (auth.error && !auth.loading)) && (
+              <Slide direction="down" in={true} mountOnEnter unmountOnExit>
+                <Alert
+                  severity="error"
+                  sx={{ width: "100%", borderRadius: "10px" }}
+                >
+                  {localError || auth.error}
+                </Alert>
+              </Slide>
+            )}
+
+            <TextField
+              label="Username"
+              fullWidth
+              variant="outlined"
+              value={username}
+              onChange={handleInput(setUsername)}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <PersonIcon sx={{ color: "#0f2a1d" }} />
+                  </InputAdornment>
+                ),
+                sx: { borderRadius: "12px" },
+              }}
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  "&.Mui-focused fieldset": { borderColor: "#0f2a1d" },
+                },
+                "& .MuiInputLabel-root.Mui-focused": { color: "#0f2a1d" },
+              }}
+            />
+
+            <TextField
+              label="Email Address"
+              type="email"
+              fullWidth
+              variant="outlined"
+              value={email}
+              onChange={handleInput(setEmail)}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <EmailIcon sx={{ color: "#0f2a1d" }} />
+                  </InputAdornment>
+                ),
+                sx: { borderRadius: "12px" },
+              }}
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  "&.Mui-focused fieldset": { borderColor: "#0f2a1d" },
+                },
+                "& .MuiInputLabel-root.Mui-focused": { color: "#0f2a1d" },
+              }}
+            />
+
+            <TextField
+              type={showPassword ? "text" : "password"}
+              label="Password"
+              fullWidth
+              variant="outlined"
+              value={password}
+              onChange={handleInput(setPassword)}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <LockIcon sx={{ color: "#0f2a1d" }} />
+                  </InputAdornment>
+                ),
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={() => setShowPassword(!showPassword)}
+                      edge="end"
+                    >
+                      {showPassword ? (
+                        <VisibilityOffIcon />
+                      ) : (
+                        <VisibilityIcon />
+                      )}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+                sx: { borderRadius: "12px" },
+              }}
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  "&.Mui-focused fieldset": { borderColor: "#0f2a1d" },
+                },
+                "& .MuiInputLabel-root.Mui-focused": { color: "#0f2a1d" },
+              }}
+            />
+
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              disabled={auth.loading}
+              sx={{
+                mt: 2,
+                mb: 2,
+                py: 1.5,
+                fontSize: "1rem",
+                fontWeight: 600,
+                backgroundColor: "#0f2a1d",
+                borderRadius: "30px",
+                textTransform: "none",
+                boxShadow: "0 4px 12px rgba(15, 42, 29, 0.2)",
+                "&:hover": {
+                  backgroundColor: "#1a4d33",
+                  boxShadow: "0 6px 16px rgba(15, 42, 29, 0.3)",
+                },
+              }}
+            >
+              {auth.loading ? (
+                <CircularProgress size={24} color="inherit" />
+              ) : (
+                "Create Account"
+              )}
+            </Button>
+
+            <Grid container justifyContent="center">
+              <Grid item>
+                <Typography variant="body2" sx={{ color: "text.secondary" }}>
+                  Already have an account?{" "}
+                  <span
+                    style={{
+                      color: "#0f2a1d",
+                      fontWeight: "bold",
+                      cursor: "pointer",
+                      textDecoration: "underline",
+                      textUnderlineOffset: "3px",
+                    }}
+                    onClick={() => navigate("/signIn")}
+                  >
+                    Log In
+                  </span>
+                </Typography>
+              </Grid>
+            </Grid>
+          </Box>
+        </Paper>
+      </Container>
 
       <Dialog
         open={openDialog}
@@ -238,6 +316,7 @@ const SignUp = () => {
             p: 2,
             minWidth: { xs: "300px", sm: "400px" },
             textAlign: "center",
+            boxShadow: "0 10px 30px rgba(0,0,0,0.2)",
           },
         }}
       >
@@ -247,6 +326,7 @@ const SignUp = () => {
             fontSize: "1.8rem",
             color: "#0f2a1d",
             fontWeight: "bold",
+            pb: 1,
           }}
         >
           Welcome Aboard!
@@ -254,21 +334,24 @@ const SignUp = () => {
         <DialogContent>
           <DialogContentText
             id="welcome-dialog-description"
-            sx={{ fontSize: "1.1rem", color: "#555" }}
+            sx={{ fontSize: "1.05rem", color: "#555", lineHeight: 1.6 }}
           >
             Welcome to <strong>Scarlett Marque</strong>.<br />
             We are thrilled to have you! Enjoy shopping our exclusive
             collections.
           </DialogContentText>
         </DialogContent>
-        <DialogActions sx={{ justifyContent: "center", pb: 2 }}>
+        <DialogActions sx={{ justifyContent: "center", pb: 3, pt: 1 }}>
           <Button
             onClick={handleCloseAndNavigate}
             variant="contained"
             sx={{
               backgroundColor: "#0f2a1d",
               borderRadius: "20px",
-              px: 4,
+              px: 5,
+              py: 1,
+              textTransform: "none",
+              fontSize: "1rem",
               "&:hover": { backgroundColor: "#1a4d33" },
             }}
           >

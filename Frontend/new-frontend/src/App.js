@@ -24,6 +24,7 @@ import OtpVerification from "./Container/OTPpage";
 import ForgotPassword from "./Passwords/ForgotPassword";
 import ResetPassword from "./Passwords/ResetPassword";
 import MobileFooter from "./Container/MobileFooter"; 
+import ProfilePage from "./Container/ProfilePage/ProfilePage";
 
 function App() {
   return (
@@ -51,6 +52,7 @@ function App() {
               <Route path="/manageAddress" element={<ManageAddressPage />} />
               <Route path="/place-order" element={<PlaceOrderPage />} />
               <Route path="/order/:id" element={<OrderPage />} />
+              <Route path="/profile" element={<ProfilePage />} />
               <Route
                 path="/account/orders/track-order/:id"
                 element={<TrackOrderPage />}
