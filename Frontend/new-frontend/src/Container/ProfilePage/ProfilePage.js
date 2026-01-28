@@ -12,8 +12,6 @@ import {
   Chip,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
-
 import LogoutIcon from "@mui/icons-material/Logout";
 import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
 import EmailIcon from "@mui/icons-material/Email";
@@ -67,7 +65,7 @@ const ProfilePage = () => {
           My Account
         </Typography>
 
-        <Grid container spacing={4} sx={{justifyContent: "center"}}>
+        <Grid container spacing={4} sx={{ justifyContent: "center" }}>
           <Grid item xs={12} md={4} lg={3}>
             <Paper
               elevation={0}
