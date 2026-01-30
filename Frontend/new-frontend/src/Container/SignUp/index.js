@@ -61,7 +61,11 @@ const SignUp = () => {
   };
 
   useEffect(() => {
-    if (!auth.loading && auth.message && !auth.error) {
+    if (
+      !auth.loading &&
+      auth.message === "Registration Successful" &&
+      !auth.error
+    ) {
       setOpenDialog(true);
     }
   }, [auth.loading, auth.message, auth.error]);
@@ -304,6 +308,7 @@ const SignUp = () => {
         </Paper>
       </Container>
 
+      {/* Success Dialog */}
       <Dialog
         open={openDialog}
         TransitionComponent={Transition}
