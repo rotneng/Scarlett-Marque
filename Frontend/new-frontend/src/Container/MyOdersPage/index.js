@@ -78,7 +78,7 @@ const MyOrdersPage = () => {
       <Container maxWidth="lg" sx={{ py: 6, minHeight: "85vh" }}>
         <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 5 }}>
           <IconButton
-            onClick={() => navigate("/")}
+            onClick={() => navigate(-1)}
             sx={{
               bgcolor: "#fff",
               boxShadow: 1,

@@ -15,6 +15,7 @@ import {
   MenuItem,
   Divider,
   ListItemIcon,
+  Avatar,
 } from "@mui/material";
 
 import SearchIcon from "@mui/icons-material/Search";
@@ -68,11 +69,15 @@ const Header = ({ searchTerm = "", setSearchTerm }) => {
 
   const handleLogout = () => {
     handleMenuClose();
-
     dispatch(logout());
-
     localStorage.clear();
     navigate("/");
+  };
+
+  // Helper to get initials
+  const getInitials = (name) => {
+    if (!name) return "";
+    return name.charAt(0).toUpperCase();
   };
 
   const navButtonStyle = {
@@ -197,6 +202,7 @@ const Header = ({ searchTerm = "", setSearchTerm }) => {
           <Box
             sx={{ display: { xs: "none", md: "flex" }, alignItems: "center" }}
           >
+            {/* Show About ONLY if NOT admin */}
             {!isAdmin && (
               <Button
                 onClick={() => navigate("/about")}
@@ -207,37 +213,19 @@ const Header = ({ searchTerm = "", setSearchTerm }) => {
               </Button>
             )}
 
-            {isAdmin ? (
-              <>
-                <Button
-                  onClick={() => navigate("/admin/orders")}
-                  startIcon={<ListAltIcon />}
-                  sx={navButtonStyle}
-                >
-                  <span style={labelStyle}>Orders</span>
-                </Button>
-                <Button
-                  onClick={() => navigate("/addproducts")}
-                  startIcon={<AddIcon />}
-                  sx={navButtonStyle}
-                >
-                  <span style={labelStyle}>Add Products</span>
-                </Button>
-              </>
-            ) : (
-              <>
-                <Button
-                  onClick={() => navigate("/cart")}
-                  sx={navButtonStyle}
-                  startIcon={
-                    <Badge badgeContent={cartItems.length} color="warning">
-                      <ShoppingCartIcon />
-                    </Badge>
-                  }
-                >
-                  <span style={labelStyle}>Cart</span>
-                </Button>
-              </>
+            {/* Show Cart ONLY if NOT admin */}
+            {!isAdmin && (
+              <Button
+                onClick={() => navigate("/cart")}
+                sx={navButtonStyle}
+                startIcon={
+                  <Badge badgeContent={cartItems.length} color="warning">
+                    <ShoppingCartIcon />
+                  </Badge>
+                }
+              >
+                <span style={labelStyle}>Cart</span>
+              </Button>
             )}
           </Box>
 
@@ -254,29 +242,28 @@ const Header = ({ searchTerm = "", setSearchTerm }) => {
               pl: { xs: 0, md: 1 },
             }}
           >
-            {token && (
-              <Typography
-                variant="body2"
-                sx={{
-                  display: { xs: "none", md: "block" },
-                  opacity: 0.9,
-                  color: "white",
-                  maxWidth: "100px",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                {user?.username}
-              </Typography>
-            )}
-
             <Tooltip title={token ? "Account Settings" : "Sign In / Sign Up"}>
               <IconButton
                 onClick={handleProfileClick}
-                sx={{ color: "white", ml: 1 }}
+                sx={{ ml: 1, p: 0.5 }}
               >
-                <AccountCircleIcon fontSize="large" />
+                {token && user ? (
+                  <Avatar
+                    sx={{
+                      bgcolor: "white",
+                      color: PRIMARY_COLOR,
+                      width: 35,
+                      height: 35,
+                      fontSize: "1rem",
+                      fontWeight: "bold",
+                      border: "1px solid rgba(255,255,255,0.2)",
+                    }}
+                  >
+                    {getInitials(user.username)}
+                  </Avatar>
+                ) : (
+                  <AccountCircleIcon fontSize="large" sx={{ color: "white" }} />
+                )}
               </IconButton>
             </Tooltip>
 
@@ -300,6 +287,7 @@ const Header = ({ searchTerm = "", setSearchTerm }) => {
               transformOrigin={{ horizontal: "right", vertical: "top" }}
               anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
             >
+              {/* --- LOGGED OUT STATE --- */}
               {!token && (
                 <MenuItem onClick={() => handleNavigateAndClose("/signIn")}>
                   <ListItemIcon>
@@ -318,6 +306,7 @@ const Header = ({ searchTerm = "", setSearchTerm }) => {
                 </MenuItem>
               )}
 
+              {/* --- REGULAR USER STATE --- */}
               {token && !isAdmin && (
                 <MenuItem onClick={() => handleNavigateAndClose("/profile")}>
                   <ListItemIcon>
@@ -338,8 +327,32 @@ const Header = ({ searchTerm = "", setSearchTerm }) => {
                 </MenuItem>
               )}
 
-              {token && !isAdmin && <Divider />}
+              {/* --- ADMIN STATE --- */}
+              {token && isAdmin && (
+                <MenuItem
+                  onClick={() => handleNavigateAndClose("/admin/orders")}
+                >
+                  <ListItemIcon>
+                    <ListAltIcon fontSize="small" />
+                  </ListItemIcon>
+                  <Typography variant="body2">Admin Orders</Typography>
+                </MenuItem>
+              )}
 
+              {token && isAdmin && (
+                <MenuItem
+                  onClick={() => handleNavigateAndClose("/addproducts")}
+                >
+                  <ListItemIcon>
+                    <AddIcon fontSize="small" />
+                  </ListItemIcon>
+                  <Typography variant="body2">Add Products</Typography>
+                </MenuItem>
+              )}
+
+              {token && <Divider />}
+
+              {/* --- LOGOUT --- */}
               {token && (
                 <MenuItem onClick={handleLogout} sx={{ color: "error.main" }}>
                   <ListItemIcon>

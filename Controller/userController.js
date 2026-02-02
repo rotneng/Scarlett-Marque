@@ -23,6 +23,7 @@ exports.registerUser = async (req, res) => {
       role,
     });
 
+    // Uncomment this block if you want to enable OTP sending upon registration
     // try {
     //   const otp = Math.floor(100000 + Math.random() * 900000);
     //   const token = new Token({ email, token: otp });
@@ -71,11 +72,14 @@ exports.loginUser = async (req, res) => {
       { expiresIn: "1h" }
     );
 
+    // UPDATED: Now returning email and _id in the response
     return res.status(200).json({
       message: "Login successful",
       token,
+      _id: user._id,
       role: user.role,
       username: user.username,
+      email: user.email,
     });
   } catch (error) {
     console.log("Error in login:", error);
@@ -118,6 +122,7 @@ exports.verifyEmail = async (req, res) => {
         username: user.username,
         role: user.role,
         email: user.email,
+        _id: user._id,
       },
     });
   } catch (error) {
