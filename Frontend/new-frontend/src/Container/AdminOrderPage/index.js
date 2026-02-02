@@ -330,21 +330,21 @@ const AdminOrdersPage = () => {
                 title: "Total Orders",
                 value: stats.total,
                 icon: <ShoppingBagIcon />,
-                color: "#1976d2", 
+                color: "#1976d2",
                 bg: "#e3f2fd",
               },
               {
                 title: "Total Revenue",
                 value: `₦${stats.revenue.toLocaleString()}`,
                 icon: <AttachMoneyIcon />,
-                color: "#2e7d32", 
+                color: "#2e7d32",
                 bg: "#e8f5e9",
               },
               {
                 title: "Active Issues",
                 value: stats.issues,
                 icon: <ReportProblemIcon />,
-                color: "#d32f2f", 
+                color: "#d32f2f",
                 bg: "#ffebee",
               },
             ].map((stat, index) => (
@@ -365,22 +365,10 @@ const AdminOrdersPage = () => {
                   <CardContent sx={{ p: 3 }}>
                     <Stack
                       direction="row"
-                      justifyContent="space-between"
-                      alignItems="flex-start"
+                      alignItems="center"
+                      spacing={2}
                       mb={2}
                     >
-                      <Typography
-                        variant="subtitle2"
-                        fontWeight="700"
-                        color="text.secondary"
-                        sx={{
-                          textTransform: "uppercase",
-                          letterSpacing: "1px",
-                        }}
-                      >
-                        {stat.title}
-                      </Typography>
-
                       <Avatar
                         variant="rounded"
                         sx={{
@@ -393,6 +381,18 @@ const AdminOrdersPage = () => {
                       >
                         {stat.icon}
                       </Avatar>
+
+                      <Typography
+                        variant="subtitle2"
+                        fontWeight="700"
+                        color="text.secondary"
+                        sx={{
+                          textTransform: "uppercase",
+                          letterSpacing: "1px",
+                        }}
+                      >
+                        {stat.title}
+                      </Typography>
                     </Stack>
 
                     <Typography
@@ -402,6 +402,7 @@ const AdminOrdersPage = () => {
                         color: "#0f2a1d",
                         fontFamily:
                           "'Roboto', 'Helvetica', 'Arial', sans-serif",
+                        ml: 0.5,
                       }}
                     >
                       {stat.value}
@@ -410,7 +411,7 @@ const AdminOrdersPage = () => {
                     <Typography
                       variant="caption"
                       color="text.secondary"
-                      sx={{ mt: 1, display: "block" }}
+                      sx={{ mt: 1, display: "block", ml: 0.5 }}
                     >
                       {index === 0
                         ? "All time orders"

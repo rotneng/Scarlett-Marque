@@ -98,7 +98,7 @@ const MyOrdersPage = () => {
         </Stack>
 
         {orders && orders.length > 0 ? (
-          <Grid container spacing={3}>
+          <Grid container spacing={2} sx={{ justifyContent: "center" }}>
             {orders.map((order) => (
               <Grid item xs={12} md={6} lg={4} key={order._id}>
                 <Card
@@ -114,7 +114,7 @@ const MyOrdersPage = () => {
                     },
                   }}
                 >
-                  <CardContent sx={{ p: 3 }}>
+                  <CardContent sx={{ p: 2 }}>
                     <Box
                       sx={{
                         display: "flex",
@@ -170,7 +170,7 @@ const MyOrdersPage = () => {
                                 year: "numeric",
                                 month: "short",
                                 day: "numeric",
-                              }
+                              },
                             )
                           : "Date N/A"}
                       </Typography>
