@@ -226,15 +226,6 @@ const Header = ({ searchTerm = "", setSearchTerm }) => {
               </>
             ) : (
               <>
-                {token && (
-                  <Button
-                    onClick={() => navigate("/account/orders")}
-                    startIcon={<LocalShippingIcon />}
-                    sx={navButtonStyle}
-                  >
-                    <span style={labelStyle}>Orders</span>
-                  </Button>
-                )}
                 <Button
                   onClick={() => navigate("/cart")}
                   sx={navButtonStyle}

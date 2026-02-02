@@ -57,7 +57,7 @@ const ManageAddressPage = () => {
   };
 
   const handleSelectAddress = (address) => {
-    navigate("/checkout", { state: { selectedAddress: address } });
+    navigate( -1, { state: { selectedAddress: address } });
   };
 
   return (
@@ -73,7 +73,7 @@ const ManageAddressPage = () => {
         <Box sx={{ mb: 4 }}>
           <Button
             startIcon={<ArrowBackIcon />}
-            onClick={() => navigate("/checkout")}
+            onClick={() => navigate(-1)}
             sx={{
               mb: 2,
               color: "#555",
@@ -82,7 +82,7 @@ const ManageAddressPage = () => {
               "&:hover": { backgroundColor: "transparent", color: "#0f2a1d" },
             }}
           >
-            Return to Checkout
+           Back
           </Button>
 
           <Stack
