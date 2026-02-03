@@ -47,13 +47,20 @@ const orderSchema = mongoose.Schema(
       type: String,
       required: true,
       default: "ordered",
-      enum: ["ordered", "packed", "shipped", "delivered", "issue_reported"],
+      enum: [
+        "ordered",
+        "packed",
+        "shipped",
+        "delivered",
+        "issue_reported",
+        "cancelled",
+      ],
     },
 
     isDelivered: { type: Boolean, required: true, default: false },
     deliveredAt: { type: Date },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 module.exports = mongoose.model("Order", orderSchema);

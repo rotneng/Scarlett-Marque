@@ -46,7 +46,7 @@ const addOrderItems = async (req, res) => {
     for (const item of orderItems) {
       await Product.updateOne(
         { _id: item.product },
-        { $inc: { stock: -Number(item.qty) } }
+        { $inc: { stock: -Number(item.qty) } },
       );
     }
 
@@ -61,7 +61,7 @@ const getOrderById = async (req, res) => {
   try {
     const order = await Order.findById(req.params.id).populate(
       "user",
-      "firstName lastName email username"
+      "firstName lastName email username",
     );
 
     if (!order) {
@@ -247,6 +247,45 @@ const updateOrderToDelivered = async (req, res) => {
   }
 };
 
+const cancelOrder = async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id);
+
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+    const currentUserId = req.user.userId || req.user._id;
+
+    if (order.user.toString() !== currentUserId.toString()) {
+      return res
+        .status(403)
+        .json({ message: "Access denied. You do not own this order." });
+    }
+
+    if (order.orderStatus !== "ordered" && order.orderStatus !== "packed") {
+      return res.status(400).json({
+        message:
+          "Order cannot be cancelled. It has already been shipped or delivered.",
+      });
+    }
+
+    for (const item of order.orderItems) {
+      await Product.updateOne(
+        { _id: item.product },
+        { $inc: { stock: Number(item.qty) } },
+      );
+    }
+
+    order.orderStatus = "cancelled";
+    const updatedOrder = await order.save();
+
+    res.json({ message: "Order cancelled successfully", order: updatedOrder });
+  } catch (error) {
+    console.log("Cancel Order Error:", error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   addOrderItems,
   getOrderById,
@@ -257,4 +296,5 @@ module.exports = {
   updateOrderStatus,
   userConfirmDelivery,
   reportOrderIssue,
+  cancelOrder,
 };

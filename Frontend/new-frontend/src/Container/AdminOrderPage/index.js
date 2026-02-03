@@ -25,6 +25,8 @@ import {
   Divider,
   useTheme,
   useMediaQuery,
+  IconButton,
+  Tooltip,
 } from "@mui/material";
 
 import ReportProblemIcon from "@mui/icons-material/ReportProblem";
@@ -35,18 +37,347 @@ import PersonIcon from "@mui/icons-material/Person";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import FilterListIcon from "@mui/icons-material/FilterList";
+import CancelIcon from "@mui/icons-material/Cancel";
 import Header from "../header";
 
 const PRIMARY_COLOR = "#0f2a1d";
 const BG_COLOR = "#f4f6f8";
+
+const STATUS_CONFIG = {
+  ordered: { bg: "#e3f2fd", color: "#1565c0", text: "Ordered", icon: null },
+  packed: { bg: "#f3e5f5", color: "#7b1fa2", text: "Packed", icon: null },
+  shipped: {
+    bg: "#fff3e0",
+    color: "#e65100",
+    text: "Shipped",
+    icon: LocalShippingIcon,
+  },
+  delivered: {
+    bg: "#e8f5e9",
+    color: "#2e7d32",
+    text: "Delivered",
+    icon: CheckCircleIcon,
+  },
+  issue_reported: {
+    bg: "#fff8e1",
+    color: "#f57c00",
+    text: "Issue",
+    icon: ReportProblemIcon,
+  },
+  cancelled: {
+    bg: "#ffebee",
+    color: "#c62828",
+    text: "Cancelled",
+    icon: CancelIcon,
+  },
+  default: { bg: "#f5f5f5", color: "#616161", text: "Unknown", icon: null },
+};
+
+const getStatusStyle = (status) =>
+  STATUS_CONFIG[status] || STATUS_CONFIG.default;
+
+const formatCurrency = (amount) => {
+  return new Intl.NumberFormat("en-NG", {
+    style: "currency",
+    currency: "NGN",
+    minimumFractionDigits: 0,
+  }).format(amount || 0);
+};
+
+const formatDate = (dateString) => {
+  if (!dateString) return "N/A";
+  return new Date(dateString).toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+};
+
+const RenderPaymentStatus = ({ order }) => {
+  if (order.isPaid) {
+    return (
+      <Chip
+        label="PAID"
+        color="success"
+        size="small"
+        variant="filled"
+        sx={{ fontWeight: 700, borderRadius: "6px", minWidth: 60 }}
+      />
+    );
+  }
+  const method = order.paymentMethod?.toLowerCase();
+  if (method === "cod" || method === "pay on delivery") {
+    return (
+      <Chip
+        label="COD"
+        color="warning"
+        size="small"
+        variant="outlined"
+        sx={{ fontWeight: 700, borderRadius: "6px", minWidth: 60 }}
+      />
+    );
+  }
+  return (
+    <Chip
+      label="UNPAID"
+      color="error"
+      size="small"
+      variant="outlined"
+      sx={{ fontWeight: 700, borderRadius: "6px", minWidth: 60 }}
+    />
+  );
+};
+
+const RenderOrderStatusBadge = ({ status }) => {
+  const style = getStatusStyle(status);
+  const Icon = style.icon;
+  return (
+    <Box
+      sx={{
+        display: "inline-flex",
+        alignItems: "center",
+        px: 1.5,
+        py: 0.5,
+        borderRadius: "20px",
+        bgcolor: style.bg,
+        color: style.color,
+        fontSize: "0.75rem",
+        fontWeight: 700,
+        textTransform: "uppercase",
+        border: `1px solid ${style.bg}`,
+        whiteSpace: "nowrap",
+      }}
+    >
+      {Icon && <Icon sx={{ fontSize: 14, mr: 0.5 }} />}
+      {style.text}
+    </Box>
+  );
+};
+
+const EmptyState = () => (
+  <Box py={8} display="flex" flexDirection="column" alignItems="center">
+    <LocalShippingIcon sx={{ fontSize: 60, color: "#e0e0e0", mb: 2 }} />
+    <Typography variant="h6" color="text.secondary" fontWeight="bold">
+      No Orders Found
+    </Typography>
+    <Typography variant="body2" color="text.secondary">
+      When customers place orders, they will appear here.
+    </Typography>
+  </Box>
+);
+
+const MobileOrderCard = ({ order, onStatusChange }) => {
+  const isIssue = order.orderStatus === "issue_reported";
+  const isCancelled = order.orderStatus === "cancelled";
+  const statusStyle = getStatusStyle(order.orderStatus);
+
+  return (
+    <Paper
+      elevation={0}
+      sx={{
+        mb: 2,
+        p: 2,
+        borderRadius: 3,
+        border: isIssue
+          ? "1px solid #ffb74d"
+          : isCancelled
+            ? "1px solid #ef5350"
+            : "1px solid #e0e0e0",
+        bgcolor: isCancelled ? "#fafafa" : "white",
+        position: "relative",
+        overflow: "hidden",
+        opacity: isCancelled ? 0.8 : 1,
+      }}
+    >
+      <Box
+        sx={{
+          position: "absolute",
+          left: 0,
+          top: 0,
+          bottom: 0,
+          width: "6px",
+          bgcolor: statusStyle.color,
+        }}
+      />
+
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="flex-start"
+        mb={2}
+        pl={1.5}
+      >
+        <Box>
+          <Typography
+            variant="caption"
+            color="text.secondary"
+            display="block"
+            gutterBottom
+          >
+            Order ID
+          </Typography>
+          <Typography
+            variant="subtitle1"
+            fontWeight="bold"
+            fontFamily="monospace"
+            sx={{
+              letterSpacing: 1,
+              textDecoration: isCancelled ? "line-through" : "none",
+            }}
+          >
+            #{order._id.substring(0, 8)}
+          </Typography>
+        </Box>
+        <Box textAlign="right">
+          <Typography
+            variant="caption"
+            color="text.secondary"
+            display="block"
+            gutterBottom
+          >
+            Total Amount
+          </Typography>
+          <Typography variant="h6" fontWeight="800" color={PRIMARY_COLOR}>
+            {formatCurrency(order.totalAmount || order.totalPrice)}
+          </Typography>
+        </Box>
+      </Box>
+
+      <Divider sx={{ mb: 2, borderStyle: "dashed" }} />
+
+      <Stack direction="row" spacing={2} alignItems="center" mb={2} pl={1.5}>
+        <Avatar
+          sx={{
+            bgcolor: isCancelled ? "#ffebee" : "#e0f2f1",
+            color: isCancelled ? "error.main" : PRIMARY_COLOR,
+          }}
+        >
+          <PersonIcon />
+        </Avatar>
+        <Box>
+          <Typography variant="subtitle2" fontWeight="bold">
+            {order.user?.username || order.user?.firstName || "Guest User"}
+          </Typography>
+          <Typography variant="caption" color="text.secondary">
+            {formatDate(order.createdAt)} • {order.paymentMethod}
+          </Typography>
+        </Box>
+      </Stack>
+
+      <Box
+        bgcolor="#f9fafb"
+        mx={-2}
+        mb={-2}
+        p={2}
+        borderTop="1px solid #f0f0f0"
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+      >
+        <RenderOrderStatusBadge status={order.orderStatus} />
+
+        <FormControl size="small" sx={{ minWidth: 120 }}>
+          <Select
+            value={order.orderStatus}
+            onChange={(e) => onStatusChange(order._id, e.target.value)}
+            disabled={isCancelled}
+            variant="standard"
+            disableUnderline
+            sx={{
+              fontSize: "0.85rem",
+              fontWeight: 600,
+              color: "text.primary",
+              "& .MuiSelect-select": { py: 0.5, pr: 2 },
+            }}
+            IconComponent={(props) => (
+              <ArrowForwardIosIcon {...props} style={{ fontSize: 12 }} />
+            )}
+          >
+            <MenuItem value="ordered">Ordered</MenuItem>
+            <MenuItem value="packed">Packed</MenuItem>
+            <MenuItem value="shipped">Shipped</MenuItem>
+            <MenuItem value="delivered">Delivered</MenuItem>
+            <MenuItem value="cancelled" sx={{ display: "none" }}>
+              Cancelled
+            </MenuItem>
+          </Select>
+        </FormControl>
+      </Box>
+    </Paper>
+  );
+};
+
+const StatCard = ({ title, value, icon, color, bg, subtitle }) => (
+  <Card
+    elevation={0}
+    sx={{
+      borderRadius: "16px",
+      border: "none",
+      boxShadow: "0px 10px 30px rgba(0,0,0,0.04)",
+      height: "100%",
+      transition: "transform 0.2s ease-in-out",
+      "&:hover": {
+        transform: "translateY(-4px)",
+        boxShadow: "0px 15px 35px rgba(0,0,0,0.06)",
+      },
+    }}
+  >
+    <CardContent sx={{ p: 3 }}>
+      <Stack direction="row" alignItems="center" spacing={2} mb={2}>
+        <Avatar
+          variant="rounded"
+          sx={{
+            bgcolor: bg,
+            color: color,
+            width: 48,
+            height: 48,
+            borderRadius: "12px",
+          }}
+        >
+          {icon}
+        </Avatar>
+        <Typography
+          variant="subtitle2"
+          fontWeight="700"
+          color="text.secondary"
+          sx={{ textTransform: "uppercase", letterSpacing: "1px" }}
+        >
+          {title}
+        </Typography>
+      </Stack>
+
+      <Typography
+        variant="h4"
+        fontWeight="800"
+        sx={{
+          color: "#0f2a1d",
+          fontFamily: "'Roboto', sans-serif",
+          ml: 0.5,
+        }}
+      >
+        {value}
+      </Typography>
+
+      <Typography
+        variant="caption"
+        color="text.secondary"
+        sx={{ mt: 1, display: "block", ml: 0.5 }}
+      >
+        {subtitle}
+      </Typography>
+    </CardContent>
+  </Card>
+);
 
 const AdminOrdersPage = () => {
   const dispatch = useDispatch();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
-  const orderList = useSelector((state) => state.orderList || {});
-  const { orders, loading } = orderList;
+  const { orders = [], loading } = useSelector(
+    (state) => state.orderList || {},
+  );
 
   useEffect(() => {
     dispatch(getAllOrders());
@@ -61,234 +392,17 @@ const AdminOrdersPage = () => {
   };
 
   const stats = useMemo(() => {
-    if (!orders) return { total: 0, revenue: 0, issues: 0 };
+    if (!orders || orders.length === 0)
+      return { total: 0, revenue: 0, issues: 0 };
     return {
       total: orders.length,
-      revenue: orders.reduce(
-        (acc, order) => acc + (order.totalAmount || order.totalPrice || 0),
-        0,
-      ),
+      revenue: orders.reduce((acc, order) => {
+        if (order.orderStatus === "cancelled") return acc;
+        return acc + (order.totalAmount || order.totalPrice || 0);
+      }, 0),
       issues: orders.filter((o) => o.orderStatus === "issue_reported").length,
     };
   }, [orders]);
-
-  const renderPaymentStatus = (order) => {
-    if (order.isPaid) {
-      return (
-        <Chip
-          label="PAID"
-          color="success"
-          size="small"
-          variant="filled"
-          sx={{ fontWeight: 700, borderRadius: "6px" }}
-        />
-      );
-    }
-    if (
-      order.paymentMethod === "COD" ||
-      order.paymentMethod === "Pay on Delivery"
-    ) {
-      return (
-        <Chip
-          label="COD"
-          color="warning"
-          size="small"
-          variant="outlined"
-          sx={{ fontWeight: 700, borderRadius: "6px" }}
-        />
-      );
-    }
-    return (
-      <Chip
-        label="UNPAID"
-        color="error"
-        size="small"
-        variant="outlined"
-        sx={{ fontWeight: 700, borderRadius: "6px" }}
-      />
-    );
-  };
-
-  const getStatusColor = (status) => {
-    switch (status) {
-      case "ordered":
-        return { bg: "#e3f2fd", color: "#1565c0", text: "Ordered" };
-      case "packed":
-        return { bg: "#f3e5f5", color: "#7b1fa2", text: "Packed" };
-      case "shipped":
-        return { bg: "#fff3e0", color: "#e65100", text: "Shipped" };
-      case "delivered":
-        return { bg: "#e8f5e9", color: "#2e7d32", text: "Delivered" };
-      case "issue_reported":
-        return { bg: "#ffebee", color: "#c62828", text: "Issue" };
-      default:
-        return { bg: "#f5f5f5", color: "#616161", text: status };
-    }
-  };
-
-  const renderOrderStatusBadge = (status) => {
-    const style = getStatusColor(status);
-    return (
-      <Box
-        sx={{
-          display: "inline-flex",
-          alignItems: "center",
-          px: 1.5,
-          py: 0.5,
-          borderRadius: "20px",
-          bgcolor: style.bg,
-          color: style.color,
-          fontSize: "0.75rem",
-          fontWeight: 700,
-          textTransform: "uppercase",
-          border: `1px solid ${style.bg}`,
-        }}
-      >
-        {status === "issue_reported" && (
-          <ReportProblemIcon sx={{ fontSize: 14, mr: 0.5 }} />
-        )}
-        {status === "delivered" && (
-          <CheckCircleIcon sx={{ fontSize: 14, mr: 0.5 }} />
-        )}
-        {status === "shipped" && (
-          <LocalShippingIcon sx={{ fontSize: 14, mr: 0.5 }} />
-        )}
-        {style.text}
-      </Box>
-    );
-  };
-
-  const MobileOrderCard = ({ order }) => {
-    const isIssue = order.orderStatus === "issue_reported";
-    const statusStyle = getStatusColor(order.orderStatus);
-
-    return (
-      <Paper
-        elevation={0}
-        sx={{
-          mb: 2,
-          p: 2,
-          borderRadius: 3,
-          border: isIssue ? "1px solid #ef5350" : "1px solid #e0e0e0",
-          bgcolor: "white",
-          position: "relative",
-          overflow: "hidden",
-        }}
-      >
-        <Box
-          sx={{
-            position: "absolute",
-            left: 0,
-            top: 0,
-            bottom: 0,
-            width: "6px",
-            bgcolor: statusStyle.color,
-          }}
-        />
-
-        <Box
-          display="flex"
-          justifyContent="space-between"
-          alignItems="center"
-          mb={2}
-          pl={1}
-        >
-          <Box>
-            <Typography
-              variant="caption"
-              color="text.secondary"
-              display="block"
-            >
-              Order ID
-            </Typography>
-            <Typography
-              variant="subtitle1"
-              fontWeight="bold"
-              fontFamily="monospace"
-            >
-              #{order._id.substring(0, 8)}
-            </Typography>
-          </Box>
-          <Box textAlign="right">
-            <Typography
-              variant="caption"
-              color="text.secondary"
-              display="block"
-            >
-              Total Amount
-            </Typography>
-            <Typography variant="h6" fontWeight="800" color={PRIMARY_COLOR}>
-              ₦{(order.totalAmount || order.totalPrice).toLocaleString()}
-            </Typography>
-          </Box>
-        </Box>
-
-        <Divider sx={{ mb: 2, borderStyle: "dashed" }} />
-
-        <Stack direction="row" spacing={2} alignItems="center" mb={2} pl={1}>
-          <Avatar
-            sx={{
-              bgcolor: isIssue ? "#ffebee" : "#e0f2f1",
-              color: isIssue ? "error.main" : PRIMARY_COLOR,
-            }}
-          >
-            <PersonIcon />
-          </Avatar>
-          <Box>
-            <Typography variant="subtitle2" fontWeight="bold">
-              {order.user?.username || order.user?.firstName || "Guest User"}
-            </Typography>
-            <Typography variant="caption" color="text.secondary">
-              {new Date(order.createdAt).toLocaleDateString(undefined, {
-                year: "numeric",
-                month: "short",
-                day: "numeric",
-              })}
-            </Typography>
-          </Box>
-        </Stack>
-
-        <Box
-          bgcolor="#f9fafb"
-          mx={-2}
-          mb={-2}
-          p={2}
-          borderTop="1px solid #f0f0f0"
-        >
-          <Stack
-            direction="row"
-            justifyContent="space-between"
-            alignItems="center"
-          >
-            {renderOrderStatusBadge(order.orderStatus)}
-
-            <FormControl size="small" sx={{ minWidth: 120 }}>
-              <Select
-                value={order.orderStatus}
-                onChange={(e) => onStatusChange(order._id, e.target.value)}
-                variant="standard"
-                disableUnderline
-                sx={{
-                  fontSize: "0.85rem",
-                  fontWeight: 600,
-                  color: "text.primary",
-                  "& .MuiSelect-select": { py: 0.5, pr: 2 },
-                }}
-                IconComponent={(props) => (
-                  <ArrowForwardIosIcon {...props} style={{ fontSize: 12 }} />
-                )}
-              >
-                <MenuItem value="ordered">Ordered</MenuItem>
-                <MenuItem value="packed">Packed</MenuItem>
-                <MenuItem value="shipped">Shipped</MenuItem>
-                <MenuItem value="delivered">Delivered</MenuItem>
-              </Select>
-            </FormControl>
-          </Stack>
-        </Box>
-      </Paper>
-    );
-  };
 
   return (
     <Box sx={{ bgcolor: BG_COLOR, minHeight: "100vh" }}>
@@ -301,6 +415,7 @@ const AdminOrdersPage = () => {
           justifyContent="space-between"
           alignItems="center"
           flexWrap="wrap"
+          gap={2}
         >
           <Box>
             <Typography
@@ -314,117 +429,65 @@ const AdminOrdersPage = () => {
               Track and manage all customer orders in one place.
             </Typography>
           </Box>
-          <Box sx={{ display: { xs: "none", sm: "block" } }}>
-            <Chip
-              icon={<CalendarTodayIcon sx={{ fontSize: 16 }} />}
-              label={new Date().toLocaleDateString()}
-              sx={{ bgcolor: "white", fontWeight: 600 }}
-            />
-          </Box>
+          <Stack direction="row" spacing={2} alignItems="center">
+            <Box sx={{ display: { xs: "none", sm: "block" } }}>
+              <Chip
+                icon={<CalendarTodayIcon sx={{ fontSize: 16 }} />}
+                label={new Date().toLocaleDateString("en-GB", {
+                  weekday: "long",
+                  day: "numeric",
+                  month: "long",
+                })}
+                sx={{
+                  bgcolor: "white",
+                  fontWeight: 600,
+                  boxShadow: "0 2px 5px rgba(0,0,0,0.05)",
+                }}
+              />
+            </Box>
+            <Tooltip title="Filter Orders (Coming Soon)">
+              <IconButton sx={{ bgcolor: "white" }}>
+                <FilterListIcon />
+              </IconButton>
+            </Tooltip>
+          </Stack>
         </Box>
 
         {!loading && (
           <Grid container spacing={3} mb={5}>
-            {[
-              {
-                title: "Total Orders",
-                value: stats.total,
-                icon: <ShoppingBagIcon />,
-                color: "#1976d2",
-                bg: "#e3f2fd",
-              },
-              {
-                title: "Total Revenue",
-                value: `₦${stats.revenue.toLocaleString()}`,
-                icon: <AttachMoneyIcon />,
-                color: "#2e7d32",
-                bg: "#e8f5e9",
-              },
-              {
-                title: "Active Issues",
-                value: stats.issues,
-                icon: <ReportProblemIcon />,
-                color: "#d32f2f",
-                bg: "#ffebee",
-              },
-            ].map((stat, index) => (
-              <Grid item xs={12} md={4} key={index}>
-                <Card
-                  elevation={0}
-                  sx={{
-                    borderRadius: "16px",
-                    border: "none",
-                    boxShadow: "0px 10px 30px rgba(0,0,0,0.04)",
-                    height: "100%",
-                    transition: "transform 0.2s",
-                    "&:hover": {
-                      transform: "translateY(-4px)",
-                    },
-                  }}
-                >
-                  <CardContent sx={{ p: 3 }}>
-                    <Stack
-                      direction="row"
-                      alignItems="center"
-                      spacing={2}
-                      mb={2}
-                    >
-                      <Avatar
-                        variant="rounded"
-                        sx={{
-                          bgcolor: stat.bg,
-                          color: stat.color,
-                          width: 48,
-                          height: 48,
-                          borderRadius: "12px",
-                        }}
-                      >
-                        {stat.icon}
-                      </Avatar>
-
-                      <Typography
-                        variant="subtitle2"
-                        fontWeight="700"
-                        color="text.secondary"
-                        sx={{
-                          textTransform: "uppercase",
-                          letterSpacing: "1px",
-                        }}
-                      >
-                        {stat.title}
-                      </Typography>
-                    </Stack>
-
-                    <Typography
-                      variant="h4"
-                      fontWeight="800"
-                      sx={{
-                        color: "#0f2a1d",
-                        fontFamily:
-                          "'Roboto', 'Helvetica', 'Arial', sans-serif",
-                        ml: 0.5,
-                      }}
-                    >
-                      {stat.value}
-                    </Typography>
-
-                    <Typography
-                      variant="caption"
-                      color="text.secondary"
-                      sx={{ mt: 1, display: "block", ml: 0.5 }}
-                    >
-                      {index === 0
-                        ? "All time orders"
-                        : index === 1
-                          ? "Total earnings"
-                          : "Requires attention"}
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </Grid>
-            ))}
+            <Grid item xs={12} md={4}>
+              <StatCard
+                title="Total Orders"
+                value={stats.total}
+                icon={<ShoppingBagIcon />}
+                color="#1976d2"
+                bg="#e3f2fd"
+                subtitle="All time orders"
+              />
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <StatCard
+                title="Total Revenue"
+                value={formatCurrency(stats.revenue)}
+                icon={<AttachMoneyIcon />}
+                color="#2e7d32"
+                bg="#e8f5e9"
+                subtitle="Excluding cancelled"
+              />
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <StatCard
+                title="Active Issues"
+                value={stats.issues}
+                icon={<ReportProblemIcon />}
+                color="#d32f2f"
+                bg="#ffebee"
+                subtitle="Requires attention"
+              />
+            </Grid>
           </Grid>
         )}
+
         {loading ? (
           <Box
             display="flex"
@@ -442,9 +505,13 @@ const AdminOrdersPage = () => {
           <>
             {isMobile ? (
               <Box>
-                {orders && orders.length > 0 ? (
+                {orders.length > 0 ? (
                   orders.map((order) => (
-                    <MobileOrderCard key={order._id} order={order} />
+                    <MobileOrderCard
+                      key={order._id}
+                      order={order}
+                      onStatusChange={onStatusChange}
+                    />
                   ))
                 ) : (
                   <EmptyState />
@@ -461,7 +528,7 @@ const AdminOrdersPage = () => {
                 }}
               >
                 <TableContainer>
-                  <Table sx={{ minWidth: 800 }}>
+                  <Table sx={{ minWidth: 900 }}>
                     <TableHead>
                       <TableRow sx={{ bgcolor: "#fafafa" }}>
                         {[
@@ -490,20 +557,24 @@ const AdminOrdersPage = () => {
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {orders && orders.length > 0 ? (
+                      {orders.length > 0 ? (
                         orders.map((order) => {
                           const isIssue =
                             order.orderStatus === "issue_reported";
+                          const isCancelled = order.orderStatus === "cancelled";
+
                           return (
                             <TableRow
                               key={order._id}
                               hover
                               sx={{
-                                "&:last-child td, &:last-child th": {
-                                  border: 0,
-                                },
                                 transition: "all 0.2s",
-                                bgcolor: isIssue ? "#fff5f5" : "inherit",
+                                bgcolor: isIssue
+                                  ? "#fff8e1"
+                                  : isCancelled
+                                    ? "#fafafa"
+                                    : "inherit",
+                                opacity: isCancelled ? 0.6 : 1,
                               }}
                             >
                               <TableCell>
@@ -511,6 +582,12 @@ const AdminOrdersPage = () => {
                                   variant="body2"
                                   fontFamily="monospace"
                                   fontWeight="bold"
+                                  color="text.primary"
+                                  sx={{
+                                    textDecoration: isCancelled
+                                      ? "line-through"
+                                      : "none",
+                                  }}
                                 >
                                   #{order._id.substring(0, 8)}
                                 </Typography>
@@ -524,13 +601,15 @@ const AdminOrdersPage = () => {
                                 >
                                   <Avatar
                                     sx={{
-                                      width: 30,
-                                      height: 30,
-                                      fontSize: "0.8rem",
-                                      bgcolor: PRIMARY_COLOR,
+                                      width: 32,
+                                      height: 32,
+                                      fontSize: "0.85rem",
+                                      bgcolor: isCancelled
+                                        ? "#bdbdbd"
+                                        : PRIMARY_COLOR,
                                     }}
                                   >
-                                    {(order.user?.username || "U")
+                                    {(order.user?.username || "G")
                                       .charAt(0)
                                       .toUpperCase()}
                                   </Avatar>
@@ -545,7 +624,7 @@ const AdminOrdersPage = () => {
                                       variant="caption"
                                       color="text.secondary"
                                     >
-                                      {order.user?.email}
+                                      {order.user?.email || "No Email"}
                                     </Typography>
                                   </Box>
                                 </Stack>
@@ -556,27 +635,26 @@ const AdminOrdersPage = () => {
                                   variant="body2"
                                   color="text.secondary"
                                 >
-                                  {new Date(
-                                    order.createdAt,
-                                  ).toLocaleDateString()}
+                                  {formatDate(order.createdAt)}
                                 </Typography>
                               </TableCell>
 
                               <TableCell>
                                 <Typography fontWeight="700" color="#333">
-                                  ₦
-                                  {(
-                                    order.totalAmount || order.totalPrice
-                                  ).toLocaleString()}
+                                  {formatCurrency(
+                                    order.totalAmount || order.totalPrice,
+                                  )}
                                 </Typography>
                               </TableCell>
 
                               <TableCell>
-                                {renderPaymentStatus(order)}
+                                <RenderPaymentStatus order={order} />
                               </TableCell>
 
                               <TableCell>
-                                {renderOrderStatusBadge(order.orderStatus)}
+                                <RenderOrderStatusBadge
+                                  status={order.orderStatus}
+                                />
                               </TableCell>
 
                               <TableCell>
@@ -590,10 +668,12 @@ const AdminOrdersPage = () => {
                                     onChange={(e) =>
                                       onStatusChange(order._id, e.target.value)
                                     }
+                                    disabled={isCancelled}
                                     sx={{
                                       fontSize: "0.85rem",
                                       bgcolor: "white",
                                       borderRadius: "8px",
+                                      height: 35,
                                       "& .MuiOutlinedInput-notchedOutline": {
                                         borderColor: "#e0e0e0",
                                       },
@@ -601,6 +681,9 @@ const AdminOrdersPage = () => {
                                         {
                                           borderColor: PRIMARY_COLOR,
                                         },
+                                      "&.Mui-disabled": {
+                                        bgcolor: "#f5f5f5",
+                                      },
                                     }}
                                   >
                                     <MenuItem value="ordered">Ordered</MenuItem>
@@ -613,12 +696,16 @@ const AdminOrdersPage = () => {
                                     <MenuItem
                                       value="issue_reported"
                                       disabled
-                                      sx={{
-                                        color: "error.main",
-                                        fontSize: "0.8rem",
-                                      }}
+                                      sx={{ color: "error.main" }}
                                     >
-                                      Reported by User
+                                      Issue Reported
+                                    </MenuItem>
+                                    <MenuItem
+                                      value="cancelled"
+                                      disabled
+                                      sx={{ display: "none" }}
+                                    >
+                                      Cancelled
                                     </MenuItem>
                                   </Select>
                                 </FormControl>
@@ -648,17 +735,5 @@ const AdminOrdersPage = () => {
     </Box>
   );
 };
-
-const EmptyState = () => (
-  <Box py={8} display="flex" flexDirection="column" alignItems="center">
-    <LocalShippingIcon sx={{ fontSize: 60, color: "#e0e0e0", mb: 2 }} />
-    <Typography variant="h6" color="text.secondary" fontWeight="bold">
-      No Orders Found
-    </Typography>
-    <Typography variant="body2" color="text.secondary">
-      When customers place orders, they will appear here.
-    </Typography>
-  </Box>
-);
 
 export default AdminOrdersPage;

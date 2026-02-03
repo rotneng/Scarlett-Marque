@@ -244,3 +244,34 @@ export const reportOrderIssue = (orderId) => {
     }
   };
 };
+
+export const cancelMyOrder = (orderId) => {
+  return async (dispatch) => {
+    try {
+      dispatch({ type: "ORDER_CANCEL_REQUEST" });
+      
+      const res = await axios.put(
+        `${BASE_URL}/order/${orderId}/cancel`,
+        {}, 
+        getAuthConfig()
+      );
+
+      if (res.status === 200) {
+        dispatch({
+          type: "ORDER_CANCEL_SUCCESS",
+          payload: res.data,
+        });
+        
+        dispatch(listMyOrders());
+      }
+    } catch (error) {
+      dispatch({
+        type: "ORDER_CANCEL_FAIL",
+        payload:
+          error.response && error.response.data.message
+            ? error.response.data.message
+            : error.message,
+      });
+    }
+  };
+};

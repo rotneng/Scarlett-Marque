@@ -103,3 +103,16 @@ export const orderUpdateReducer = (state = {}, action) => {
       return state;
   }
 };
+
+export const orderCancelReducer = (state = {}, action) => {
+  switch (action.type) {
+    case "ORDER_CANCEL_REQUEST":
+      return { loading: true };
+    case "ORDER_CANCEL_SUCCESS":
+      return { loading: false, success: true };
+    case "ORDER_CANCEL_FAIL":
+      return { loading: false, error: action.payload };
+    default:
+      return state;
+  }
+};

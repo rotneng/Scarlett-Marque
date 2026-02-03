@@ -18,8 +18,9 @@ import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ShoppingBagOutlinedIcon from "@mui/icons-material/ShoppingBagOutlined";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
 
-import { listMyOrders } from "../../Actions/order.actions";
+import { listMyOrders, cancelMyOrder } from "../../Actions/order.actions";
 import Header from "../header";
 
 const MyOrdersPage = () => {
@@ -27,13 +28,26 @@ const MyOrdersPage = () => {
   const navigate = useNavigate();
 
   const { orders, loading } = useSelector((state) => state.orderMyList);
+  const { success: successCancel } = useSelector(
+    (state) => state.orderCancel || {},
+  );
 
   useEffect(() => {
     dispatch(listMyOrders());
-  }, [dispatch]);
+  }, [dispatch, successCancel]);
 
   const getOrderTotal = (order) => {
     return order.totalAmount || order.totalPrice || order.amount || 0;
+  };
+
+  const handleCancelOrder = (orderId) => {
+    if (
+      window.confirm(
+        "Are you sure you want to cancel this order? This will refund the items to stock.",
+      )
+    ) {
+      dispatch(cancelMyOrder(orderId));
+    }
   };
 
   const getStatusColor = (status) => {
@@ -46,6 +60,7 @@ const MyOrdersPage = () => {
         return "error";
       case "processing":
       case "packed":
+      case "ordered":
         return "warning";
       default:
         return "default";
@@ -198,26 +213,45 @@ const MyOrdersPage = () => {
                         </Typography>
                       </Box>
 
-                      <Button
-                        variant="contained"
-                        size="small"
-                        endIcon={<ArrowForwardIcon />}
-                        onClick={() => navigate(`track-order/${order._id}`)}
-                        sx={{
-                          bgcolor: "#0f2a1d",
-                          color: "#fff",
-                          borderRadius: "8px",
-                          textTransform: "none",
-                          boxShadow: "none",
-                          px: 2,
-                          "&:hover": {
-                            bgcolor: "#1a4d35",
-                            boxShadow: "0 4px 12px rgba(15, 42, 29, 0.2)",
-                          },
-                        }}
-                      >
-                        Details
-                      </Button>
+                      <Stack direction="row" spacing={1}>
+                        {(order.orderStatus === "ordered" ||
+                          order.orderStatus === "packed") && (
+                          <Button
+                            variant="outlined"
+                            color="error"
+                            size="small"
+                            onClick={() => handleCancelOrder(order._id)}
+                            sx={{
+                              borderRadius: "8px",
+                              textTransform: "none",
+                              borderColor: "#d32f2f",
+                            }}
+                          >
+                            Cancel
+                          </Button>
+                        )}
+
+                        <Button
+                          variant="contained"
+                          size="small"
+                          endIcon={<ArrowForwardIcon />}
+                          onClick={() => navigate(`track-order/${order._id}`)}
+                          sx={{
+                            bgcolor: "#0f2a1d",
+                            color: "#fff",
+                            borderRadius: "8px",
+                            textTransform: "none",
+                            boxShadow: "none",
+                            px: 2,
+                            "&:hover": {
+                              bgcolor: "#1a4d35",
+                              boxShadow: "0 4px 12px rgba(15, 42, 29, 0.2)",
+                            },
+                          }}
+                        >
+                          Details
+                        </Button>
+                      </Stack>
                     </Box>
                   </CardContent>
                 </Card>
