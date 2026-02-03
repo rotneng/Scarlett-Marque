@@ -159,7 +159,7 @@ const Homepage = () => {
   };
 
   return (
-    <Box sx={{ bgcolor: "#f1f1f1", minHeight: "100vh" }}>
+    <Box sx={{ bgcolor: "#f1f1f1", minHeight: "100vh", }}>
       <Header searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
 
       {!isAdmin && (
@@ -345,11 +345,11 @@ const Homepage = () => {
         )}
 
         {loading ? (
-          <Box sx={{ display: "flex", justifyContent: "center", py: 5 }}>
+          <Box sx={{ display: "flex", justifyContent: "center", py: 2 }}>
             <CircularProgress sx={{ color: PRIMARY_COLOR }} />
           </Box>
         ) : (
-          <Grid container spacing={4} sx={{ justifyContent: "center" }}>
+          <Grid container spacing={6} sx={{ justifyContent: "center" }}>
             {filteredProducts.length > 0 ? (
               filteredProducts.map((item) => {
                 const currentStock = getStock(item);
@@ -365,7 +365,7 @@ const Homepage = () => {
                         height: "100%",
                         display: "flex",
                         flexDirection: "column",
-                        borderRadius: 1,
+                        borderRadius: 5,
                         cursor: "pointer",
                         bgcolor: "white",
                         transition: "all 0.2s ease",

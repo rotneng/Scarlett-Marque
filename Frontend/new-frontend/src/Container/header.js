@@ -74,7 +74,6 @@ const Header = ({ searchTerm = "", setSearchTerm }) => {
     navigate("/");
   };
 
-  // Helper to get initials
   const getInitials = (name) => {
     if (!name) return "";
     return name.charAt(0).toUpperCase();
@@ -202,7 +201,6 @@ const Header = ({ searchTerm = "", setSearchTerm }) => {
           <Box
             sx={{ display: { xs: "none", md: "flex" }, alignItems: "center" }}
           >
-            {/* Show About ONLY if NOT admin */}
             {!isAdmin && (
               <Button
                 onClick={() => navigate("/about")}
@@ -213,7 +211,6 @@ const Header = ({ searchTerm = "", setSearchTerm }) => {
               </Button>
             )}
 
-            {/* Show Cart ONLY if NOT admin */}
             {!isAdmin && (
               <Button
                 onClick={() => navigate("/cart")}
@@ -243,10 +240,7 @@ const Header = ({ searchTerm = "", setSearchTerm }) => {
             }}
           >
             <Tooltip title={token ? "Account Settings" : "Sign In / Sign Up"}>
-              <IconButton
-                onClick={handleProfileClick}
-                sx={{ ml: 1, p: 0.5 }}
-              >
+              <IconButton onClick={handleProfileClick} sx={{ ml: 1, p: 0.5 }}>
                 {token && user ? (
                   <Avatar
                     sx={{
@@ -287,7 +281,6 @@ const Header = ({ searchTerm = "", setSearchTerm }) => {
               transformOrigin={{ horizontal: "right", vertical: "top" }}
               anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
             >
-              {/* --- LOGGED OUT STATE --- */}
               {!token && (
                 <MenuItem onClick={() => handleNavigateAndClose("/signIn")}>
                   <ListItemIcon>
@@ -306,7 +299,6 @@ const Header = ({ searchTerm = "", setSearchTerm }) => {
                 </MenuItem>
               )}
 
-              {/* --- REGULAR USER STATE --- */}
               {token && !isAdmin && (
                 <MenuItem onClick={() => handleNavigateAndClose("/profile")}>
                   <ListItemIcon>
@@ -327,7 +319,6 @@ const Header = ({ searchTerm = "", setSearchTerm }) => {
                 </MenuItem>
               )}
 
-              {/* --- ADMIN STATE --- */}
               {token && isAdmin && (
                 <MenuItem
                   onClick={() => handleNavigateAndClose("/admin/orders")}
@@ -352,7 +343,6 @@ const Header = ({ searchTerm = "", setSearchTerm }) => {
 
               {token && <Divider />}
 
-              {/* --- LOGOUT --- */}
               {token && (
                 <MenuItem onClick={handleLogout} sx={{ color: "error.main" }}>
                   <ListItemIcon>
