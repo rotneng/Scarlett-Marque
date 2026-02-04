@@ -27,6 +27,7 @@ import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { getAddresses } from "../../Actions/address.actions";
 import { getProducts } from "../../Actions/product.actions";
+import Header from "../../Container/header";
 
 
 const CheckoutPage = () => {
@@ -124,6 +125,7 @@ const CheckoutPage = () => {
 
   return (
     <Box sx={{ bgcolor: "#f4f6f8", minHeight: "100vh", pb: 8 }}>
+      <Header />
       <Container maxWidth="lg">
         <Box sx={{ py: 4, mb: 1, display: "flex", alignItems: "center", gap: 2 }}>
            <IconButton

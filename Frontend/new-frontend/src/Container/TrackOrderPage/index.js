@@ -41,6 +41,7 @@ import PersonIcon from "@mui/icons-material/Person";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import PhoneIcon from "@mui/icons-material/Phone";
 import ReceiptIcon from "@mui/icons-material/Receipt";
+import Header from "../../Container/header";
 
 const generatePublicUrl = (fileName) => {
   if (!fileName) return "";
@@ -170,6 +171,7 @@ const TrackOrderPage = () => {
 
   return (
     <Box sx={{ minHeight: "100vh", bgcolor: "#f8f9fa" }}>
+        <Header />
       <Container maxWidth="lg" sx={{ py: 8 }}>
         <Stack direction="row" alignItems="center" spacing={3} sx={{ mb: 6 }}>
           <IconButton

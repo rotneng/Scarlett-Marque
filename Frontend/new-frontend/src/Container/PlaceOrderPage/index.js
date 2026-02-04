@@ -27,6 +27,7 @@ import LocationOnIcon from "@mui/icons-material/LocationOnOutlined";
 import EditIcon from "@mui/icons-material/EditOutlined";
 import ShoppingBagIcon from "@mui/icons-material/ShoppingBagOutlined";
 import LockIcon from "@mui/icons-material/Lock";
+import Header from "../../Container/header";
 
 import { createOrder } from "../../Actions/order.actions";
 import { orderConstants } from "../../Actions/constant";
@@ -296,28 +297,23 @@ const PlaceOrderPage = () => {
       sx={{
         backgroundColor: "#f8f9fa",
         minHeight: "100vh",
-        py: { xs: 2, md: 4 },
+        // py: { xs: 2, md: 4 },
+        
       }}
     >
-      <Container maxWidth="lg" sx={{ px: { xs: 2, md: 3 }, }}>
-        <Button
-          startIcon={<ArrowBackIcon />}
-          onClick={() => navigate(-1)}
-          sx={{ mb: 2, color: "#666", "&:hover": { color: "#0f2a1d" } }}
-        >
-          Back
-        </Button>
-        <Typography
-          variant="h4"
-          fontWeight="800"
-          sx={{
-            mb: { xs: 2, md: 4 },
-            color: "#0f2a1d",
-            fontSize: { xs: "1.75rem", md: "2.125rem" },
-          }}
-        >
-          Review & Place Order
-        </Typography>
+        <Header />
+      <Container maxWidth="lg" sx={{ px: { xs: 2, md: 3 }, gap: 2, py: 2 }}>
+         <Box sx={{ py: 4, mb: 1, display: "flex", alignItems: "center", gap: 2 }}>
+           <IconButton
+              onClick={() => navigate("/checkout")}
+              sx={{ bgcolor: "white", boxShadow: 1 }}
+            >
+              <ArrowBackIcon />
+            </IconButton>
+            <Typography variant="h4" fontWeight="800" color="#0f2a1d">
+              Review and Place Order
+            </Typography>
+        </Box>
 
         <Grid container spacing={{ xs: 2, md: 4 }} sx={{justifyContent: "center"}}>
           <Grid item xs={12} md={8}>
