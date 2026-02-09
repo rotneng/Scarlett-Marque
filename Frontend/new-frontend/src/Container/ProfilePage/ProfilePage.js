@@ -17,6 +17,8 @@ import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import ShoppingBagIcon from "@mui/icons-material/ShoppingBag";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import EmailIcon from "@mui/icons-material/Email";
+// import PhoneIcon from "@mui/icons-material/Phone";
 
 import Header from "../header";
 
@@ -36,6 +38,9 @@ const ProfilePage = () => {
 
   const isAdmin = user && user.role === "admin";
 
+  // const userPhone =
+  //   user?.phone || user?.phoneNumber || user?.mobile || "No Phone Number";
+
   useEffect(() => {
     if (!userString) {
       navigate("/signIn");
@@ -44,7 +49,7 @@ const ProfilePage = () => {
 
   const handleLogout = () => {
     localStorage.clear();
-    window.location.href = "/signIn";
+    window.location.href = "/"; 
   };
 
   const getInitials = (name) => (name ? name.charAt(0).toUpperCase() : "U");
@@ -97,21 +102,43 @@ const ProfilePage = () => {
                 {user.username}
               </Typography>
 
-              <Typography variant="body2" color="text.secondary" gutterBottom>
-                {user.email}
-              </Typography>
-
               {isAdmin && (
                 <Chip
                   icon={<AdminPanelSettingsIcon fontSize="small" />}
                   label="Administrator"
                   color="primary"
                   size="small"
-                  sx={{ mt: 1, mb: 3, fontWeight: "bold" }}
+                  sx={{ mt: 0.5, mb: 2, fontWeight: "bold" }}
                 />
               )}
 
-              <Divider sx={{ width: "100%", my: 3 }} />
+              <Stack spacing={1.5} width="100%" sx={{ mt: 1, mb: 3 }}>
+                <Box
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="center"
+                  gap={1}
+                  sx={{ color: "text.secondary" }}
+                >
+                  <EmailIcon fontSize="small" />
+                  <Typography variant="body2">
+                    {user.email || "No Email Provided"}
+                  </Typography>
+                </Box>
+
+                {/* <Box
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="center"
+                  gap={1}
+                  sx={{ color: "text.secondary" }}
+                >
+                  <PhoneIcon fontSize="small" />
+                  <Typography variant="body2">{userPhone}</Typography>
+                </Box> */}
+              </Stack>
+
+              <Divider sx={{ width: "100%", mb: 3 }} />
 
               <Button
                 variant="outlined"
@@ -139,6 +166,7 @@ const ProfilePage = () => {
                     onClick={() => navigate("/account/orders")}
                     sx={{
                       p: 3,
+                      height: "100%",
                       borderRadius: "24px",
                       border: "1px solid #eee",
                       cursor: "pointer",
@@ -187,6 +215,7 @@ const ProfilePage = () => {
                     }
                     sx={{
                       p: 3,
+                      height: "100%",
                       borderRadius: "24px",
                       border: "1px solid #eee",
                       cursor: "pointer",

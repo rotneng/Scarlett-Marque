@@ -47,10 +47,19 @@ export const login = (loginData) => {
       );
 
       if (res.status === 200) {
-        const { token, username, role } = res.data;
+        // --- FIX START ---
+        // We capture token separately, and then everything else as 'userData'
+        // This ensures email, phone, _id, etc., are all captured.
+        const { token, user, ...rest } = res.data;
+        
+        // Handle both response structures:
+        // 1. { token, user: { username, email... } }
+        // 2. { token, username, email... }
+        const userToSave = user ? user : rest;
 
         localStorage.setItem("token", token);
-        localStorage.setItem("user", JSON.stringify({ username, role }));
+        localStorage.setItem("user", JSON.stringify(userToSave));
+        // --- FIX END ---
 
         await mergeCart(token);
 
@@ -58,7 +67,7 @@ export const login = (loginData) => {
           type: authConstants.LOGIN_SUCCESS,
           payload: {
             token,
-            user: { username, role },
+            user: userToSave,
           },
         });
       }
