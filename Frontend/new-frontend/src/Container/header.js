@@ -326,7 +326,7 @@ const Header = ({ searchTerm = "", setSearchTerm }) => {
                   <ListItemIcon>
                     <ListAltIcon fontSize="small" />
                   </ListItemIcon>
-                  <Typography variant="body2">Admin Orders</Typography>
+                  <Typography variant="body2">Dashboard</Typography>
                 </MenuItem>
               )}
 
