@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllOrders, updateOrder } from "../../Actions/order.actions";
 import {
@@ -27,6 +27,11 @@ import {
   useMediaQuery,
   IconButton,
   Tooltip,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
 } from "@mui/material";
 
 import ReportProblemIcon from "@mui/icons-material/ReportProblem";
@@ -39,6 +44,11 @@ import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import CancelIcon from "@mui/icons-material/Cancel";
+import VisibilityIcon from "@mui/icons-material/Visibility"; 
+import CloseIcon from "@mui/icons-material/Close";
+import PhoneIcon from "@mui/icons-material/Phone";
+import LocationOnIcon from "@mui/icons-material/LocationOn";
+import EmailIcon from "@mui/icons-material/Email";
 import Header from "../header";
 
 const PRIMARY_COLOR = "#0f2a1d";
@@ -92,6 +102,171 @@ const formatDate = (dateString) => {
     month: "short",
     year: "numeric",
   });
+};
+
+const OrderDetailsDialog = ({ open, onClose, order }) => {
+  if (!order) return null;
+
+  return (
+    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
+      <DialogTitle sx={{ borderBottom: "1px solid #eee", pb: 2 }}>
+        <Box display="flex" justifyContent="space-between" alignItems="center">
+          <Typography variant="h6" fontWeight="bold">
+            Order Details #{order._id.substring(0, 8)}
+          </Typography>
+          <IconButton onClick={onClose}>
+            <CloseIcon />
+          </IconButton>
+        </Box>
+      </DialogTitle>
+      <DialogContent sx={{ pt: 3, bgcolor: "#fafafa" }}>
+        <Grid container spacing={3}>
+          <Grid item xs={12} md={6}>
+            <Paper elevation={0} sx={{ p: 3, height: "100%", borderRadius: 3 }}>
+              <Typography
+                variant="subtitle2"
+                fontWeight="bold"
+                textTransform="uppercase"
+                color="text.secondary"
+                mb={2}
+              >
+                Customer Information
+              </Typography>
+
+              <Stack spacing={2}>
+                <Box display="flex" alignItems="center" gap={2}>
+                  <Avatar sx={{ bgcolor: PRIMARY_COLOR }}>
+                    <PersonIcon />
+                  </Avatar>
+                  <Box>
+                    <Typography variant="subtitle1" fontWeight="bold">
+                      {order.user?.username || order.user?.name || "Guest"}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      User ID: {order.user?._id || "N/A"}
+                    </Typography>
+                  </Box>
+                </Box>
+
+                <Divider />
+
+                <Box display="flex" alignItems="flex-start" gap={2}>
+                  <EmailIcon color="action" fontSize="small" sx={{ mt: 0.5 }} />
+                  <Typography variant="body2">
+                    {order.user?.email || "No Email Provided"}
+                  </Typography>
+                </Box>
+
+                <Box display="flex" alignItems="flex-start" gap={2}>
+                  <PhoneIcon color="action" fontSize="small" sx={{ mt: 0.5 }} />
+                  <Typography variant="body2">
+                    {order.shippingAddress?.phone ||
+                      order.shippingAddress?.phoneNumber ||
+                      "No Phone Provided"}
+                  </Typography>
+                </Box>
+
+                <Box display="flex" alignItems="flex-start" gap={2}>
+                  <LocationOnIcon
+                    color="action"
+                    fontSize="small"
+                    sx={{ mt: 0.5 }}
+                  />
+                  <Box>
+                    <Typography variant="body2" fontWeight="bold">
+                      Shipping Address:
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {order.shippingAddress?.address},{" "}
+                      {order.shippingAddress?.city}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {order.shippingAddress?.postalCode},{" "}
+                      {order.shippingAddress?.country}
+                    </Typography>
+                  </Box>
+                </Box>
+              </Stack>
+            </Paper>
+          </Grid>
+
+          <Grid item xs={12} md={6}>
+            <Paper elevation={0} sx={{ p: 3, height: "100%", borderRadius: 3 }}>
+              <Typography
+                variant="subtitle2"
+                fontWeight="bold"
+                textTransform="uppercase"
+                color="text.secondary"
+                mb={2}
+              >
+                Order Summary
+              </Typography>
+
+              <Stack spacing={2}>
+                {order.orderItems?.map((item, index) => (
+                  <Box
+                    key={index}
+                    display="flex"
+                    justifyContent="space-between"
+                    alignItems="center"
+                  >
+                    <Box display="flex" alignItems="center" gap={2}>
+                      <Avatar
+                        variant="rounded"
+                        src={item.image}
+                        alt={item.name}
+                        sx={{ width: 50, height: 50 }}
+                      >
+                        <ShoppingBagIcon />
+                      </Avatar>
+                      <Box>
+                        <Typography
+                          variant="body2"
+                          fontWeight="bold"
+                          sx={{
+                            maxWidth: 150,
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            whiteSpace: "nowrap",
+                          }}
+                        >
+                          {item.name}
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          Qty: {item.qty || item.quantity}
+                        </Typography>
+                      </Box>
+                    </Box>
+                    <Typography variant="body2" fontWeight="bold">
+                      {formatCurrency(item.price * (item.qty || item.quantity))}
+                    </Typography>
+                  </Box>
+                ))}
+
+                <Divider sx={{ my: 2 }} />
+
+                <Box display="flex" justifyContent="space-between">
+                  <Typography variant="body1">Total</Typography>
+                  <Typography
+                    variant="h6"
+                    fontWeight="bold"
+                    color={PRIMARY_COLOR}
+                  >
+                    {formatCurrency(order.totalAmount || order.totalPrice)}
+                  </Typography>
+                </Box>
+              </Stack>
+            </Paper>
+          </Grid>
+        </Grid>
+      </DialogContent>
+      <DialogActions sx={{ p: 2 }}>
+        <Button onClick={onClose} variant="outlined" color="inherit">
+          Close
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
 };
 
 const RenderPaymentStatus = ({ order }) => {
@@ -167,7 +342,7 @@ const EmptyState = () => (
   </Box>
 );
 
-const MobileOrderCard = ({ order, onStatusChange }) => {
+const MobileOrderCard = ({ order, onStatusChange, onViewDetails }) => {
   const isIssue = order.orderStatus === "issue_reported";
   const isCancelled = order.orderStatus === "cancelled";
   const statusStyle = getStatusStyle(order.orderStatus);
@@ -277,32 +452,43 @@ const MobileOrderCard = ({ order, onStatusChange }) => {
       >
         <RenderOrderStatusBadge status={order.orderStatus} />
 
-        <FormControl size="small" sx={{ minWidth: 120 }}>
-          <Select
-            value={order.orderStatus}
-            onChange={(e) => onStatusChange(order._id, e.target.value)}
-            disabled={isCancelled}
-            variant="standard"
-            disableUnderline
+        <Stack direction="row" spacing={1}>
+          <IconButton
+            size="small"
+            onClick={() => onViewDetails(order)}
             sx={{
-              fontSize: "0.85rem",
-              fontWeight: 600,
-              color: "text.primary",
-              "& .MuiSelect-select": { py: 0.5, pr: 2 },
+              bgcolor: "white",
+              border: "1px solid #e0e0e0",
+              borderRadius: "8px",
             }}
-            IconComponent={(props) => (
-              <ArrowForwardIosIcon {...props} style={{ fontSize: 12 }} />
-            )}
           >
-            <MenuItem value="ordered">Ordered</MenuItem>
-            <MenuItem value="packed">Packed</MenuItem>
-            <MenuItem value="shipped">Shipped</MenuItem>
-            <MenuItem value="delivered">Delivered</MenuItem>
-            <MenuItem value="cancelled" sx={{ display: "none" }}>
-              Cancelled
-            </MenuItem>
-          </Select>
-        </FormControl>
+            <VisibilityIcon fontSize="small" color="primary" />
+          </IconButton>
+
+          <FormControl size="small" sx={{ minWidth: 120 }}>
+            <Select
+              value={order.orderStatus}
+              onChange={(e) => onStatusChange(order._id, e.target.value)}
+              disabled={isCancelled}
+              variant="standard"
+              disableUnderline
+              sx={{
+                fontSize: "0.85rem",
+                fontWeight: 600,
+                color: "text.primary",
+                "& .MuiSelect-select": { py: 0.5, pr: 2 },
+              }}
+              IconComponent={(props) => (
+                <ArrowForwardIosIcon {...props} style={{ fontSize: 12 }} />
+              )}
+            >
+              <MenuItem value="ordered">Ordered</MenuItem>
+              <MenuItem value="packed">Packed</MenuItem>
+              <MenuItem value="shipped">Shipped</MenuItem>
+              <MenuItem value="delivered">Delivered</MenuItem>
+            </Select>
+          </FormControl>
+        </Stack>
       </Box>
     </Paper>
   );
@@ -375,6 +561,9 @@ const AdminOrdersPage = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
+  const [openDetails, setOpenDetails] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState(null);
+
   const { orders = [], loading } = useSelector(
     (state) => state.orderList || {},
   );
@@ -389,6 +578,16 @@ const AdminOrdersPage = () => {
       type: newStatus,
     };
     dispatch(updateOrder(payload));
+  };
+
+  const handleOpenDetails = (order) => {
+    setSelectedOrder(order);
+    setOpenDetails(true);
+  };
+
+  const handleCloseDetails = () => {
+    setOpenDetails(false);
+    setTimeout(() => setSelectedOrder(null), 200);
   };
 
   const stats = useMemo(() => {
@@ -407,6 +606,12 @@ const AdminOrdersPage = () => {
   return (
     <Box sx={{ bgcolor: BG_COLOR, minHeight: "100vh" }}>
       <Header />
+
+      <OrderDetailsDialog
+        open={openDetails}
+        onClose={handleCloseDetails}
+        order={selectedOrder}
+      />
 
       <Container maxWidth="xl" sx={{ pt: 4, pb: 8 }}>
         <Box
@@ -511,6 +716,7 @@ const AdminOrdersPage = () => {
                       key={order._id}
                       order={order}
                       onStatusChange={onStatusChange}
+                      onViewDetails={handleOpenDetails}
                     />
                   ))
                 ) : (
@@ -658,57 +864,79 @@ const AdminOrdersPage = () => {
                               </TableCell>
 
                               <TableCell>
-                                <FormControl
-                                  size="small"
-                                  fullWidth
-                                  sx={{ maxWidth: 140 }}
+                                <Stack
+                                  direction="row"
+                                  spacing={1}
+                                  alignItems="center"
                                 >
-                                  <Select
-                                    value={order.orderStatus}
-                                    onChange={(e) =>
-                                      onStatusChange(order._id, e.target.value)
-                                    }
-                                    disabled={isCancelled}
-                                    sx={{
-                                      fontSize: "0.85rem",
-                                      bgcolor: "white",
-                                      borderRadius: "8px",
-                                      height: 35,
-                                      "& .MuiOutlinedInput-notchedOutline": {
-                                        borderColor: "#e0e0e0",
-                                      },
-                                      "&:hover .MuiOutlinedInput-notchedOutline":
-                                        {
-                                          borderColor: PRIMARY_COLOR,
-                                        },
-                                      "&.Mui-disabled": {
+                                  <Tooltip title="View Order Details">
+                                    <IconButton
+                                      onClick={() => handleOpenDetails(order)}
+                                      size="small"
+                                      sx={{
                                         bgcolor: "#f5f5f5",
-                                      },
-                                    }}
+                                        "&:hover": { bgcolor: "#e0e0e0" },
+                                      }}
+                                    >
+                                      <VisibilityIcon
+                                        fontSize="small"
+                                        color="primary"
+                                      />
+                                    </IconButton>
+                                  </Tooltip>
+
+                                  <FormControl
+                                    size="small"
+                                    fullWidth
+                                    sx={{ maxWidth: 140 }}
                                   >
-                                    <MenuItem value="ordered">Ordered</MenuItem>
-                                    <MenuItem value="packed">Packed</MenuItem>
-                                    <MenuItem value="shipped">Shipped</MenuItem>
-                                    <MenuItem value="delivered">
-                                      Delivered
-                                    </MenuItem>
-                                    <Divider />
-                                    <MenuItem
-                                      value="issue_reported"
-                                      disabled
-                                      sx={{ color: "error.main" }}
+                                    <Select
+                                      value={order.orderStatus}
+                                      onChange={(e) =>
+                                        onStatusChange(
+                                          order._id,
+                                          e.target.value,
+                                        )
+                                      }
+                                      disabled={isCancelled}
+                                      sx={{
+                                        fontSize: "0.85rem",
+                                        bgcolor: "white",
+                                        borderRadius: "8px",
+                                        height: 35,
+                                        "& .MuiOutlinedInput-notchedOutline": {
+                                          borderColor: "#e0e0e0",
+                                        },
+                                        "&:hover .MuiOutlinedInput-notchedOutline":
+                                          {
+                                            borderColor: PRIMARY_COLOR,
+                                          },
+                                        "&.Mui-disabled": {
+                                          bgcolor: "#f5f5f5",
+                                        },
+                                      }}
                                     >
-                                      Issue Reported
-                                    </MenuItem>
-                                    <MenuItem
-                                      value="cancelled"
-                                      disabled
-                                      sx={{ display: "none" }}
-                                    >
-                                      Cancelled
-                                    </MenuItem>
-                                  </Select>
-                                </FormControl>
+                                      <MenuItem value="ordered">
+                                        Ordered
+                                      </MenuItem>
+                                      <MenuItem value="packed">Packed</MenuItem>
+                                      <MenuItem value="shipped">
+                                        Shipped
+                                      </MenuItem>
+                                      <MenuItem value="delivered">
+                                        Delivered
+                                      </MenuItem>
+                                      <Divider />
+                                      <MenuItem
+                                        value="issue_reported"
+                                        disabled
+                                        sx={{ color: "error.main" }}
+                                      >
+                                        Issue Reported
+                                      </MenuItem>
+                                    </Select>
+                                  </FormControl>
+                                </Stack>
                               </TableCell>
                             </TableRow>
                           );
